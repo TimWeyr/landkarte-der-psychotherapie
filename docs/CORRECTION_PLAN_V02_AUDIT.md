@@ -2,7 +2,7 @@
 
 > **Dokumentenversion:** 2.1  
 > **Projekt:** Landkarte der Psychotherapie  
-> **Basis-Commit:** `8006cc43892208238eaae461715e7a9f1bba417b`  
+> **Basis-Commit (V0.2 Release):** `8006cc43892208238eaae461715e7a9f1bba417b`  
 > **Plan-Vorgänger-Commit (V2.0):** `ce8599c`  
 > **Status:** Verbindlicher Korrekturplan zur formalen Freigabe (Stopppunkt vor Implementierung)  
 > **Regel:** In dieser Phase werden **keine Programmdateien verändert**.
@@ -120,13 +120,13 @@ Findet `validateRelease.ts` erreichbare Claims mit `reviewStatus === 'draft'` od
     peerReviewed: true
   }
   ```
-* **Eng begrenzter Claim in `claims.ts` (ohne unzulässige Verallgemeinerung):**
+* **Eng begrenzter Claim in `claims.ts` (ohne pauschale Verallgemeinerung):**
   ```typescript
   {
     id: 'claim_therapist_characteristics_null_finding',
     type: 'association',
     statement: 'Die 38 in dieser Untersuchung erhobenen Vorabmerkmale von Therapeutinnen und Therapeuten zeigten weitgehend keine statistische Vorhersagekraft für die Behandlungsergebnisse der untersuchten Patientinnen und Patienten.',
-    publicExplanation: 'In einer großangelegten, präregistrierten Analyse mit 97 Therapeutinnen/Therapeuten und 6.152 Patientinnen/Patienten sagten die 38 multimodalen Vorab-Merkmale (Persönlichkeit, Bindungsstil, soziale Fertigkeiten) das Therapieergebnis kaum vorher (Goldberg et al., 2026).',
+    publicExplanation: 'In einer großangelegten, präregistrierten Analyse mit 97 Therapeutinnen/Therapeuten und 6.152 Patientinnen/Patienten sagten die 38 multimodalen Vorab-Merkmale (Persönlichkeit, Bindungsstil, soziale Fertigkeiten) das Therapieergebnis kaum vorher (Goldberg et al., 2026, S. 1–18, Tabellen 2 & 3).',
     citations: [
       {
         sourceId: 'src_goldberg_2026_therapist_characteristics',
@@ -137,7 +137,7 @@ Findet `validateRelease.ts` erreichbare Claims mit `reviewStatus === 'draft'` od
     ],
     evidenceLevel: 'limited',
     reviewStatus: 'draft',
-    limitations: 'Untersuchte ausschließlich 38 statische Merkmale vor Therapiebeginn; keine Aussage über dynamische Prozessmerkmale oder andere Matching-Konzepte (z. B. Präferenz- oder Problem-Matching).'
+    limitations: 'Untersuchte ausschließlich die 38 statischen Merkmale vor Therapiebeginn; keine Aussage über dynamische Prozessmerkmale oder andere Matching-Konzepte (z. B. Präferenz- oder Problem-Matching).'
   }
   ```
 * **Korrektur von `claim_fit_collaboration_dynamic`:**
@@ -238,18 +238,20 @@ Findet `validateRelease.ts` erreichbare Claims mit `reviewStatus === 'draft'` od
   * `jurisdiction`: `'DE'`
 * **KBV Quellen (`sources.ts`):**
   * `src_kbv_psychotherapie`:
+    * `title`: *„Kassenärztliche Bundesvereinigung: Psychotherapeutische Versorgung“*
     * `url`: `'https://www.kbv.de/psychotherapie'`
     * `jurisdiction`: `'DE'`, `lastCheckedAt`: `'2026-09-03'`
   * `src_kbv_terminvermittlung`:
+    * `title`: *„Kassenärztliche Bundesvereinigung: Terminvermittlung über 116 117“*
     * `url`: `'https://www.kbv.de/praxis/praxisfuehrung/terminvermittlung'`
     * `jurisdiction`: `'DE'`, `lastCheckedAt`: `'2026-09-03'`
-* **Präzise Neufassung von `claim_care_funding_paths` (§ 13 Abs. 3 SGB V):**
+* **Wörtlich und rechtlich präzise Neufassung von `claim_care_funding_paths` (§ 13 Abs. 3 SGB V):**
   ```typescript
   {
     id: 'claim_care_funding_paths',
     type: 'care-fact',
-    statement: 'Gesetzlich Versicherte können unter den engen Voraussetzungen des § 13 Abs. 3 SGB V eine Kostenerstattung für eine selbstbeschaffte psychotherapeutische Behandlung erhalten.',
-    publicExplanation: 'Das Gesetz sieht zwei getrennte Fälle vor: (1) Eine unaufschiebbare Leistung konnte von der Krankenkasse nicht rechtzeitig erbracht werden, oder (2) eine Leistung wurde zu Unrecht abgelehnt. Es werden die tatsächlich entstandenen Kosten erstattet, soweit die Leistung notwendig war und bei Psychotherapeuten die Voraussetzungen des § 95c SGB V (Approbation, Fachkunde) erfüllt sind.',
+    statement: 'Gesetzlich Versicherte haben nach § 13 Abs. 3 Satz 1 SGB V Anspruch auf Erstattung tatsächlich entstandener Kosten für eine selbstbeschaffte notwendige Leistung.',
+    publicExplanation: 'Das Gesetz sieht zwei getrennte Alternativen vor: (1) Die Krankenkasse konnte eine unaufschiebbare Leistung nicht rechtzeitig erbringen, oder (2) eine Leistung wurde zu Unrecht abgelehnt. Die Kostenerstattung umfasst die tatsächlich entstandenen Kosten der notwendigen Leistung; bei psychotherapeutischen Leistungen müssen die behandelnden Personen die Voraussetzungen des § 95c SGB V (Approbation, Fachkunde) erfüllen.',
     citations: [
       {
         sourceId: 'src_sgb5_paragraph13',
@@ -259,7 +261,7 @@ Findet `validateRelease.ts` erreichbare Claims mit `reviewStatus === 'draft'` od
     ],
     evidenceLevel: 'not-applicable',
     reviewStatus: 'draft',
-    limitations: 'Vorherige Antragstellung und schriftlicher Ablehnungsbescheid sind Voraussetzung bei Alternative 2; bei unaufschiebbaren Notfällen (Alt. 1) gelten gesonderte Nachweispflichten des Systemversagens.'
+    limitations: 'Vorherige Antragstellung und schriftlicher Ablehnungsbescheid sind Voraussetzung bei Alternative 2; bei akuten unaufschiebbaren Notfällen (Alternative 1) greift der Grundsatz der Systemversagens-Kostenerstattung ohne vorherige Wartepflicht auf einen Ablehnungsbescheid.'
   }
   ```
 
@@ -268,7 +270,7 @@ Findet `validateRelease.ts` erreichbare Claims mit `reviewStatus === 'draft'` od
 
 ### 4.4 Konkrete automatisierte Akzeptanztests
 * Test prüft, dass alle Quellen mit `kind: 'official'` gültige `url`, `jurisdiction: 'DE'` und ein ISO-8601-Datumsformat in `lastCheckedAt` besitzen (keine zukünftigen Daten).
-* Test validiert, dass `claim_care_funding_paths` beide Alternativen des § 13 Abs. 3 Satz 1 SGB V abbildet.
+* Test validiert, dass `claim_care_funding_paths` beide Alternativen des § 13 Abs. 3 Satz 1 SGB V korrekt getrennt abbildet und § 95c SGB V nennt.
 
 ### 4.5 Erwartete Kommando-Ausgaben
 * `npm test`: **Exit 0**.
@@ -295,8 +297,8 @@ Findet `validateRelease.ts` erreichbare Claims mit `reviewStatus === 'draft'` od
   export type RelationType =
     | 'evokes-need'      // experience -> need
     | 'addresses-need'   // need -> working-mode
-    | 'implements'       // intervention -> working-mode / process -> working-mode
-    | 'acts-via'         // process -> intervention
+    | 'implements'       // process -> intervention
+    | 'acts-via'         // working-mode -> process
     | 'belongs-to'       // intervention -> approach
     | 'examines-fit'     // working-mode -> collaboration / collaboration -> alliance
     | 'explores-aspect';
@@ -304,9 +306,9 @@ Findet `validateRelease.ts` erreichbare Claims mit `reviewStatus === 'draft'` od
 
 * **Vollständige Kette (Beispiel Werkstattpfad) mit konkreten IDs und stützenden Claims:**
   1. `node_exp_constant_rumination` (Erleben)
-     → `rel_rumination_evokes_coping` (`evokes-need`, Claim: `claim_theory_rumination_coping`)
+     → `rel_rumination_evokes_coping` (`evokes-need`, Claim: `claim_action_oriented_rumination`)
   2. `node_need_structure_coping` (Bedürfnis: Wunsch nach konkreter Handlungsfähigkeit)
-     → `rel_need_addresses_action` (`addresses-need`, Claim: `claim_theory_rumination_coping`)
+     → `rel_need_addresses_action` (`addresses-need`, Claim: `claim_action_oriented_rumination`)
   3. `node_wm_concrete_action` (Arbeitsweise: Konkrete Strategien & Handlungen)
      → `rel_action_acts_via_activation` (`acts-via`, Claim: `claim_action_oriented_rumination`)
   4. `node_proc_behavioral_activation` (Prozess: Verhaltensaktivierung)
@@ -314,7 +316,7 @@ Findet `validateRelease.ts` erreichbare Claims mit `reviewStatus === 'draft'` od
   5. `node_tech_behavioral_experiment` (Intervention: Verhaltensexperimente)
      → `rel_exp_to_cbt` (`belongs-to`, Claim: `claim_gba_guidelines`)
   6. `node_app_cbt` (Ansatz: KVT)
-     *Zusätzlich:* `node_tech_chair_work` → `rel_chair_to_humanistic` (`belongs-to`) → `node_app_humanistic`; `node_tech_systemic_tasks` → `rel_tasks_to_systemic` (`belongs-to`) → `node_app_systemic`
+     *Zusätzlich:* `node_tech_chair_work` → `rel_chair_to_humanistic` (`belongs-to`, Claim: `claim_gba_guidelines`) → `node_app_humanistic`; `node_tech_systemic_tasks` → `rel_tasks_to_systemic` (`belongs-to`, Claim: `claim_gba_guidelines`) → `node_app_systemic`
   7. `node_wm_concrete_action` → `rel_action_to_fit` (`examines-fit`, Claim: `claim_fit_collaboration_dynamic`)
   8. `node_collab_fit_examination` (Zusammenarbeit: Gemeinsame Passungsprüfung im Erstgespräch)
      → `rel_fit_to_alliance` (`examines-fit`, Claim: `claim_therapeutic_alliance`)
@@ -330,7 +332,7 @@ Findet `validateRelease.ts` erreichbare Claims mit `reviewStatus === 'draft'` od
   * `loc_teaser_body`: `['node_wm_body_emotion']`
 
 * **Verhalten beim Anklicken der Optionen 2–5:**
-  * `bookmarkId` wird bei Optionen 2–5 **vollständig aus dem Interface gelöscht** (nicht als `undefined` deklariert; `bookmarkId?: string` ist optional).
+  * `bookmarkId` wird bei Optionen 2–5 **vollständig aus dem Datenobjekt gelöscht** (nicht als `undefined` deklariert; Interface `bookmarkId?: string` ist optional).
   * Klick auf Optionen 2–5 hebt keine isolierten Schul-Orte hervor, sondern öffnet ein dezent gestaltetes Informationsbanner:
     *„🧭 Erkundungsperspektive: [Label] – Schauplätze in Entwicklung. Entdecke vorerst die Werkstatt der Erprobung für handlungsorientierte Schritte.“*
 
