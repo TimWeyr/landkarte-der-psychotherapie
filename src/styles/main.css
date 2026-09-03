@@ -1,0 +1,366 @@
+:root {
+  /* Cartographic & Storybook Theme Tokens */
+  --bg-parchment: #f6f1e8;
+  --bg-parchment-deep: #ede4d3;
+  --bg-card: #fffdf8;
+  --bg-card-translucent: rgba(255, 253, 248, 0.94);
+  
+  --ink-primary: #2d261e;
+  --ink-secondary: #5a5043;
+  --ink-muted: #877a6a;
+  
+  --border-parchment: #dcd0bc;
+  --border-dark: #8c7657;
+  
+  --accent-gold: #c68a35;
+  --accent-gold-hover: #b07525;
+  --accent-gold-light: #fbeedb;
+  
+  --accent-terracotta: #b25838;
+  --accent-terracotta-light: #faece6;
+  
+  --accent-sage: #50755a;
+  --accent-sage-light: #eaf1ec;
+  
+  --accent-slate: #446473;
+  --accent-slate-light: #e6eef2;
+  
+  --shadow-sm: 0 2px 6px rgba(45, 38, 30, 0.08);
+  --shadow-md: 0 6px 16px rgba(45, 38, 30, 0.12);
+  --shadow-lg: 0 12px 32px rgba(45, 38, 30, 0.18);
+  
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-pill: 9999px;
+  
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-serif: "Georgia", "Cambria", "Times New Roman", serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-parchment);
+  color: var(--ink-primary);
+  line-height: 1.5;
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#app {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Typography Utilities */
+h1, h2, h3, h4 {
+  font-family: var(--font-serif);
+  color: var(--ink-primary);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* Button Styles */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 18px;
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: var(--accent-gold);
+  color: #ffffff;
+  border-color: #a87224;
+  box-shadow: 0 2px 8px rgba(198, 138, 53, 0.3);
+}
+
+.btn-primary:hover {
+  background: var(--accent-gold-hover);
+  box-shadow: 0 4px 12px rgba(198, 138, 53, 0.4);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: var(--bg-card);
+  color: var(--ink-primary);
+  border-color: var(--border-parchment);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-secondary:hover {
+  background: #ffffff;
+  border-color: var(--border-dark);
+  color: var(--ink-primary);
+  transform: translateY(-1px);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--ink-secondary);
+}
+
+.btn-ghost:hover {
+  background: rgba(45, 38, 30, 0.06);
+  color: var(--ink-primary);
+}
+
+.btn-icon {
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border-radius: var(--radius-pill);
+}
+
+/* Floating HUD Navigation */
+.app-header {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.header-left, .header-right {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-badge {
+  background: var(--bg-card-translucent);
+  border: 1px solid var(--border-dark);
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.brand-badge.clickable {
+  cursor: pointer;
+}
+
+.brand-badge.clickable:hover {
+  background: #ffffff;
+  border-color: var(--accent-gold);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+
+.brand-title {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--ink-primary);
+}
+
+.brand-subtitle {
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+  border-left: 1px solid var(--border-parchment);
+  padding-left: 8px;
+}
+
+/* Unified Breadcrumb in Brand Badge */
+.breadcrumb-btn {
+  background: transparent;
+  border: none;
+  color: var(--accent-gold-hover);
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.15s ease;
+}
+
+.breadcrumb-btn:hover {
+  background: var(--accent-gold-light);
+  color: var(--ink-primary);
+}
+
+.breadcrumb-separator {
+  color: var(--ink-muted);
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+.breadcrumb-current {
+  color: var(--ink-primary);
+  font-weight: 700;
+  font-family: var(--font-serif);
+  font-size: 0.95rem;
+  padding: 4px 6px;
+}
+
+/* Scene Compass Back Button (Bottom Right) */
+.btn-scene-back-compass {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  background: var(--bg-card-translucent);
+  border: 2px solid var(--accent-gold);
+  color: var(--ink-primary);
+  padding: 12px 20px;
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-lg);
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  z-index: 70;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.btn-scene-back-compass:hover {
+  background: #ffffff;
+  border-color: var(--accent-gold-hover);
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 12px 28px rgba(198, 138, 53, 0.4);
+}
+
+.btn-scene-back-compass svg {
+  animation: compassSpin 8s infinite linear;
+}
+
+@keyframes compassSpin {
+  0% { transform: rotate(0deg); }
+  50% { transform: rotate(15deg); }
+  100% { transform: rotate(0deg); }
+}
+
+/* Backpack Toggle Button */
+.btn-backpack {
+  position: relative;
+  background: var(--bg-card-translucent);
+  border: 1px solid var(--border-dark);
+  color: var(--ink-primary);
+  padding: 10px 18px;
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-md);
+  font-weight: 600;
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-backpack:hover {
+  background: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--accent-gold);
+}
+
+.backpack-badge {
+  background: var(--accent-terracotta);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: var(--radius-pill);
+  min-width: 20px;
+  text-align: center;
+}
+
+/* Modal Backdrop */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(30, 24, 18, 0.65);
+  backdrop-filter: blur(4px);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.modal-backdrop.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Toast Notifications */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.toast {
+  background: var(--ink-primary);
+  color: var(--bg-parchment);
+  padding: 12px 20px;
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-lg);
+  font-size: 0.9rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--accent-gold);
+  animation: toastSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes toastSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

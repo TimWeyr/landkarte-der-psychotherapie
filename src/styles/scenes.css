@@ -1,0 +1,253 @@
+/* Point-and-Click Scene Container */
+.scene-view-container {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: #1a1612;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  z-index: 50;
+  animation: sceneFadeIn 0.35s ease-out;
+}
+
+@keyframes sceneFadeIn {
+  from { opacity: 0; transform: scale(1.02); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.scene-viewport {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-width: 1920px;
+  max-height: 1080px;
+  aspect-ratio: 16 / 9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.scene-background {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Scene HUD Header */
+.scene-hud {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 60;
+  pointer-events: none;
+}
+
+.scene-hud > * {
+  pointer-events: auto;
+}
+
+.scene-title-badge {
+  background: var(--bg-card-translucent);
+  border: 1px solid var(--border-dark);
+  padding: 8px 18px;
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(8px);
+}
+
+.scene-title {
+  font-size: 1.1rem;
+  font-family: var(--font-serif);
+  color: var(--ink-primary);
+}
+
+.scene-subtitle {
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+}
+
+/* Hotspot Interactive Markers */
+.scene-hotspots-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.hotspot-marker {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: transparent;
+  border: none;
+  padding: 0;
+  outline: none;
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.hotspot-pin {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 253, 248, 0.55);
+  border: 2px solid var(--accent-gold);
+  color: var(--ink-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(45, 38, 30, 0.25), inset 0 1px 2px rgba(255, 255, 255, 0.6);
+  position: relative;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.hotspot-pin svg {
+  width: 20px;
+  height: 20px;
+  stroke: var(--accent-gold-hover);
+  transition: transform 0.2s ease, stroke 0.2s ease;
+}
+
+/* 1. Unvisited Hotspot: Pulsing Glow Ring */
+.hotspot-marker.hotspot-unvisited .hotspot-pin::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: var(--radius-pill);
+  border: 2px solid var(--accent-gold);
+  opacity: 0.85;
+  animation: hotspotPulse 2.2s infinite ease-out;
+}
+
+@keyframes hotspotPulse {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.9;
+  }
+  70% {
+    transform: scale(1.45);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.45);
+    opacity: 0;
+  }
+}
+
+/* 2. Visited Hotspot: Calm, Settled State */
+.hotspot-marker.hotspot-visited .hotspot-pin {
+  background: rgba(237, 228, 211, 0.5);
+  border-color: rgba(198, 138, 53, 0.65);
+  box-shadow: 0 2px 8px rgba(45, 38, 30, 0.15);
+}
+
+.hotspot-marker.hotspot-visited .hotspot-pin svg {
+  stroke: var(--ink-secondary);
+  opacity: 0.85;
+}
+
+/* 3. Completed Hotspot Badge (✓) */
+.hotspot-check-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--radius-pill);
+  background: var(--accent-sage);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  border: 1.5px solid #ffffff;
+}
+
+/* Hover & Focus Interactions */
+.hotspot-marker:hover .hotspot-pin,
+.hotspot-marker:focus-visible .hotspot-pin {
+  transform: scale(1.18);
+  background: rgba(255, 255, 255, 0.95);
+  border-color: var(--accent-gold-hover);
+  box-shadow: 0 6px 24px rgba(198, 138, 53, 0.5), inset 0 1px 3px #ffffff;
+}
+
+.hotspot-marker:hover .hotspot-pin svg,
+.hotspot-marker:focus-visible .hotspot-pin svg {
+  stroke: var(--accent-gold-hover);
+  transform: scale(1.08);
+}
+
+/* Diegetic Floating Label (Revealed on Hover / Focus / Tap) */
+.hotspot-label {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  background: var(--bg-card-translucent);
+  border: 1px solid var(--border-dark);
+  color: var(--ink-primary);
+  font-size: 0.82rem;
+  font-weight: 700;
+  font-family: var(--font-sans);
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(6px) scale(0.95);
+  transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1), transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 20;
+}
+
+.hotspot-label::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px 5px 0;
+  border-style: solid;
+  border-color: var(--border-dark) transparent transparent transparent;
+}
+
+.hotspot-marker:hover .hotspot-label,
+.hotspot-marker:focus-visible .hotspot-label {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* Touch hint bar at bottom */
+.scene-bottom-bar {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-card-translucent);
+  border: 1px solid var(--border-parchment);
+  border-radius: var(--radius-pill);
+  padding: 8px 20px;
+  font-size: 0.85rem;
+  color: var(--ink-secondary);
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(8px);
+  z-index: 60;
+  pointer-events: none;
+}

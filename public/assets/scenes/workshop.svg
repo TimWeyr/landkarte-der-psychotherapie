@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgWall" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3d342a"/>
+      <stop offset="60%" stop-color="#2a231b"/>
+      <stop offset="100%" stop-color="#1c1611"/>
+    </linearGradient>
+    <linearGradient id="floorGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#4a3b2c"/>
+      <stop offset="100%" stop-color="#2c2117"/>
+    </linearGradient>
+    <linearGradient id="windowLight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffe8a3" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#d4af37" stop-opacity="0.02"/>
+    </linearGradient>
+    <linearGradient id="tableWood" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#8a5a36"/>
+      <stop offset="50%" stop-color="#a67247"/>
+      <stop offset="100%" stop-color="#734928"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background Wall -->
+  <rect width="1920" height="750" fill="url(#bgWall)"/>
+
+  <!-- Wooden Floor -->
+  <polygon points="0,750 1920,750 1920,1080 0,1080" fill="url(#floorGrad)"/>
+  
+  <!-- Floor Planks Perspective Lines -->
+  <g stroke="#1a120b" stroke-width="2" opacity="0.4">
+    <line x1="960" y1="750" x2="300" y2="1080"/>
+    <line x1="960" y1="750" x2="650" y2="1080"/>
+    <line x1="960" y1="750" x2="1050" y2="1080"/>
+    <line x1="960" y1="750" x2="1450" y2="1080"/>
+    <line x1="960" y1="750" x2="1750" y2="1080"/>
+  </g>
+
+  <!-- Arched Windows in Background -->
+  <g fill="#211a14" stroke="#d4af37" stroke-width="3" opacity="0.85">
+    <path d="M 320,500 L 320,250 A 100,100 0 0,1 520,250 L 520,500 Z" fill="#4a5d6e"/>
+    <path d="M 860,500 L 860,200 A 100,100 0 0,1 1060,200 L 1060,500 Z" fill="#5c7387"/>
+    <path d="M 1400,500 L 1400,250 A 100,100 0 0,1 1600,250 L 1600,500 Z" fill="#4a5d6e"/>
+  </g>
+
+  <!-- Light Beams from Windows -->
+  <polygon points="420,200 150,900 650,900" fill="url(#windowLight)"/>
+  <polygon points="960,150 700,950 1220,950" fill="url(#windowLight)"/>
+
+  <!-- Central Workbench (Werkbank der Erprobung) -->
+  <g id="workbench">
+    <!-- Legs -->
+    <rect x="520" y="700" width="35" height="220" fill="#3b281a"/>
+    <rect x="1365" y="700" width="35" height="220" fill="#3b281a"/>
+    <rect x="580" y="680" width="25" height="200" fill="#291a10"/>
+    <rect x="1315" y="680" width="25" height="200" fill="#291a10"/>
+    <!-- Tabletop -->
+    <polygon points="460,680 1460,680 1430,730 490,730" fill="url(#tableWood)" stroke="#52321c" stroke-width="3"/>
+    <rect x="490" y="730" width="940" height="25" fill="#52321c"/>
+  </g>
+
+  <!-- Tools & Objects on Workbench -->
+  <g id="table-props">
+    <!-- Open Blueprint / Plan -->
+    <polygon points="600,690 780,685 820,720 620,725" fill="#e8dcbe" stroke="#8a7350" stroke-width="2"/>
+    <line x1="630" y1="700" x2="750" y2="695" stroke="#8a7350" stroke-width="1.5" stroke-dasharray="4,2"/>
+    <line x1="640" y1="710" x2="770" y2="705" stroke="#8a7350" stroke-width="1.5" stroke-dasharray="4,2"/>
+
+    <!-- Compass / Messing-Instrument -->
+    <circle cx="950" cy="705" r="18" fill="#d4af37" stroke="#8c6d17" stroke-width="2"/>
+    <polygon points="950,693 955,705 950,717 945,705" fill="#8c2317"/>
+
+    <!-- Open Wooden Case / Stuhl-Modell -->
+    <rect x="1100" y="660" width="90" height="50" fill="#694326" stroke="#422915" stroke-width="2"/>
+    <rect x="1110" y="650" width="70" height="40" fill="#e3d6b8" stroke="#422915" stroke-width="1.5"/>
+  </g>
+
+  <!-- Ambient Wall Shelves with Books & Scrolls -->
+  <g id="shelves">
+    <rect x="200" y="380" width="80" height="15" fill="#694326"/>
+    <rect x="210" y="340" width="15" height="40" fill="#8a3b34"/>
+    <rect x="230" y="330" width="20" height="50" fill="#3b5c73"/>
+    <rect x="255" y="345" width="18" height="35" fill="#4a734b"/>
+
+    <rect x="1640" y="380" width="100" height="15" fill="#694326"/>
+    <rect x="1650" y="325" width="22" height="55" fill="#9c7a36"/>
+    <rect x="1675" y="335" width="18" height="45" fill="#4a5d6e"/>
+    <rect x="1700" y="330" width="24" height="50" fill="#6e3d5c"/>
+  </g>
+
+  <!-- Hanging Lantern / Warm Light -->
+  <g id="lamp">
+    <line x1="960" y1="0" x2="960" y2="180" stroke="#8c6d17" stroke-width="3"/>
+    <polygon points="930,180 990,180 1005,250 915,250" fill="#291a10" stroke="#d4af37" stroke-width="2"/>
+    <ellipse cx="960" cy="225" rx="30" ry="20" fill="#fff3bd"/>
+    <ellipse cx="960" cy="225" rx="120" ry="80" fill="#ffe066" opacity="0.15"/>
+  </g>
+</svg>
