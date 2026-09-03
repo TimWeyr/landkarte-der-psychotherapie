@@ -3,17 +3,21 @@ import './styles/map.css';
 import './styles/scenes.css';
 import './styles/backpack.css';
 import './styles/dialogue.css';
+import './styles/innerAtlas.css';
+import './styles/worldMap.css';
 
 import { WORLD_DATA } from './data/worldData';
 import { getSceneById } from './data/scenes';
 import { getNodeById } from './data/knowledge';
 import { store } from './state/store';
-import { MapEngine } from './engine/MapEngine';
-import { IntroScreen } from './ui/IntroScreen';
 import { BackpackPanel } from './ui/BackpackPanel';
 import { ActionModal } from './ui/ActionModal';
 import { SceneView } from './ui/SceneView';
 import { LocationNode, Scene, RouteOption, UserState } from './types';
+import { NavigationLevel } from './types/worldMap';
+import { MainWorldView } from './ui/MainWorldView';
+import { InnerAtlasView } from './prototypes/innerAtlas/ui/InnerAtlasView';
+import { IntroScreen } from './ui/IntroScreen';
 
 export interface RouteNavigationResult {
   highlightedLocationIds: string[];
@@ -80,19 +84,19 @@ export function renderTeaserCardHtml(location: LocationNode, actionModal: Action
   `;
 }
 
-import { InnerAtlasView } from './prototypes/innerAtlas/ui/InnerAtlasView';
-
 export class Application {
   private root: HTMLElement;
-  private mapContainer!: HTMLElement;
-  private mapEngine!: MapEngine;
+  private headerContainer!: HTMLElement;
+  private mainViewContainer!: HTMLElement;
+  
   private backpackPanel!: BackpackPanel;
   private actionModal!: ActionModal;
-  private currentSceneView: SceneView | null = null;
-  private currentSceneLocationId: string | null = null;
-  private activeTeaserCard: HTMLElement | null = null;
-  private routeHighlightBanner: HTMLElement | null = null;
+  
+  private currentLevel: NavigationLevel = 'world';
+  private mainWorldView: MainWorldView | null = null;
   private innerAtlasView: InnerAtlasView | null = null;
+  private currentSceneView: SceneView | null = null;
+  private currentScene: Scene | null = null;
 
   constructor(customRoot?: HTMLElement) {
     this.root = customRoot || (document.getElementById('app') as HTMLElement);
@@ -102,27 +106,9 @@ export class Application {
   }
 
   private async init(): Promise<void> {
-    const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-    if (urlParams?.get('prototype') === 'inner-atlas-v01') {
-      this.renderInnerAtlasPrototype();
-      return;
-    }
-
     this.buildBaseDOM();
     this.backpackPanel = new BackpackPanel();
     this.actionModal = new ActionModal();
-
-    // Initialize Map Engine
-    this.mapEngine = new MapEngine({
-      container: this.mapContainer,
-      worldData: WORLD_DATA,
-      onLocationSelect: (loc, pos) => this.handleLocationSelect(loc, pos),
-      onLocationHover: (_loc, _pos) => {
-        // Hover handling
-      }
-    });
-
-    await this.mapEngine.init();
 
     // Check onboarding
     const state = store.getState();
@@ -138,67 +124,21 @@ export class Application {
       this.updateBackpackBadge(currState);
     });
 
-    // Close preview cards when clicking outside
-    this.mapContainer.addEventListener('pointerdown', (e) => {
-      if (this.activeTeaserCard && !this.activeTeaserCard.contains(e.target as Node)) {
-        this.closeTeaserCard();
-      }
-    });
-  }
-
-  private renderInnerAtlasPrototype(): void {
-    if (!this.actionModal) {
-      this.actionModal = new ActionModal();
+    // Check URL query param to allow direct jump
+    const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+    if (urlParams?.get('level') === 'central' || urlParams?.get('prototype') === 'inner-atlas-v01') {
+      this.navigateToLevel('central_atlas');
+    } else {
+      this.navigateToLevel('world');
     }
-    this.root.innerHTML = '';
-    this.innerAtlasView = new InnerAtlasView({
-      container: this.root,
-      onEnterActiveScene: (sceneId: string) => {
-        const scene = getSceneById(sceneId);
-        const loc = WORLD_DATA.locations.find(l => l.id === scene?.locationId) || {
-          id: sceneId,
-          name: scene?.title || 'Szene',
-          regionId: 'reg_central',
-          xPercent: 50,
-          yPercent: 50,
-          isAccessible: true,
-          tagline: ''
-        };
-        if (scene) {
-          const region = WORLD_DATA.regions.find(r => r.id === loc.regionId);
-          this.openScene(scene, region?.name || 'Zentralregion');
-        }
-      },
-      onBackToProduction: () => {
-        if (typeof window !== 'undefined') {
-          const url = new URL(window.location.href);
-          url.searchParams.delete('prototype');
-          window.history.pushState({}, '', url.toString());
-        }
-        this.init();
-      }
-    });
-    this.root.appendChild(this.innerAtlasView.getElement());
   }
 
   private buildBaseDOM(): void {
     this.root.innerHTML = `
-      <!-- Header HUD -->
-      <header class="app-header">
-        <div class="header-left">
-          <div class="brand-badge">
-            <span style="font-size: 1.2rem;">🗺️</span>
-            <div>
-              <div class="brand-title">Landkarte der Psychotherapie</div>
-              <div class="brand-subtitle">Zentralregion • Prototyp V0.1</div>
-            </div>
-          </div>
-        </div>
-
+      <!-- App Header with Breadcrumbs -->
+      <header class="app-header" id="app-header">
+        <div class="header-left" id="header-breadcrumbs"></div>
         <div class="header-right">
-          <button class="btn btn-sm btn-secondary" id="btn-open-atlas-proto" style="margin-right: 0.75rem; border-color: #c68a35;" title="Öffne den 37-Orte-Explorationsatlas">
-            🌟 Atlas (37 Orte)
-          </button>
           <button class="btn-backpack" id="btn-toggle-backpack" aria-label="Rucksack öffnen">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M4 10a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"/>
@@ -212,52 +152,144 @@ export class Application {
         </div>
       </header>
 
-      <!-- Map Container -->
-      <main class="map-view-container" id="map-container"></main>
-
-      <!-- Map Controls HUD -->
-      <div class="map-controls">
-        <button class="control-btn" id="btn-zoom-in" title="Vergrößern">+</button>
-        <button class="control-btn" id="btn-zoom-out" title="Verkleinern">−</button>
-        <button class="control-btn" id="btn-zoom-reset" title="Übersicht">⟲</button>
-      </div>
-
-      <!-- Map Guide Bottom-Left -->
-      <div class="map-guide">
-        <div class="map-guide-title">
-          <span>🧭</span> Orientierung
-        </div>
-        <p>Erkunde die Landschaft per Maus/Touch. Klicke auf goldene Landmarken, um Schauplätze zu betreten.</p>
-      </div>
+      <!-- Main Stage Container -->
+      <main class="app-stage" id="app-stage"></main>
     `;
 
-    this.mapContainer = this.root.querySelector('#map-container') as HTMLElement;
-
-    // Button Listeners
-    this.root.querySelector('#btn-open-atlas-proto')?.addEventListener('click', () => {
-      if (typeof window !== 'undefined') {
-        const url = new URL(window.location.href);
-        url.searchParams.set('prototype', 'inner-atlas-v01');
-        window.history.pushState({}, '', url.toString());
-      }
-      this.renderInnerAtlasPrototype();
-    });
+    this.headerContainer = this.root.querySelector('#header-breadcrumbs') as HTMLElement;
+    this.mainViewContainer = this.root.querySelector('#app-stage') as HTMLElement;
 
     this.root.querySelector('#btn-toggle-backpack')?.addEventListener('click', () => {
       this.backpackPanel.open();
     });
+  }
 
-    this.root.querySelector('#btn-zoom-in')?.addEventListener('click', () => {
-      this.mapEngine.zoomIn();
-    });
+  public navigateToLevel(level: NavigationLevel, targetSceneId?: string): void {
+    this.currentLevel = level;
+    this.renderHeader();
 
-    this.root.querySelector('#btn-zoom-out')?.addEventListener('click', () => {
-      this.mapEngine.zoomOut();
-    });
+    this.mainViewContainer.innerHTML = '';
 
-    this.root.querySelector('#btn-zoom-reset')?.addEventListener('click', () => {
-      this.mapEngine.resetView();
+    if (level === 'world') {
+      this.renderLevel1World();
+    } else if (level === 'central_atlas') {
+      this.renderLevel2CentralAtlas();
+    } else if (level === 'scene' && targetSceneId) {
+      this.renderLevel3Scene(targetSceneId);
+    }
+  }
+
+  private renderHeader(): void {
+    if (!this.headerContainer) return;
+
+    if (this.currentLevel === 'world') {
+      this.headerContainer.innerHTML = `
+        <div class="brand-badge">
+          <span style="font-size: 1.3rem;">🗺️</span>
+          <div>
+            <div class="brand-title">Landkarte der Psychotherapie</div>
+            <div class="brand-subtitle">Ebene 1 • Große Weltkarte der Therapielandschaften</div>
+          </div>
+        </div>
+      `;
+    } else if (this.currentLevel === 'central_atlas') {
+      this.headerContainer.innerHTML = `
+        <button class="btn-zoom-up" id="btn-zoom-to-world" title="Zurück zur Weltkarte">
+          <span>⤺</span> <span>Zur Weltkarte</span>
+        </button>
+        <nav class="breadcrumb-nav">
+          <span class="breadcrumb-item" id="bc-world">Weltkarte</span>
+          <span class="breadcrumb-separator">›</span>
+          <span class="breadcrumb-item active">🧭 Zentralregion (37 Schauplätze)</span>
+        </nav>
+      `;
+
+      this.headerContainer.querySelector('#btn-zoom-to-world')?.addEventListener('click', () => {
+        this.navigateToLevel('world');
+      });
+      this.headerContainer.querySelector('#bc-world')?.addEventListener('click', () => {
+        this.navigateToLevel('world');
+      });
+    } else if (this.currentLevel === 'scene' && this.currentScene) {
+      this.headerContainer.innerHTML = `
+        <button class="btn-zoom-up" id="btn-zoom-to-central" title="Zurück zur Zentralregion">
+          <span>⤺</span> <span>Zur Zentralregion</span>
+        </button>
+        <nav class="breadcrumb-nav">
+          <span class="breadcrumb-item" id="bc-world-from-scene">Weltkarte</span>
+          <span class="breadcrumb-separator">›</span>
+          <span class="breadcrumb-item" id="bc-central-from-scene">Zentralregion</span>
+          <span class="breadcrumb-separator">›</span>
+          <span class="breadcrumb-item active">${this.currentScene.title}</span>
+        </nav>
+      `;
+
+      this.headerContainer.querySelector('#btn-zoom-to-central')?.addEventListener('click', () => {
+        this.navigateToLevel('central_atlas');
+      });
+      this.headerContainer.querySelector('#bc-central-from-scene')?.addEventListener('click', () => {
+        this.navigateToLevel('central_atlas');
+      });
+      this.headerContainer.querySelector('#bc-world-from-scene')?.addEventListener('click', () => {
+        this.navigateToLevel('world');
+      });
+    }
+  }
+
+  private renderLevel1World(): void {
+    this.mainWorldView = new MainWorldView({
+      container: this.mainViewContainer,
+      onEnterCentralRegion: () => {
+        this.navigateToLevel('central_atlas');
+      }
     });
+    this.mainViewContainer.appendChild(this.mainWorldView.getElement());
+  }
+
+  private renderLevel2CentralAtlas(): void {
+    this.innerAtlasView = new InnerAtlasView({
+      container: this.mainViewContainer,
+      onEnterActiveScene: (sceneId: string) => {
+        this.navigateToLevel('scene', sceneId);
+      },
+      onBackToProduction: () => {
+        this.navigateToLevel('world');
+      }
+    });
+    this.mainViewContainer.appendChild(this.innerAtlasView.getElement());
+  }
+
+  private renderLevel3Scene(sceneId: string): void {
+    const scene = getSceneById(sceneId);
+    if (!scene) return;
+
+    this.currentScene = scene;
+    const loc: LocationNode = WORLD_DATA.locations.find(l => l.id === scene.locationId) || {
+      id: scene.locationId || sceneId,
+      name: scene.title,
+      type: 'scene',
+      regionId: 'reg_central',
+      xPercent: 50,
+      yPercent: 50,
+      icon: 'landmark',
+      tagline: ''
+    };
+
+    this.currentSceneView = new SceneView(
+      {
+        container: this.mainViewContainer,
+        scene,
+        location: loc,
+        regionName: 'Zentralregion',
+        onBackToMap: () => {
+          this.navigateToLevel('central_atlas');
+        }
+      },
+      this.actionModal
+    );
+
+    this.mainViewContainer.appendChild(this.currentSceneView.getElement());
+    this.renderHeader();
   }
 
   private updateBackpackBadge(_state: UserState): void {
@@ -267,208 +299,14 @@ export class Application {
       badge.textContent = count.toString();
     }
   }
-
-  private handleLocationSelect(location: LocationNode, screenPos: { x: number; y: number }): void {
-    this.closeTeaserCard();
-
-    if (location.type === 'scene' && location.sceneId) {
-      const scene = getSceneById(location.sceneId);
-      if (scene) {
-        const region = WORLD_DATA.regions.find(r => r.id === location.regionId);
-        this.openScene(scene, region?.name);
-      }
-    } else {
-      this.showLocationTeaserCard(location, screenPos);
-    }
-  }
-
-  private showLocationTeaserCard(location: LocationNode, pos: { x: number; y: number }): void {
-    const card = document.createElement('div');
-    card.className = 'location-preview-card';
-    card.style.left = `${pos.x}px`;
-    card.style.top = `${pos.y}px`;
-    card.setAttribute('role', 'region');
-    card.setAttribute('aria-labelledby', `teaser-title-${location.id}`);
-
-    card.innerHTML = renderTeaserCardHtml(location, this.actionModal);
-
-    card.querySelector('#btn-close-teaser')?.addEventListener('click', () => {
-      this.closeTeaserCard();
-    });
-
-    this.root.appendChild(card);
-    this.activeTeaserCard = card;
-    this.actionModal.attachAccordionListeners(card);
-  }
-
-  public closeTeaserCard(): void {
-    if (this.activeTeaserCard) {
-      this.activeTeaserCard.remove();
-      this.activeTeaserCard = null;
-    }
-  }
-
-  private openScene(scene: Scene, regionName?: string): void {
-    if (this.currentSceneView) {
-      this.currentSceneView.destroy();
-    }
-
-    this.currentSceneLocationId = scene.locationId;
-
-    // Toggle HUD map controls
-    const mapControls = this.root.querySelector('.map-controls') as HTMLElement;
-    const mapGuide = this.root.querySelector('.map-guide') as HTMLElement;
-    const brandBadge = this.root.querySelector('.brand-badge') as HTMLElement;
-
-    if (mapControls) mapControls.style.display = 'none';
-    if (mapGuide) mapGuide.style.display = 'none';
-    
-    // Unified Breadcrumb Capsule in Header
-    if (brandBadge) {
-      brandBadge.innerHTML = `
-        <button class="breadcrumb-btn" id="btn-header-world" title="Zurück zur Weltkarte">
-          <span>🗺️</span> Weltkarte
-        </button>
-        <span class="breadcrumb-separator">›</span>
-        <button class="breadcrumb-btn" id="btn-header-region" title="Zur Region auf der Karte">
-          ${regionName || 'Zentralregion'}
-        </button>
-        <span class="breadcrumb-separator">›</span>
-        <span class="breadcrumb-current">${scene.title}</span>
-      `;
-
-      brandBadge.querySelector('#btn-header-world')?.addEventListener('click', (e) => {
-        e.stopPropagation();
-        this.closeScene();
-      });
-
-      brandBadge.querySelector('#btn-header-region')?.addEventListener('click', (e) => {
-        e.stopPropagation();
-        this.closeScene();
-      });
-    }
-
-    const location = WORLD_DATA.locations.find(l => l.id === scene.locationId);
-
-    this.currentSceneView = new SceneView(
-      {
-        container: this.root,
-        scene: scene,
-        location: location,
-        regionName: regionName,
-        onBackToMap: () => this.closeScene(),
-        onRouteNavigate: (option) => this.handleRouteNavigation(option)
-      },
-      this.actionModal
-    );
-
-    this.root.appendChild(this.currentSceneView.getElement());
-  }
-
-  public closeScene(): void {
-    if (this.currentSceneView) {
-      this.currentSceneView.destroy();
-      this.currentSceneView = null;
-    }
-
-    // Restore HUD map controls
-    const mapControls = this.root.querySelector('.map-controls') as HTMLElement;
-    const mapGuide = this.root.querySelector('.map-guide') as HTMLElement;
-    const brandBadge = this.root.querySelector('.brand-badge') as HTMLElement;
-
-    if (mapControls) mapControls.style.display = 'flex';
-    if (mapGuide) mapGuide.style.display = 'block';
-    
-    // Restore default Brand Badge title
-    if (brandBadge) {
-      brandBadge.innerHTML = `
-        <span style="font-size: 1.2rem;">🗺️</span>
-        <div>
-          <div class="brand-title">Landkarte der Psychotherapie</div>
-          <div class="brand-subtitle">Zentralregion • Prototyp V0.1</div>
-        </div>
-      `;
-    }
-  }
-
-  public handleRouteNavigation(option: RouteOption): RouteNavigationResult {
-    const originLocationId = this.currentSceneLocationId || undefined;
-    this.closeScene();
-    const result = computeRouteNavigationEffect(option, WORLD_DATA.locations, originLocationId);
-
-    if (result.highlightedLocationIds.length > 0) {
-      this.mapEngine?.highlightLocations(result.highlightedLocationIds);
-      this.mapEngine?.fitLocations(result.highlightedLocationIds);
-    } else {
-      this.mapEngine?.clearHighlights();
-    }
-
-    this.showRouteHighlightBanner(result.bannerHtml);
-    return result;
-  }
-
-  private showRouteHighlightBanner(messageHtml: string): void {
-    if (this.routeHighlightBanner) {
-      this.routeHighlightBanner.remove();
-      this.routeHighlightBanner = null;
-    }
-
-    const banner = document.createElement('div');
-    banner.className = 'route-highlight-banner';
-    banner.innerHTML = `
-      <div class="banner-text">
-        <span>${messageHtml}</span>
-      </div>
-      <button class="btn btn-ghost btn-sm" id="btn-clear-highlights" title="Hinweis schließen">✕ Schließen</button>
-    `;
-
-    banner.querySelector('#btn-clear-highlights')?.addEventListener('click', () => {
-      this.clearRouteHighlights();
-    });
-
-    this.root.appendChild(banner);
-    this.routeHighlightBanner = banner;
-  }
-
-  public clearRouteHighlights(): void {
-    this.mapEngine?.clearHighlights();
-    if (this.routeHighlightBanner) {
-      this.routeHighlightBanner.remove();
-      this.routeHighlightBanner = null;
-    }
-  }
 }
 
-// Start application & global shortcuts
-if (typeof window !== 'undefined') {
-  window.addEventListener('DOMContentLoaded', () => {
-    const app = new Application();
-
-    // Click on Brand Badge in header
-    document.querySelector('.brand-badge')?.addEventListener('click', () => {
-      app.closeScene();
-    });
-
-    // Global Keyboard Shortcuts (ESC & M)
-    window.addEventListener('keydown', (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        const activeBackdrop = document.querySelector('.modal-backdrop.active');
-        const activeBackpack = document.querySelector('.backpack-modal.active');
-        
-        if (activeBackdrop) {
-          activeBackdrop.classList.remove('active');
-        } else if (activeBackpack) {
-          activeBackpack.classList.remove('active');
-        } else {
-          app.closeScene();
-          app.closeTeaserCard();
-          app.clearRouteHighlights();
-        }
-      } else if (e.key === 'm' || e.key === 'M') {
-        if (document.activeElement?.tagName !== 'INPUT' && document.activeElement?.tagName !== 'TEXTAREA') {
-          app.closeScene();
-        }
-      }
-    });
+// Auto-boot if app container is present
+if (typeof document !== 'undefined') {
+  document.addEventListener('DOMContentLoaded', () => {
+    const appEl = document.getElementById('app');
+    if (appEl) {
+      new Application(appEl);
+    }
   });
 }

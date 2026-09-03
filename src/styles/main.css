@@ -1,4 +1,5 @@
 @import './innerAtlas.css';
+@import './worldMap.css';
 
 :root {
   /* Cartographic & Storybook Theme Tokens */
