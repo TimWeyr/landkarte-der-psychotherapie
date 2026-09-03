@@ -48,7 +48,7 @@ export const lighthouseScene: Scene = {
         speakerRole: 'Optisches Instrument',
         text: 'Durch dieses Messingfernrohr blickt man weit über das Meer der Psychotherapie. Es erinnert daran, dass verschiedene Perspektiven – empirische Forschung, fundierte Theorie und persönliche Erfahrung – erst zusammen ein klares Gesamtbild ergeben.',
         claimIds: ['claim_evidence_perspectives'],
-        subtext: 'Wissenschaftliche Evidenz hilft, wirksame Wege von bloßen Behauptungen zu unterscheiden.',
+        subtext: 'Wissenschaftliche Evidenz hilft, fundierte Wege von bloßen Behauptungen zu unterscheiden.',
         subtextClaimIds: ['claim_evidence_perspectives'],
         actions: [
           {
@@ -78,7 +78,7 @@ export const lighthouseScene: Scene = {
     {
       id: 'lh_wall_charts',
       title: 'Die Studientafel',
-      subtitle: 'Systematische Wirksamkeitsforschung',
+      subtitle: 'Richtlinienverfahren & Versorgungsrahmen',
       xPercent: 57,
       yPercent: 26,
       icon: 'file-text',
@@ -86,9 +86,9 @@ export const lighthouseScene: Scene = {
       dialogue: {
         speaker: 'Forschungstafel',
         speakerRole: 'Wissenschaftliche Übersicht',
-        text: 'In Deutschland sind Richtlinienverfahren (z. B. Verhaltenstherapie, tiefenpsychologisch fundierte Psychotherapie, analytische Psychotherapie und Systemische Therapie) durch den Gemeinsamen Bundesausschuss (G-BA) auf ihre wissenschaftliche Wirksamkeit hin geprüft und anerkannt.',
+        text: 'Der Gemeinsame Bundesausschuss (G-BA) legt als Selbstverwaltungsorgan fest, welche psychotherapeutischen Behandlungsverfahren von den gesetzlichen Krankenkassen erstattet werden (Richtlinienverfahren: Verhaltenstherapie, tiefenpsychologisch fundierte Psychotherapie, analytische Psychotherapie und systemische Therapie). Dieser sozialrechtliche Zulassungsstatus regelt den Leistungsanspruch im deutschen Kassensystem, stellt jedoch keine vergleichende Rangfolge oder qualitative Überlegenheitsaussage therapeutischer Traditionen dar.',
         claimIds: ['claim_gba_guidelines'],
-        subtext: 'Evidenzbasierung schützt Patientinnen und Patienten vor unwirksamen oder schädlichen Methoden.',
+        subtext: 'Die Psychotherapie-Richtlinie definiert den formalen Rahmen der Leistungsübernahme durch die gesetzliche Krankenversicherung.',
         subtextClaimIds: ['claim_gba_guidelines'],
         actions: [
           {
@@ -145,31 +145,31 @@ export const lighthouseScene: Scene = {
     {
       id: 'lh_keeper',
       title: 'Der Leuchtturmwärter',
-      subtitle: 'Gespräch & Reflexion',
-      xPercent: 86,
+      subtitle: 'Therapeutische Allianz als Wirkfaktor',
+      xPercent: 82,
       yPercent: 70,
       icon: 'user',
       zIndex: 10,
       dialogue: {
-        speaker: 'Leuchtturmwärter Paul',
-        speakerRole: 'Orientierungsgeber',
-        text: '„Willkommen, Reisender. Viele Menschen fühlen sich vom Dschungel der Therapiebegriffe überwältigt. Mein Rat: Achte darauf, ob ein Ansatz methodisch abgesichert ist, aber vergiss nie, dass auch die persönliche Beziehung zu deiner Therapeutin oder deinem Therapeuten ein entscheidender Wirkfaktor ist.“',
+        speaker: 'Leuchtturmwärter',
+        speakerRole: 'Erfahrener Wegbegleiter',
+        text: '„Verfahren und Techniken sind das Handwerkszeug. Doch die Forschung zeigt unmissverständlich: Ob eine Psychotherapie hilft, hängt maßgeblich von einer vertrauensvollen Beziehung zwischen Patient und Therapeut ab.“',
         claimIds: ['claim_therapeutic_alliance'],
-        subtext: 'Studiendaten geben die Leitplanken – die therapeutische Allianz füllt sie mit Leben.',
+        subtext: 'Zahlreiche Metaanalysen belegen, dass die therapeutische Beziehung ein schulenübergreifender Hauptwirkfaktor ist.',
         subtextClaimIds: ['claim_therapeutic_alliance'],
         actions: [
           {
-            id: 'act_lh_about_me_safety',
-            type: 'ABOUT_ME',
-            label: 'Das beschreibt etwas von mir: Ich lege Wert auf wissenschaftliche Absicherung',
-            description: 'Du hast für dich vermerkt, dass dir transparente und fundierte Methoden Orientierung geben.',
-            claimIds: ['claim_evidence_perspectives']
-          },
-          {
             id: 'act_lh_interest_alliance',
             type: 'INTEREST',
-            label: 'Das interessiert mich: Die therapeutische Beziehung als Wirkfaktor',
-            description: 'Du interessierst dich für die Rolle der zwischenmenschlichen Passung in der Therapie.',
+            label: 'Das interessiert mich: Die therapeutische Allianz als Wirkfaktor',
+            description: 'Du hast dir gemerkt, dass die Qualität der therapeutischen Beziehung eine zentrale Rolle spielt.',
+            claimIds: ['claim_therapeutic_alliance']
+          },
+          {
+            id: 'act_lh_about_me_alliance',
+            type: 'ABOUT_ME',
+            label: 'Das beschreibt etwas von mir: Mir ist eine vertrauensvolle Beziehung besonders wichtig',
+            description: 'Du hast für dich festgehalten, dass ein gutes Bauchgefühl und gegenseitiges Vertrauen für dich zentral sind.',
             claimIds: ['claim_therapeutic_alliance']
           }
         ]

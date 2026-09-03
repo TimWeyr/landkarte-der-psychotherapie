@@ -66,9 +66,9 @@ export const workshopScene: Scene = {
         speaker: 'Notizen zur therapeutischen Allianz',
         speakerRole: 'Orientierungsleitfaden',
         text: '„Passung ist keine vorab berechenbare Eigenschaft einer Therapieschule. Ob eine Zusammenarbeit funktioniert, zeigt sich im konkreten Gespräch: Fühle ich mich verstanden? Werden meine Ziele ernst genommen? Kann ich offen ansprechen, wenn eine Übung nicht passt?“',
-        claimIds: ['claim_fit_collaboration_dynamic', 'claim_therapeutic_alliance', 'claim_therapist_characteristics_null_finding'],
+        claimIds: ['claim_fit_collaboration_dynamic', 'claim_therapeutic_alliance'],
         subtext: 'Die therapeutische Beziehung entsteht im gemeinsamen Tun und darf aktiv mitgestaltet werden.',
-        subtextClaimIds: ['claim_therapeutic_alliance', 'claim_therapist_characteristics_null_finding'],
+        subtextClaimIds: ['claim_therapeutic_alliance'],
         actions: [
           {
             id: 'act_ws_about_me_flexibility',
@@ -87,8 +87,8 @@ export const workshopScene: Scene = {
           {
             id: 'act_ws_interest_goldberg_fit',
             type: 'INTEREST',
-            label: 'Das interessiert mich: Grenzen statischer Vorab-Merkmale (Goldberg 2026)',
-            description: 'Wissenschaftlicher Befund: 38 statische Vorabmerkmale sagten Behandlungsergebnisse kaum vorher – Passung entscheidet sich im realen Dialog.',
+            label: 'Das interessiert mich: Nullbefund zu Vorabmerkmalen (Goldberg et al., 2026)',
+            description: 'Die 38 in dieser Untersuchung erhobenen statischen Vorabmerkmale von Therapeutinnen und Therapeuten zeigten weitgehend keine statistische Vorhersagekraft für die Behandlungsergebnisse.',
             claimIds: ['claim_therapist_characteristics_null_finding']
           }
         ]

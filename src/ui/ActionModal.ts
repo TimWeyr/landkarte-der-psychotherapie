@@ -6,25 +6,34 @@ import { getExplorationRouteById } from '../data/exploration';
 import { renderClaimCardHtml } from './renderers/evidenceRenderer';
 
 export class ActionModal {
-  private backdrop: HTMLElement;
+  private backdrop: HTMLElement | null = null;
   private currentHotspot: Hotspot | null = null;
   private currentScene: Scene | null = null;
   public onNavigateRoute?: (option: RouteOption) => void;
 
   constructor() {
-    this.backdrop = document.createElement('div');
-    this.backdrop.className = 'modal-backdrop';
-    document.body.appendChild(this.backdrop);
+    if (typeof document !== 'undefined') {
+      this.backdrop = document.createElement('div');
+      this.backdrop.className = 'modal-backdrop';
+      document.body.appendChild(this.backdrop);
 
-    // Close on clicking backdrop
-    this.backdrop.addEventListener('click', (e) => {
-      if (e.target === this.backdrop) {
-        this.close();
-      }
-    });
+      // Close on clicking backdrop
+      this.backdrop.addEventListener('click', (e) => {
+        if (e.target === this.backdrop) {
+          this.close();
+        }
+      });
+    }
   }
 
   public open(hotspot: Hotspot, scene: Scene): void {
+    if (!this.backdrop && typeof document !== 'undefined') {
+      this.backdrop = document.createElement('div');
+      this.backdrop.className = 'modal-backdrop';
+      document.body.appendChild(this.backdrop);
+    }
+    if (!this.backdrop) return;
+
     this.currentHotspot = hotspot;
     this.currentScene = scene;
 
@@ -34,38 +43,195 @@ export class ActionModal {
   }
 
   public openSceneEvidenceModal(scene: Scene, location?: LocationNode): void {
+    if (!this.backdrop && typeof document !== 'undefined') {
+      this.backdrop = document.createElement('div');
+      this.backdrop.className = 'modal-backdrop';
+      document.body.appendChild(this.backdrop);
+    }
+    if (!this.backdrop) return;
+
     const nodeIds = location?.knowledgeNodeIds || [];
     const nodes = nodeIds.map(id => getNodeById(id)).filter((n): n is NonNullable<typeof n> => Boolean(n));
 
     this.backdrop.innerHTML = `
-      <div class="dialogue-modal-box scene-evidence-box">
+      <div class="dialogue-modal-box scene-evidence-box" role="dialog" aria-modal="true" aria-labelledby="modal-title-scene-evidence">
         <div class="dialogue-header">
           <div class="speaker-badge">
             <div class="speaker-avatar">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
             </div>
             <div>
-              <div class="speaker-title">Schauplatz-Evidenz & Fachkonzepte</div>
-              <div class="speaker-role">${scene.title} • ${location?.tagline || 'Kanonische Wissensknoten'}</div>
+              <div class="speaker-name" id="modal-title-scene-evidence">Wissenschaftliche Einordnung & Fachkonzepte</div>
+              <div class="speaker-role">${scene.title}</div>
             </div>
           </div>
-          <button class="btn btn-ghost btn-icon" id="btn-close-evidence-modal" title="Schließen (ESC)">✕</button>
+          <button class="btn-close-modal" id="btn-close-scene-evidence" aria-label="Modal schließen">✕</button>
         </div>
 
-        <div class="dialogue-content">
-          <div class="speech-subtext" style="margin-bottom: 14px;">
-            Die folgenden fundierten Fachknoten und wissenschaftlichen Claims sind diesem Schauplatz zugeordnet:
+        <div class="dialogue-body">
+          <p class="scene-evidence-intro">
+            Hier sind alle in diesem Schauplatz verankerten psychotherapeutischen Fachkonzepte, Wirkprozesse und ihre wissenschaftlichen Nachweise zusammengefasst:
+          </p>
+
+          ${nodes.length > 0 ? nodes.map(node => `
+            <div class="scene-node-card">
+              <div class="scene-node-header">
+                <span class="badge badge-primary">${node.kind}</span>
+                <h4>${node.title}</h4>
+              </div>
+              <p class="scene-node-desc">${node.plainDescription}</p>
+              ${node.claimIds.length > 0 ? this.renderSourcesAccordion(node.claimIds, `📚 Evidenz & Nachweise (${node.claimIds.length})`, `node-${node.id}`) : ''}
+            </div>
+          `).join('') : '<p class="text-muted">Keine gesonderten Wissensknoten für diesen Ort hinterlegt.</p>'}
+        </div>
+
+        <div class="dialogue-footer">
+          <button class="btn btn-secondary" id="btn-done-scene-evidence">Schließen</button>
+        </div>
+      </div>
+    `;
+
+    this.backdrop.classList.add('active');
+
+    const closeBtn = this.backdrop.querySelector('#btn-close-scene-evidence');
+    const doneBtn = this.backdrop.querySelector('#btn-done-scene-evidence');
+    const closeHandler = () => this.close();
+    closeBtn?.addEventListener('click', closeHandler);
+    doneBtn?.addEventListener('click', closeHandler);
+
+    this.attachAccordionListeners(this.backdrop);
+  }
+
+  public close(): void {
+    if (this.backdrop) {
+      this.backdrop.classList.remove('active');
+    }
+  }
+
+  private render(): void {
+    if (!this.currentHotspot || !this.backdrop) return;
+
+    const hotspot = this.currentHotspot;
+    const dialogue = hotspot.dialogue;
+
+    // Check if this hotspot has a route navigation action (e.g. Kompasstisch)
+    const routeAction = dialogue.actions?.find((a): a is HotspotAction & { type: 'NAVIGATE_ROUTES' } => a.type === 'NAVIGATE_ROUTES');
+    if (routeAction && routeAction.routeId) {
+      this.renderCompassModal(hotspot, routeAction);
+      return;
+    }
+
+    const speakerName = dialogue.speaker || hotspot.title;
+    const speakerRole = dialogue.speakerRole || 'Schauplatz';
+
+    this.backdrop.innerHTML = `
+      <div class="dialogue-modal-box" role="dialog" aria-modal="true" aria-labelledby="modal-title-${hotspot.id}">
+        <div class="dialogue-header">
+          <div class="speaker-badge">
+            <div class="speaker-avatar">
+              ${this.getSpeakerIcon(hotspot.icon)}
+            </div>
+            <div>
+              <div class="speaker-name" id="modal-title-${hotspot.id}">${speakerName}</div>
+              <div class="speaker-role">${speakerRole}</div>
+            </div>
+          </div>
+          <button class="btn-close-modal" id="btn-close-dialogue" aria-label="Dialog schließen">✕</button>
+        </div>
+
+        <div class="dialogue-body">
+          <div class="dialogue-text">
+            ${dialogue.text}
           </div>
 
-          <div class="scene-nodes-list" style="display: flex; flex-direction: column; gap: 14px;">
-            ${nodes.map(node => `
-              <div class="scene-node-card" style="border: 1px solid var(--border-parchment); border-radius: var(--radius-sm); padding: 12px; background: var(--bg-parchment);">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                  <strong style="color: var(--ink-primary); font-size: 0.95rem;">${node.title}</strong>
-                  <span class="claim-type-badge" style="font-size: 0.7rem;">${node.kind}</span>
+          ${this.renderSourcesAccordion(dialogue.claimIds, '📚 Wissenschaftliche Einordnung & Nachweise', `dialogue-${hotspot.id}`)}
+
+          ${dialogue.subtext ? `
+            <div class="dialogue-subtext">
+              <span class="subtext-icon">💡</span>
+              <div class="subtext-content">
+                <span>${dialogue.subtext}</span>
+                ${this.renderSourcesAccordion(dialogue.subtextClaimIds, '🔍 Nachweise zum Hinweis', `subtext-${hotspot.id}`)}
+              </div>
+            </div>
+          ` : ''}
+
+          <div class="dialogue-actions-list" id="actions-list"></div>
+        </div>
+      </div>
+    `;
+
+    // Close button
+    this.backdrop.querySelector('#btn-close-dialogue')?.addEventListener('click', () => {
+      this.close();
+    });
+
+    // Render actions
+    const actionsList = this.backdrop.querySelector('#actions-list');
+    if (actionsList && dialogue.actions) {
+      for (const action of dialogue.actions) {
+        if (action.type === 'QUIZ') {
+          actionsList.appendChild(this.createQuizElement(action));
+        } else {
+          actionsList.appendChild(this.createActionElement(action));
+        }
+      }
+    }
+
+    // Attach accordion click listeners
+    this.attachAccordionListeners(this.backdrop);
+  }
+
+  private renderCompassModal(hotspot: Hotspot, routeAction: HotspotAction & { type: 'NAVIGATE_ROUTES' }): void {
+    if (!this.backdrop) return;
+    const route = getExplorationRouteById(routeAction.routeId);
+    if (!route) return;
+
+    const disclaimerSourcesHtml = route.disclaimerClaimIds && route.disclaimerClaimIds.length > 0
+      ? this.renderSourcesAccordion(route.disclaimerClaimIds, '📚 Quelleneinordnung zum Orientierungsprinzip', 'disclaimer')
+      : '';
+
+    this.backdrop.innerHTML = `
+      <div class="dialogue-modal-box compass-modal-box" role="dialog" aria-modal="true" aria-labelledby="modal-title-compass">
+        <div class="dialogue-header">
+          <div class="speaker-badge">
+            <div class="speaker-avatar">🧭</div>
+            <div>
+              <div class="speaker-name" id="modal-title-compass">Orientierungskompass</div>
+              <div class="speaker-role">5 gleichwertige Erkundungsrichtungen</div>
+            </div>
+          </div>
+          <button class="btn-close-modal" id="btn-close-dialogue" aria-label="Dialog schließen">✕</button>
+        </div>
+
+        <div class="dialogue-body">
+          <div class="compass-intro-box">
+            <div class="compass-situation-badge">Ausgangspunkt</div>
+            <h3 class="compass-situation-title">„${route.prompt}“</h3>
+            <p class="compass-situation-desc">${route.disclaimer}</p>
+            ${disclaimerSourcesHtml}
+          </div>
+
+          <div class="compass-instruction">
+            Wähle eine Erkundungsrichtung, die dich anspricht, um relevante Arbeitsweisen und Schauplätze auf der Landkarte zu erkunden:
+          </div>
+
+          <div class="compass-options-grid route-options-list" id="compass-options-grid">
+            ${route.options.map((opt, idx) => `
+              <div class="compass-option-card route-option-card" data-opt-index="${idx}" data-option-id="${opt.id}">
+                <div class="option-header">
+                  <span class="option-number">${idx + 1}</span>
+                  <h4 class="option-label">${opt.label}</h4>
                 </div>
-                <div style="font-size: 0.84rem; color: var(--ink-secondary); margin-bottom: 8px;">${node.plainDescription}</div>
-                ${this.renderSourcesAccordion(node.claimIds, `Nachweise zu ${node.title} (${node.claimIds.length})`, `node-${node.id}`)}
+                <p class="option-summary">${opt.perspectiveDescription}</p>
+                ${opt.perspectiveClaimIds && opt.perspectiveClaimIds.length > 0 ? `
+                  ${this.renderSourcesAccordion(opt.perspectiveClaimIds, '📚 Evidenz & Nachweise zu dieser Perspektive', `opt-${opt.id}`)}
+                ` : ''}
+                <div class="option-footer">
+                  <button class="btn btn-primary btn-sm btn-select-route" data-opt-index="${idx}" data-option-id="${opt.id}">
+                    Diesen Pfad auf der Karte erkunden ➔
+                  </button>
+                </div>
               </div>
             `).join('')}
           </div>
@@ -73,100 +239,71 @@ export class ActionModal {
       </div>
     `;
 
-    this.backdrop.querySelector('#btn-close-evidence-modal')?.addEventListener('click', () => this.close());
-    this.attachAccordionListeners(this.backdrop);
-    this.backdrop.classList.add('active');
-  }
-
-  public close(): void {
-    this.backdrop.classList.remove('active');
-  }
-
-  private render(): void {
-    if (!this.currentHotspot || !this.currentScene) return;
-
-    const h = this.currentHotspot;
-    const d = h.dialogue;
-
-    // Collect all relevant claim IDs for this dialogue, including nested quiz and item claims
-    const actionClaimIds = d.actions.flatMap(a => {
-      const ids = [...(a.claimIds || [])];
-      if (a.type === 'QUIZ' && a.quiz.explanationClaimIds) {
-        ids.push(...a.quiz.explanationClaimIds);
-      }
-      if (a.type === 'ITEM' && a.item && a.item.claimIds) {
-        ids.push(...a.item.claimIds);
-      }
-      return ids;
+    this.backdrop.querySelector('#btn-close-dialogue')?.addEventListener('click', () => {
+      this.close();
     });
 
-    const allClaimIds = Array.from(new Set([
-      ...(d.claimIds || []),
-      ...(d.subtextClaimIds || []),
-      ...actionClaimIds
-    ]));
+    const optionButtons = this.backdrop.querySelectorAll<HTMLButtonElement>('.btn-select-route');
+    optionButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.getAttribute('data-opt-index') || '0', 10);
+        const selectedOpt = route.options[idx];
+        if (selectedOpt) {
+          this.close();
+          this.onNavigateRoute?.(selectedOpt);
+        }
+      });
+    });
 
-    this.backdrop.innerHTML = `
-      <div class="dialogue-modal-box">
-        <div class="dialogue-header">
-          <div class="speaker-badge">
-            <div class="speaker-avatar">
-              ${this.getSpeakerIcon(h.icon)}
-            </div>
-            <div>
-              <div class="speaker-title">${d.speaker || h.title}</div>
-              <div class="speaker-role">${d.speakerRole || h.subtitle || this.currentScene.title}</div>
-            </div>
+    this.attachAccordionListeners(this.backdrop);
+  }
+
+  public renderSourcesAccordion(claimIds?: string[], label = '📚 Wissenschaftliche Einordnung & Nachweise', customId?: string): string {
+    if (!claimIds || claimIds.length === 0) return '';
+
+    const claims = claimIds
+      .map(id => getClaimById(id))
+      .filter((c): c is NonNullable<typeof c> => Boolean(c));
+
+    if (claims.length === 0) return '';
+
+    const prefix = customId || `acc-${Math.random().toString(36).slice(2, 7)}`;
+    const btnId = `btn-acc-${prefix}`;
+    const bodyId = `body-acc-${prefix}`;
+
+    return `
+      <div class="sources-accordion" data-accordion-id="${prefix}">
+        <button class="sources-toggle-btn" id="${btnId}" type="button" aria-expanded="false" aria-controls="${bodyId}">
+          <span class="sources-toggle-label">${label}</span>
+          <span class="sources-arrow">▼</span>
+        </button>
+        <div class="sources-body hidden" id="${bodyId}" role="region" aria-labelledby="${btnId}">
+          <div class="sources-list">
+            ${claims.map(claim => {
+              const citations = getSourcesForClaim(claim);
+              return renderClaimCardHtml(claim, citations);
+            }).join('')}
           </div>
-          <button class="btn btn-ghost btn-icon" id="btn-close-dialogue" title="Schließen (ESC)">✕</button>
-        </div>
-
-        <div class="dialogue-content">
-          <div class="speech-bubble">${d.text}</div>
-          ${d.subtext ? `<div class="speech-subtext">${d.subtext}</div>` : ''}
-
-          <!-- Sources & Evidence Section -->
-          ${this.renderSourcesAccordion(allClaimIds, undefined, `dialogue-${h.id}`)}
-
-          ${d.actions && d.actions.length > 0 ? `
-            <div class="actions-section">
-              <div class="actions-section-title">Mögliche Aktionen & Reflexionen</div>
-              <div class="actions-list" id="actions-container"></div>
-            </div>
-          ` : ''}
         </div>
       </div>
     `;
-
-    this.backdrop.querySelector('#btn-close-dialogue')?.addEventListener('click', () => this.close());
-    this.attachAccordionListeners(this.backdrop);
-
-    // Render actions
-    if (d.actions && d.actions.length > 0) {
-      const container = this.backdrop.querySelector('#actions-container');
-      if (container) {
-        for (const action of d.actions) {
-          container.appendChild(this.createActionElement(action));
-        }
-      }
-    }
   }
 
-  /**
-   * Bindet Akkordeon-Klickhandler für alle .sources-accordion Elemente innerhalb des Containers
-   */
   public attachAccordionListeners(container: HTMLElement): void {
     const accordions = container.querySelectorAll<HTMLElement>('.sources-accordion');
     accordions.forEach(acc => {
+      if (acc.getAttribute('data-has-listener') === 'true') return;
+      acc.setAttribute('data-has-listener', 'true');
+
       const btn = acc.querySelector<HTMLButtonElement>('.sources-toggle-btn');
       const body = acc.querySelector<HTMLElement>('.sources-body');
-      const arrow = acc.querySelector<HTMLElement>('.toggle-arrow');
+      const arrow = acc.querySelector<HTMLElement>('.sources-arrow');
 
-      if (btn && body && !btn.dataset.hasAccordionListener) {
-        btn.dataset.hasAccordionListener = 'true';
+      if (btn && body) {
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
           const isHidden = body.classList.toggle('hidden');
+          btn.setAttribute('aria-expanded', (!isHidden).toString());
           if (arrow) {
             arrow.classList.toggle('rotated', !isHidden);
           }
@@ -175,53 +312,19 @@ export class ActionModal {
     });
   }
 
-  public renderSourcesAccordion(claimIds: string[], customTitle?: string, uniquePrefix?: string): string {
-    if (!claimIds || claimIds.length === 0) return '';
-
-    const claims = claimIds.map(id => getClaimById(id)).filter((c): c is NonNullable<typeof c> => Boolean(c));
-    if (claims.length === 0) return '';
-
-    const title = customTitle || `📚 Wissenschaftliche Einordnung & Quellen (${claims.length})`;
-    const prefix = uniquePrefix || `acc-${Math.random().toString(36).substr(2, 6)}`;
-
-    return `
-      <div class="sources-accordion" data-accordion-id="${prefix}">
-        <button class="sources-toggle-btn" type="button" aria-expanded="false">
-          <span>${title}</span>
-          <span class="toggle-arrow">▾</span>
-        </button>
-        <div class="sources-body hidden">
-          ${claims.map(claim => {
-            const citationsWithSources = getSourcesForClaim(claim);
-            return renderClaimCardHtml(claim, citationsWithSources);
-          }).join('')}
-        </div>
-      </div>
-    `;
-  }
-
   private createActionElement(action: HotspotAction): HTMLElement {
-    if (action.type === 'QUIZ') {
-      return this.createQuizElement(action);
-    }
-    if (action.type === 'NAVIGATE_ROUTES') {
-      return this.createRouteSelectionElement(action);
-    }
-
     const el = document.createElement('div');
-    el.className = 'action-card-btn';
-    el.setAttribute('data-type', action.type);
+    el.className = 'dialogue-action-item';
 
     const isAlreadyDone = this.checkActionState(action);
-    if (isAlreadyDone) {
-      el.classList.add('action-done');
-    }
 
     el.innerHTML = `
-      <div class="action-icon">${this.getActionIcon(action.type)}</div>
-      <div class="action-btn-text">
-        <div class="action-btn-title">${action.label}</div>
-        ${action.description ? `<div class="action-btn-desc">${action.description}</div>` : ''}
+      <div class="action-icon-wrap">
+        ${this.getActionIcon(action.type)}
+      </div>
+      <div class="action-content">
+        <div class="action-label">${action.label}</div>
+        ${action.description ? `<div class="action-description">${action.description}</div>` : ''}
       </div>
       ${isAlreadyDone ? `<div class="action-check-badge">✓ Im Rucksack</div>` : ''}
     `;
@@ -231,63 +334,6 @@ export class ActionModal {
     });
 
     return el;
-  }
-
-  private createRouteSelectionElement(action: HotspotAction & { type: 'NAVIGATE_ROUTES' }): HTMLElement {
-    const route = getExplorationRouteById(action.routeId);
-    const box = document.createElement('div');
-    box.className = 'route-exploration-box';
-
-    if (!route) {
-      box.textContent = 'Route nicht gefunden.';
-      return box;
-    }
-
-    const disclaimerSourcesHtml = route.disclaimerClaimIds && route.disclaimerClaimIds.length > 0
-      ? this.renderSourcesAccordion(route.disclaimerClaimIds, `📚 Quelleneinordnung zum Orientierungsprinzip`, `disclaimer-${route.id}`)
-      : '';
-
-    box.innerHTML = `
-      <div class="route-header">
-        <div class="route-title">🧭 ${route.prompt}</div>
-        <div class="route-disclaimer">${route.disclaimer}</div>
-        ${disclaimerSourcesHtml}
-      </div>
-      <div class="route-options-list">
-        ${route.options.map((opt) => {
-          const perspectiveSourcesHtml = opt.perspectiveClaimIds && opt.perspectiveClaimIds.length > 0
-            ? this.renderSourcesAccordion(opt.perspectiveClaimIds, `📚 Evidenz & Modellkontext dieser Perspektive`, `opt-${opt.id}`)
-            : '';
-
-          return `
-            <div class="route-option-card" data-option-id="${opt.id}">
-              <div class="route-option-label">${opt.label}</div>
-              <div class="route-option-desc">${opt.perspectiveDescription}</div>
-              ${perspectiveSourcesHtml}
-              <button class="btn btn-primary btn-sm btn-select-route" data-option-id="${opt.id}">
-                <span>Erkundungsperspektive wählen</span> ➔
-              </button>
-            </div>
-          `;
-        }).join('')}
-      </div>
-    `;
-
-    const buttons = box.querySelectorAll('.btn-select-route');
-    buttons.forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const optId = btn.getAttribute('data-option-id');
-        const selectedOpt = route.options.find(o => o.id === optId);
-        if (selectedOpt) {
-          this.close();
-          this.onNavigateRoute?.(selectedOpt);
-        }
-      });
-    });
-
-    this.attachAccordionListeners(box);
-    return box;
   }
 
   private createQuizElement(action: HotspotAction & { type: 'QUIZ' }): HTMLElement {

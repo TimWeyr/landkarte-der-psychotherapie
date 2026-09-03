@@ -5,7 +5,10 @@ import {
   KnowledgeRelation,
   ExplorationRoute,
   WorldMapData,
-  Scene
+  Scene,
+  Region,
+  LocationNode,
+  HotspotAction
 } from '../types';
 import { SOURCES } from '../data/knowledge/sources';
 import { CLAIMS } from '../data/knowledge/claims';
@@ -151,11 +154,15 @@ export function getReachableClaimIds(data: KnowledgeDatasets): string[] {
 }
 
 /**
- * Validiert sämtliche Entitäten und Referenzen fail-closed
+ * Validiert sämtliche Entitäten und Referenzen in einer zweistufigen Fail-Closed-Architektur
  */
 export function validateKnowledgeGraph(customData?: KnowledgeDatasets): ValidationReport {
   const data = customData || getDefaultDatasets();
   const issues: ValidationIssue[] = [];
+
+  // =========================================================================
+  // PHASE 1: Vollständige Vorab-Indizierung & Duplikatsprüfung
+  // =========================================================================
 
   const sourceMap = new Map<string, SourceRecord>();
   const claimMap = new Map<string, ClaimRecord>();
@@ -163,12 +170,181 @@ export function validateKnowledgeGraph(customData?: KnowledgeDatasets): Validati
   const relationMap = new Map<string, KnowledgeRelation>();
   const routeMap = new Map<string, ExplorationRoute>();
   const optionMap = new Map<string, string>(); // optId -> routeId
-  const locationMap = new Map<string, import('../types').LocationNode>();
+  const regionMap = new Map<string, Region>();
+  const locationMap = new Map<string, LocationNode>();
   const sceneMap = new Map<string, Scene>();
   const hotspotMap = new Map<string, string>(); // hotspotId -> sceneId
-  const actionMap = new Map<string, string>(); // actionId -> hotspotId
+  const actionMap = new Map<string, HotspotAction>();
+  const itemMap = new Map<string, string>(); // itemId -> actionId
+  const quizActionMap = new Map<string, HotspotAction>();
+  const bookmarkActionMap = new Map<string, HotspotAction>();
 
-  // Helper zum Prüfen von Claim-Referenzen
+  // 1.1 Regionen indizieren
+  for (const reg of data.worldData.regions) {
+    if (regionMap.has(reg.id)) {
+      issues.push({
+        level: 'ERROR',
+        category: 'INTEGRITY',
+        entityId: reg.id,
+        message: `Doppelte Region-ID gefunden: ${reg.id}`
+      });
+    }
+    regionMap.set(reg.id, reg);
+  }
+
+  // 1.2 Locations indizieren
+  for (const loc of data.worldData.locations) {
+    if (locationMap.has(loc.id)) {
+      issues.push({
+        level: 'ERROR',
+        category: 'INTEGRITY',
+        entityId: loc.id,
+        message: `Doppelte Location-ID gefunden: ${loc.id}`
+      });
+    }
+    locationMap.set(loc.id, loc);
+  }
+
+  // 1.3 Szenen, Hotspots und Actions indizieren
+  for (const scene of Object.values(data.scenesRegistry)) {
+    if (sceneMap.has(scene.id)) {
+      issues.push({
+        level: 'ERROR',
+        category: 'INTEGRITY',
+        entityId: scene.id,
+        message: `Doppelte Scene-ID gefunden: ${scene.id}`
+      });
+    }
+    sceneMap.set(scene.id, scene);
+
+    for (const hotspot of scene.hotspots) {
+      if (hotspotMap.has(hotspot.id)) {
+        issues.push({
+          level: 'ERROR',
+          category: 'INTEGRITY',
+          entityId: hotspot.id,
+          message: `Doppelte Hotspot-ID gefunden: ${hotspot.id} (in Szene ${scene.id})`
+        });
+      }
+      hotspotMap.set(hotspot.id, scene.id);
+
+      if (hotspot.dialogue.actions) {
+        for (const action of hotspot.dialogue.actions) {
+          if (actionMap.has(action.id)) {
+            issues.push({
+              level: 'ERROR',
+              category: 'INTEGRITY',
+              entityId: action.id,
+              message: `Doppelte Action-ID gefunden: ${action.id} (in Hotspot ${hotspot.id})`
+            });
+          }
+          actionMap.set(action.id, action);
+
+          if (action.type === 'ITEM' && action.item) {
+            if (itemMap.has(action.item.itemId)) {
+              issues.push({
+                level: 'ERROR',
+                category: 'INTEGRITY',
+                entityId: action.item.itemId,
+                message: `Doppelte Item-ID gefunden: ${action.item.itemId}`
+              });
+            }
+            itemMap.set(action.item.itemId, action.id);
+          }
+
+          if (action.type === 'QUIZ') {
+            quizActionMap.set(action.id, action);
+          }
+
+          if (action.type === 'BOOKMARK') {
+            bookmarkActionMap.set(action.id, action);
+          }
+        }
+      }
+    }
+  }
+
+  // 1.4 Quellen indizieren
+  for (const src of data.sources) {
+    if (sourceMap.has(src.id)) {
+      issues.push({
+        level: 'ERROR',
+        category: 'INTEGRITY',
+        entityId: src.id,
+        message: `Doppelte Source-ID gefunden: ${src.id}`
+      });
+    }
+    sourceMap.set(src.id, src);
+  }
+
+  // 1.5 Claims indizieren
+  for (const claim of data.claims) {
+    if (claimMap.has(claim.id)) {
+      issues.push({
+        level: 'ERROR',
+        category: 'INTEGRITY',
+        entityId: claim.id,
+        message: `Doppelte Claim-ID gefunden: ${claim.id}`
+      });
+    }
+    claimMap.set(claim.id, claim);
+  }
+
+  // 1.6 Nodes indizieren
+  for (const node of data.nodes) {
+    if (nodeMap.has(node.id)) {
+      issues.push({
+        level: 'ERROR',
+        category: 'INTEGRITY',
+        entityId: node.id,
+        message: `Doppelte Node-ID gefunden: ${node.id}`
+      });
+    }
+    nodeMap.set(node.id, node);
+  }
+
+  // 1.7 Relationen indizieren
+  for (const rel of data.relations) {
+    if (relationMap.has(rel.id)) {
+      issues.push({
+        level: 'ERROR',
+        category: 'INTEGRITY',
+        entityId: rel.id,
+        message: `Doppelte Relation-ID gefunden: ${rel.id}`
+      });
+    }
+    relationMap.set(rel.id, rel);
+  }
+
+  // 1.8 Routen und Optionen indizieren (vollständig in Phase 1 vor jeder NAVIGATE_ROUTES Prüfung)
+  for (const route of data.routes) {
+    if (routeMap.has(route.id)) {
+      issues.push({
+        level: 'ERROR',
+        category: 'INTEGRITY',
+        entityId: route.id,
+        message: `Doppelte Route-ID gefunden: ${route.id}`
+      });
+    }
+    routeMap.set(route.id, route);
+
+    for (const opt of route.options) {
+      if (optionMap.has(opt.id)) {
+        issues.push({
+          level: 'ERROR',
+          category: 'INTEGRITY',
+          entityId: opt.id,
+          message: `Doppelte Option-ID gefunden: ${opt.id}`
+        });
+      }
+      optionMap.set(opt.id, route.id);
+    }
+  }
+
+  // =========================================================================
+  // PHASE 2: Referenz-, Konsistenz- und Typprüfung
+  // =========================================================================
+
   const checkClaimExists = (claimId: string, context: string, entityId: string) => {
     if (!claimMap.has(claimId)) {
       issues.push({
@@ -180,7 +356,6 @@ export function validateKnowledgeGraph(customData?: KnowledgeDatasets): Validati
     }
   };
 
-  // Helper zum Prüfen von Node-Referenzen
   const checkNodeExists = (nodeId: string, context: string, entityId: string) => {
     if (!nodeMap.has(nodeId)) {
       issues.push({
@@ -192,18 +367,8 @@ export function validateKnowledgeGraph(customData?: KnowledgeDatasets): Validati
     }
   };
 
-  // 1. Quellen-Integrität
+  // 2.1 Quellen Validierung
   for (const src of data.sources) {
-    if (sourceMap.has(src.id)) {
-      issues.push({
-        level: 'ERROR',
-        category: 'INTEGRITY',
-        entityId: src.id,
-        message: `Doppelte Source-ID gefunden: ${src.id}`
-      });
-    }
-    sourceMap.set(src.id, src);
-
     if (src.kind === 'official') {
       if (!src.jurisdiction) {
         issues.push({
@@ -286,18 +451,8 @@ export function validateKnowledgeGraph(customData?: KnowledgeDatasets): Validati
     }
   }
 
-  // 2. Claim-Integrität & Zitierungsprüfung
+  // 2.2 Claims Validierung
   for (const claim of data.claims) {
-    if (claimMap.has(claim.id)) {
-      issues.push({
-        level: 'ERROR',
-        category: 'INTEGRITY',
-        entityId: claim.id,
-        message: `Doppelte Claim-ID gefunden: ${claim.id}`
-      });
-    }
-    claimMap.set(claim.id, claim);
-
     for (const citation of claim.citations) {
       const src = sourceMap.get(citation.sourceId);
       if (!src) {
@@ -327,35 +482,15 @@ export function validateKnowledgeGraph(customData?: KnowledgeDatasets): Validati
     }
   }
 
-  // 3. Node-Integrität
+  // 2.3 Nodes Validierung
   for (const node of data.nodes) {
-    if (nodeMap.has(node.id)) {
-      issues.push({
-        level: 'ERROR',
-        category: 'INTEGRITY',
-        entityId: node.id,
-        message: `Doppelte Node-ID gefunden: ${node.id}`
-      });
-    }
-    nodeMap.set(node.id, node);
-
     for (const cId of node.claimIds) {
       checkClaimExists(cId, 'KnowledgeNode', node.id);
     }
   }
 
-  // 4. Relations-Integrität
+  // 2.4 Relationen Validierung
   for (const rel of data.relations) {
-    if (relationMap.has(rel.id)) {
-      issues.push({
-        level: 'ERROR',
-        category: 'INTEGRITY',
-        entityId: rel.id,
-        message: `Doppelte Relation-ID gefunden: ${rel.id}`
-      });
-    }
-    relationMap.set(rel.id, rel);
-
     checkNodeExists(rel.fromNodeId, 'Relation fromNodeId', rel.id);
     checkNodeExists(rel.toNodeId, 'Relation toNodeId', rel.id);
 
@@ -364,18 +499,8 @@ export function validateKnowledgeGraph(customData?: KnowledgeDatasets): Validati
     }
   }
 
-  // 5. Exploration-Routen & Optionen
+  // 2.5 Routen & Optionen Validierung
   for (const route of data.routes) {
-    if (routeMap.has(route.id)) {
-      issues.push({
-        level: 'ERROR',
-        category: 'INTEGRITY',
-        entityId: route.id,
-        message: `Doppelte Route-ID gefunden: ${route.id}`
-      });
-    }
-    routeMap.set(route.id, route);
-
     const triggerNode = nodeMap.get(route.triggerNodeId);
     if (!triggerNode || triggerNode.kind !== 'experience') {
       issues.push({
@@ -402,16 +527,6 @@ export function validateKnowledgeGraph(customData?: KnowledgeDatasets): Validati
     }
 
     route.options.forEach((opt, idx) => {
-      if (optionMap.has(opt.id)) {
-        issues.push({
-          level: 'ERROR',
-          category: 'INTEGRITY',
-          entityId: opt.id,
-          message: `Doppelte Option-ID gefunden: ${opt.id}`
-        });
-      }
-      optionMap.set(opt.id, route.id);
-
       if (opt.perspectiveClaimIds) {
         for (const cId of opt.perspectiveClaimIds) {
           checkClaimExists(cId, `RouteOption perspectiveClaimIds`, opt.id);
@@ -453,6 +568,18 @@ export function validateKnowledgeGraph(customData?: KnowledgeDatasets): Validati
         });
       }
 
+      // Prüfe bookmarkId gegen die vorab indizierten BOOKMARK-Aktionen
+      if (opt.bookmarkId) {
+        if (!bookmarkActionMap.has(opt.bookmarkId)) {
+          issues.push({
+            level: 'ERROR',
+            category: 'ONTOLOGY',
+            entityId: opt.id,
+            message: `RouteOption ${opt.id} bookmarkId '${opt.bookmarkId}' verweist auf keine registrierte BOOKMARK-Aktion.`
+          });
+        }
+      }
+
       // Optionen 2-5 dürfen kein bookmarkId Property besitzen
       if (idx > 0 && opt.bookmarkId !== undefined) {
         issues.push({
@@ -465,17 +592,16 @@ export function validateKnowledgeGraph(customData?: KnowledgeDatasets): Validati
     });
   }
 
-  // 6. Locations & Weltkarte
+  // 2.6 Locations & Weltkarte Validierung
   for (const loc of data.worldData.locations) {
-    if (locationMap.has(loc.id)) {
+    if (!regionMap.has(loc.regionId)) {
       issues.push({
         level: 'ERROR',
-        category: 'INTEGRITY',
+        category: 'CONSISTENCY',
         entityId: loc.id,
-        message: `Doppelte Location-ID gefunden: ${loc.id}`
+        message: `Location ${loc.id} verweist auf unbekannte regionId '${loc.regionId}'.`
       });
     }
-    locationMap.set(loc.id, loc);
 
     if (loc.teaserClaimIds) {
       for (const cId of loc.teaserClaimIds) {
@@ -511,19 +637,9 @@ export function validateKnowledgeGraph(customData?: KnowledgeDatasets): Validati
     }
   }
 
-  // 7. Szenen, Hotspots und Actions
-  for (const [sceneKey, scene] of Object.entries(data.scenesRegistry)) {
-    if (sceneMap.has(scene.id)) {
-      issues.push({
-        level: 'ERROR',
-        category: 'INTEGRITY',
-        entityId: scene.id,
-        message: `Doppelte Scene-ID gefunden: ${scene.id}`
-      });
-    }
-    sceneMap.set(scene.id, scene);
-
-    const matchingLoc = data.worldData.locations.find(l => l.id === scene.locationId);
+  // 2.7 Szenen, Hotspots, Aktionen & Conditions Validierung
+  for (const scene of Object.values(data.scenesRegistry)) {
+    const matchingLoc = locationMap.get(scene.locationId);
     if (!matchingLoc) {
       issues.push({
         level: 'ERROR',
@@ -541,15 +657,39 @@ export function validateKnowledgeGraph(customData?: KnowledgeDatasets): Validati
     }
 
     for (const hotspot of scene.hotspots) {
-      if (hotspotMap.has(hotspot.id)) {
-        issues.push({
-          level: 'ERROR',
-          category: 'INTEGRITY',
-          entityId: hotspot.id,
-          message: `Doppelte Hotspot-ID gefunden: ${hotspot.id} (in Szene ${scene.id})`
-        });
+      // Conditions prüfen
+      if (hotspot.conditions) {
+        for (const cond of hotspot.conditions) {
+          if (cond.type === 'VISITED') {
+            if (!locationMap.has(cond.targetId)) {
+              issues.push({
+                level: 'ERROR',
+                category: 'CONSISTENCY',
+                entityId: hotspot.id,
+                message: `Hotspot Condition VISITED verweist auf unbekannte Location-ID '${cond.targetId}'.`
+              });
+            }
+          } else if (cond.type === 'ITEM_COLLECTED') {
+            if (!itemMap.has(cond.targetId)) {
+              issues.push({
+                level: 'ERROR',
+                category: 'CONSISTENCY',
+                entityId: hotspot.id,
+                message: `Hotspot Condition ITEM_COLLECTED verweist auf unbekannte Item-ID '${cond.targetId}'.`
+              });
+            }
+          } else if (cond.type === 'QUIZ_SOLVED') {
+            if (!quizActionMap.has(cond.targetId)) {
+              issues.push({
+                level: 'ERROR',
+                category: 'CONSISTENCY',
+                entityId: hotspot.id,
+                message: `Hotspot Condition QUIZ_SOLVED verweist auf unbekannte Quiz-Action-ID '${cond.targetId}'.`
+              });
+            }
+          }
+        }
       }
-      hotspotMap.set(hotspot.id, scene.id);
 
       if (hotspot.dialogue.claimIds) {
         for (const cId of hotspot.dialogue.claimIds) {
@@ -564,19 +704,20 @@ export function validateKnowledgeGraph(customData?: KnowledgeDatasets): Validati
 
       if (hotspot.dialogue.actions) {
         for (const action of hotspot.dialogue.actions) {
-          if (actionMap.has(action.id)) {
-            issues.push({
-              level: 'ERROR',
-              category: 'INTEGRITY',
-              entityId: action.id,
-              message: `Doppelte Action-ID gefunden: ${action.id} (in Hotspot ${hotspot.id})`
-            });
-          }
-          actionMap.set(action.id, hotspot.id);
-
           if (action.claimIds) {
             for (const cId of action.claimIds) {
               checkClaimExists(cId, `Action claimIds`, action.id);
+            }
+          }
+
+          if (action.type === 'NAVIGATE_ROUTES') {
+            if (!routeMap.has(action.routeId)) {
+              issues.push({
+                level: 'ERROR',
+                category: 'ONTOLOGY',
+                entityId: action.id,
+                message: `Action NAVIGATE_ROUTES verweist auf unbekannte routeId '${action.routeId}'.`
+              });
             }
           }
 
@@ -596,7 +737,7 @@ export function validateKnowledgeGraph(customData?: KnowledgeDatasets): Validati
     }
   }
 
-  // 8. Reachability Traversal & Release-Gate Status
+  // 2.8 Reachability Traversal & Release-Gate Status
   const reachableClaimIds = getReachableClaimIds(data);
   const reachableDraftClaimIds: string[] = [];
 

@@ -1,17 +1,17 @@
 import { WorldMapData } from '../types';
 
 export const WORLD_DATA: WorldMapData = {
-  id: 'map_central_region',
-  title: 'Landkarte der Psychotherapie – Zentralregion',
+  id: 'world_central_v01',
+  title: 'Zentralregion der Orientierung',
   imageSrc: '/assets/map/central_region.jpg',
-  nativeWidth: 2048,
-  nativeHeight: 1536,
+  nativeWidth: 1920,
+  nativeHeight: 1080,
   regions: [
     {
       id: 'reg_central',
-      name: 'Zentralregion',
-      description: 'Das Herzstück der Psychotherapielandschaft mit den Grundlagen der Evidenz und Versorgung.',
-      color: '#c9933b'
+      name: 'Zentralregion der Orientierung',
+      description: 'Der Einstiegsbereich für grundlegende Orientierung, Evidenz und das Versorgungssystem.',
+      color: '#d4af37'
     },
     {
       id: 'reg_behavioral',
@@ -46,9 +46,7 @@ export const WORLD_DATA: WorldMapData = {
       tagline: 'Wissensarten & Orientierungskompass',
       knowledgeNodeIds: [
         'node_collab_therapeutic_alliance',
-        'node_exp_constant_rumination',
-        'node_need_structure_coping',
-        'node_wm_concrete_action'
+        'node_exp_constant_rumination'
       ]
     },
     {
@@ -98,51 +96,50 @@ export const WORLD_DATA: WorldMapData = {
       icon: 'brain',
       badgeText: 'In Entwicklung',
       tagline: 'Gedanken, Verhalten & Erprobung',
-      teaserText: 'Auf diesem Plateau wird erkundet, wie Gedankenmuster und Verhaltensweisen analysiert und verändert werden.',
+      teaserText: 'Hier entsteht der Schauplatz für kognitive Umstrukturierung, Verhaltensanalysen und Exposition.',
       teaserClaimIds: ['claim_gba_guidelines'],
-      knowledgeNodeIds: ['node_app_cbt', 'node_proc_behavioral_activation', 'node_tech_behavioral_experiment']
+      knowledgeNodeIds: ['node_app_cbt']
     },
     {
       id: 'loc_teaser_psychoanalysis',
-      name: 'Hain der Tiefenpsychologie',
+      name: 'Schlucht der Tiefenpsychologie',
       regionId: 'reg_depth',
       type: 'teaser',
-      xPercent: 22.0,
-      yPercent: 24.0,
-      icon: 'tree-pine',
+      xPercent: 82.0,
+      yPercent: 68.0,
+      icon: 'mountain',
       badgeText: 'In Entwicklung',
-      tagline: 'Unbewusstes, Biografie & Beziehungsmuster',
-      teaserText: 'Im Hain der Tiefe werden lebensgeschichtliche Ursachen, unbewusste Konflikte und Bindungsmuster beleuchtet.',
+      tagline: 'Biografie, Übertragung & Unbewusstes',
+      teaserText: 'Hier entsteht der Schauplatz für psychodynamische Konflikte, freie Assoziation und Biografiearbeit.',
       teaserClaimIds: ['claim_gba_guidelines'],
-      knowledgeNodeIds: ['node_app_psychodynamic', 'node_proc_schema_exploration']
+      knowledgeNodeIds: ['node_app_psychodynamic']
     },
     {
       id: 'loc_teaser_systemic',
       name: 'Lichtung der Systemischen Therapie',
       regionId: 'reg_systemic',
       type: 'teaser',
-      xPercent: 82.0,
-      yPercent: 70.0,
-      icon: 'network',
+      xPercent: 44.0,
+      yPercent: 82.0,
+      icon: 'tree-pine',
       badgeText: 'In Entwicklung',
-      tagline: 'Muster im Umfeld, Rollen & Kommunikation',
-      teaserText: 'Auf dieser Lichtung werden soziale Systeme, Beziehungsdynamiken und Mehrgenerationen-Perspektiven erkundet.',
+      tagline: 'Beziehungen, Muster & Ressourcen',
+      teaserText: 'Hier entsteht der Schauplatz für Genogrammarbeit, zirkuläres Fragen und familiäre Dynamiken.',
       teaserClaimIds: ['claim_gba_guidelines'],
-      knowledgeNodeIds: ['node_app_systemic', 'node_tech_systemic_tasks']
+      knowledgeNodeIds: ['node_app_systemic']
     },
     {
       id: 'loc_teaser_humanistic',
-      name: 'Quelle der Humanistischen Verfahren',
+      name: 'Garten der Humanistischen Verfahren',
       regionId: 'reg_central',
       type: 'teaser',
-      xPercent: 44.0,
-      yPercent: 80.0,
-      icon: 'sparkles',
+      xPercent: 12.0,
+      yPercent: 34.0,
+      icon: 'flower',
       badgeText: 'In Entwicklung',
-      tagline: 'Erleben, Selbstentfaltung & Gestalttherapie',
-      teaserText: 'An dieser Quelle stehen das unmittelbare emotionale Erleben im Hier und Jetzt und ganzheitliche Wachstumsprozesse im Mittelpunkt.',
-      teaserClaimIds: ['claim_evidence_perspectives'],
-      knowledgeNodeIds: ['node_app_humanistic', 'node_tech_chair_work']
+      tagline: 'Selbstentfaltung, Kontakt & Gestaltarbeit',
+      teaserText: 'Hier entsteht der Schauplatz für Gestalttherapie, Gesprächspsychotherapie und Emotionsfokussierung.',
+      teaserClaimIds: ['claim_fit_collaboration_dynamic']
     }
   ]
 };

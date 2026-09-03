@@ -48,8 +48,8 @@ export const CLAIMS: ClaimRecord[] = [
   },
   {
     id: 'claim_care_116117_ptv11',
-    statement: 'Die psychotherapeutische Sprechstunde ist der reguläre Einstieg in die ambulante Psychotherapie (mit geregelten KBV-Ausnahmen bei Akutbehandlung, Klinikentlassung oder nahtloser Weiterbehandlung); das Formblatt PTV 11 dokumentiert die Ersteinschätzung.',
-    publicExplanation: 'Über die Terminservicestelle 116 117 können zeitnah Termine für eine Sprechstunde vermittelt werden. Ausnahmen von der vorherigen Sprechstundenpflicht gelten laut KBV z. B. bei unmittelbaren stationären Entlassungen, akuten Kriseninterventionen oder genehmigten Folgetherapien. Die Sprechstunde dient der ersten diagnostischen Orientierung, nicht automatisch der festen Zusage eines Behandlungsplatzes.',
+    statement: 'Nach den Regelungen für die ambulante GKV-Psychotherapie müssen vor Beginn probatorischer Sitzungen oder einer Akutbehandlung grundsätzlich mindestens 50 Minuten Psychotherapeutische Sprechstunde stattgefunden haben. Das Formblatt PTV 11 dokumentiert die Ergebnisse der Sprechstunde und die Empfehlungen für das weitere Vorgehen.',
+    publicExplanation: 'Über die Terminservicestelle 116 117 können zeitnah Termine für eine Sprechstunde vermittelt werden. Die Sprechstunde ist die reguläre diagnostische Erstabklärung vor einer Richtlinientherapie oder Akutbehandlung. Auf der Informationsseite der KBV werden als Ausnahmen von der vorherigen Sprechstundenpflicht genannt: (1) Eine vorherige stationäre Krankenhaus- oder Rehabilitationsbehandlung aufgrund einer psychischen Erkrankung mit einer ambulant psychotherapeutisch behandelbaren Diagnose sowie (2) ein Therapeutenwechsel während einer laufenden Psychotherapie.',
     type: 'care-fact',
     citations: [
       {
@@ -64,7 +64,8 @@ export const CLAIMS: ClaimRecord[] = [
       }
     ],
     evidenceLevel: 'not-applicable',
-    reviewStatus: 'draft'
+    reviewStatus: 'draft',
+    limitations: 'Dies sind die von der Kassenärztlichen Bundesvereinigung (KBV) für den ambulanten Bereich benannten Ausnahmetatbestände von der Sprechstundenpflicht.'
   },
   {
     id: 'claim_care_funding_paths',

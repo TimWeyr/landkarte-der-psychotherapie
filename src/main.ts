@@ -6,6 +6,7 @@ import './styles/dialogue.css';
 
 import { WORLD_DATA } from './data/worldData';
 import { getSceneById } from './data/scenes';
+import { getNodeById } from './data/knowledge';
 import { store } from './state/store';
 import { MapEngine } from './engine/MapEngine';
 import { IntroScreen } from './ui/IntroScreen';
@@ -21,11 +22,17 @@ export interface RouteNavigationResult {
 }
 
 /**
- * Reine Routing-Logik zur Berechnung der Karteneffekte bei Routennavigation (ohne Seiteneffekte)
+ * Reine Routing-Logik zur Berechnung der Karteneffekte bei Routennavigation (ohne Seiteneffekte).
+ * Schließt den aktuellen Ausgangsort (originLocationId) generisch aus.
  */
-export function computeRouteNavigationEffect(option: RouteOption, locations: LocationNode[]): RouteNavigationResult {
+export function computeRouteNavigationEffect(
+  option: RouteOption,
+  locations: LocationNode[],
+  originLocationId?: string
+): RouteNavigationResult {
   if (option.id === 'opt_concrete_action') {
     const matchingLocs = locations.filter(loc =>
+      loc.id !== originLocationId &&
       loc.knowledgeNodeIds?.some(nId => option.targetKnowledgeNodeIds.includes(nId))
     );
     const targetLocationIds = matchingLocs.map(l => l.id);
@@ -43,6 +50,36 @@ export function computeRouteNavigationEffect(option: RouteOption, locations: Loc
   }
 }
 
+/**
+ * Öffentlicher Renderer für Teaser-Karten
+ */
+export function renderTeaserCardHtml(location: LocationNode, actionModal: ActionModal): string {
+  const nodeClaims = (location.knowledgeNodeIds || [])
+    .map(nId => getNodeById(nId))
+    .filter((n): n is NonNullable<typeof n> => Boolean(n))
+    .flatMap(n => n.claimIds || []);
+
+  const allTeaserClaimIds = Array.from(new Set([
+    ...(location.teaserClaimIds || []),
+    ...nodeClaims
+  ]));
+
+  const teaserSourcesHtml = allTeaserClaimIds.length > 0
+    ? actionModal.renderSourcesAccordion(allTeaserClaimIds, `📚 Wissenschaftliche Einordnung (${allTeaserClaimIds.length})`, `teaser-${location.id}`)
+    : '';
+
+  return `
+    <div class="preview-badge badge-teaser">${location.badgeText || 'In Entwicklung'}</div>
+    <h3 class="preview-title" id="teaser-title-${location.id}">${location.name}</h3>
+    <div class="preview-tagline">${location.tagline}</div>
+    <p class="preview-text">${location.teaserText || 'Dieser Ort wird in einer kommenden Version der Psychotherapie-Landkarte begehbar sein.'}</p>
+    ${teaserSourcesHtml}
+    <div class="preview-actions">
+      <button class="btn btn-secondary btn-sm" id="btn-close-teaser">Verstanden</button>
+    </div>
+  `;
+}
+
 export class Application {
   private root: HTMLElement;
   private mapContainer!: HTMLElement;
@@ -50,6 +87,7 @@ export class Application {
   private backpackPanel!: BackpackPanel;
   private actionModal!: ActionModal;
   private currentSceneView: SceneView | null = null;
+  private currentSceneLocationId: string | null = null;
   private activeTeaserCard: HTMLElement | null = null;
   private routeHighlightBanner: HTMLElement | null = null;
 
@@ -193,22 +231,10 @@ export class Application {
     card.className = 'location-preview-card';
     card.style.left = `${pos.x}px`;
     card.style.top = `${pos.y}px`;
+    card.setAttribute('role', 'region');
+    card.setAttribute('aria-labelledby', `teaser-title-${location.id}`);
 
-    // Render teaser claims if present
-    const teaserSourcesHtml = location.teaserClaimIds && location.teaserClaimIds.length > 0
-      ? this.actionModal.renderSourcesAccordion(location.teaserClaimIds, '📚 Evidenz & Nachweise zu diesem Schauplatz', `teaser-${location.id}`)
-      : '';
-
-    card.innerHTML = `
-      <div class="preview-badge badge-teaser">${location.badgeText || 'In Entwicklung'}</div>
-      <h3 class="preview-title">${location.name}</h3>
-      <div class="preview-tagline">${location.tagline}</div>
-      <p class="preview-text">${location.teaserText || 'Dieser Ort wird in einer kommenden Version der Psychotherapie-Landkarte begehbar sein.'}</p>
-      ${teaserSourcesHtml}
-      <div class="preview-actions">
-        <button class="btn btn-secondary btn-sm" id="btn-close-teaser">Verstanden</button>
-      </div>
-    `;
+    card.innerHTML = renderTeaserCardHtml(location, this.actionModal);
 
     card.querySelector('#btn-close-teaser')?.addEventListener('click', () => {
       this.closeTeaserCard();
@@ -230,6 +256,8 @@ export class Application {
     if (this.currentSceneView) {
       this.currentSceneView.destroy();
     }
+
+    this.currentSceneLocationId = scene.locationId;
 
     // Toggle HUD map controls
     const mapControls = this.root.querySelector('.map-controls') as HTMLElement;
@@ -308,8 +336,9 @@ export class Application {
   }
 
   public handleRouteNavigation(option: RouteOption): RouteNavigationResult {
+    const originLocationId = this.currentSceneLocationId || undefined;
     this.closeScene();
-    const result = computeRouteNavigationEffect(option, WORLD_DATA.locations);
+    const result = computeRouteNavigationEffect(option, WORLD_DATA.locations, originLocationId);
 
     if (result.highlightedLocationIds.length > 0) {
       this.mapEngine?.highlightLocations(result.highlightedLocationIds);

@@ -25,7 +25,9 @@ export function getRelationsForNode(nodeId: string): KnowledgeRelation[] {
   return KNOWLEDGE_RELATIONS.filter(r => r.fromNodeId === nodeId || r.toNodeId === nodeId);
 }
 
-export function getSourcesForClaim(claim: ClaimRecord): { citation: ClaimCitation; source: SourceRecord }[] {
+export function getSourcesForClaim(claimOrId: ClaimRecord | string): { citation: ClaimCitation; source: SourceRecord }[] {
+  const claim = typeof claimOrId === 'string' ? getClaimById(claimOrId) : claimOrId;
+  if (!claim || !claim.citations) return [];
   const result: { citation: ClaimCitation; source: SourceRecord }[] = [];
   for (const cit of claim.citations) {
     const src = getSourceById(cit.sourceId);

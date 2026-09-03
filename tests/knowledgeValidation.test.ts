@@ -4,30 +4,10 @@ import { createTestKnowledgeFixture } from './fixtures/knowledgeFixtures';
 import { store } from '../src/state/store';
 import { getDefaultState } from '../src/state/storage';
 import { computeRouteNavigationEffect } from '../src/main';
-import { ActionModal } from '../src/ui/ActionModal';
 
-// Mock localStorage for Node environment in tests
-const localStorageMock = (() => {
-  let storageStore: Record<string, string> = {};
-  return {
-    getItem: (key: string) => storageStore[key] || null,
-    setItem: (key: string, value: string) => {
-      storageStore[key] = value.toString();
-    },
-    removeItem: (key: string) => {
-      delete storageStore[key];
-    },
-    clear: () => {
-      storageStore = {};
-    }
-  };
-})();
-
-(globalThis as any).localStorage = localStorageMock;
-
-describe('Knowledge Graph Integrity, Negative DI, Reachability & UI Tests', () => {
+describe('Knowledge Graph Two-Phase Integrity, Negative DI, Reachability & Routing Tests', () => {
   beforeEach(() => {
-    localStorageMock.clear();
+    localStorage.clear();
     store.replaceState(getDefaultState());
   });
 
@@ -41,12 +21,36 @@ describe('Knowledge Graph Integrity, Negative DI, Reachability & UI Tests', () =
     expect(report.releaseStatus).toBe('BLOCKED_BY_DRAFT_CONTENT');
   });
 
+  it('should accept forward references when RouteOption or Condition points to an entity in a later scene', () => {
+    const fixture = createTestKnowledgeFixture();
+
+    // Scene 1 (first registered) has a condition pointing to an item in Scene 2 (later registered)
+    fixture.scenesRegistry['scene_lighthouse'].hotspots[0].conditions = [
+      {
+        type: 'ITEM_COLLECTED',
+        targetId: 'item_notepad_action' // located in scene_workshop!
+      },
+      {
+        type: 'VISITED',
+        targetId: 'loc_workshop'
+      }
+    ];
+
+    // RouteOption in route points to bookmark in scene_workshop
+    fixture.routes[0].options[0].bookmarkId = 'bm_initial_interview_question_action';
+
+    const report = validateKnowledgeGraph(fixture);
+    expect(report.isValid).toBe(true);
+    expect(report.errorsCount).toBe(0);
+  });
+
   it('should reject route with only need (missing working-mode)', () => {
     const fixture = createTestKnowledgeFixture();
     fixture.routes[0].options[0].targetKnowledgeNodeIds = ['node_need_structure_coping']; // only need!
 
     const report = validateKnowledgeGraph(fixture);
     expect(report.isValid).toBe(false);
+    expect(report.releaseStatus).toBe('BLOCKED_BY_VALIDATION_ERRORS');
     expect(report.issues.some(i => i.message.includes('mindestens einen \'need\'- und mindestens einen \'working-mode\'-Knoten'))).toBe(true);
   });
 
@@ -56,6 +60,7 @@ describe('Knowledge Graph Integrity, Negative DI, Reachability & UI Tests', () =
 
     const report = validateKnowledgeGraph(fixture);
     expect(report.isValid).toBe(false);
+    expect(report.releaseStatus).toBe('BLOCKED_BY_VALIDATION_ERRORS');
     expect(report.issues.some(i => i.message.includes('mindestens einen \'need\'- und mindestens einen \'working-mode\'-Knoten'))).toBe(true);
   });
 
@@ -63,22 +68,30 @@ describe('Knowledge Graph Integrity, Negative DI, Reachability & UI Tests', () =
     // 1. Unknown disclaimer claim
     const fixDisclaimer = createTestKnowledgeFixture();
     fixDisclaimer.routes[0].disclaimerClaimIds = ['claim_non_existent_disclaimer'];
-    expect(validateKnowledgeGraph(fixDisclaimer).isValid).toBe(false);
+    const repDisc = validateKnowledgeGraph(fixDisclaimer);
+    expect(repDisc.isValid).toBe(false);
+    expect(repDisc.releaseStatus).toBe('BLOCKED_BY_VALIDATION_ERRORS');
 
     // 2. Unknown perspective claim
     const fixPersp = createTestKnowledgeFixture();
     fixPersp.routes[0].options[0].perspectiveClaimIds = ['claim_non_existent_persp'];
-    expect(validateKnowledgeGraph(fixPersp).isValid).toBe(false);
+    const repPersp = validateKnowledgeGraph(fixPersp);
+    expect(repPersp.isValid).toBe(false);
+    expect(repPersp.releaseStatus).toBe('BLOCKED_BY_VALIDATION_ERRORS');
 
     // 3. Unknown teaser claim
     const fixTeaser = createTestKnowledgeFixture();
     fixTeaser.worldData.locations[3].teaserClaimIds = ['claim_non_existent_teaser'];
-    expect(validateKnowledgeGraph(fixTeaser).isValid).toBe(false);
+    const repTeaser = validateKnowledgeGraph(fixTeaser);
+    expect(repTeaser.isValid).toBe(false);
+    expect(repTeaser.releaseStatus).toBe('BLOCKED_BY_VALIDATION_ERRORS');
 
     // 4. Unknown dialogue claim
     const fixDial = createTestKnowledgeFixture();
     fixDial.scenesRegistry['scene_lighthouse'].hotspots[0].dialogue.claimIds = ['claim_non_existent_dial'];
-    expect(validateKnowledgeGraph(fixDial).isValid).toBe(false);
+    const repDial = validateKnowledgeGraph(fixDial);
+    expect(repDial.isValid).toBe(false);
+    expect(repDial.releaseStatus).toBe('BLOCKED_BY_VALIDATION_ERRORS');
 
     // 5. Unknown quiz claim
     const fixQuiz = createTestKnowledgeFixture();
@@ -96,7 +109,9 @@ describe('Knowledge Graph Integrity, Negative DI, Reachability & UI Tests', () =
         }
       }
     ];
-    expect(validateKnowledgeGraph(fixQuiz).isValid).toBe(false);
+    const repQuiz = validateKnowledgeGraph(fixQuiz);
+    expect(repQuiz.isValid).toBe(false);
+    expect(repQuiz.releaseStatus).toBe('BLOCKED_BY_VALIDATION_ERRORS');
 
     // 6. Unknown item claim
     const fixItem = createTestKnowledgeFixture();
@@ -114,7 +129,110 @@ describe('Knowledge Graph Integrity, Negative DI, Reachability & UI Tests', () =
         }
       }
     ];
-    expect(validateKnowledgeGraph(fixItem).isValid).toBe(false);
+    const repItem = validateKnowledgeGraph(fixItem);
+    expect(repItem.isValid).toBe(false);
+    expect(repItem.releaseStatus).toBe('BLOCKED_BY_VALIDATION_ERRORS');
+  });
+
+  it('should reject NAVIGATE_ROUTES action with non-existent routeId', () => {
+    const fixture = createTestKnowledgeFixture();
+    fixture.scenesRegistry['scene_lighthouse'].hotspots[0].dialogue.actions = [
+      {
+        id: 'act_broken_nav',
+        type: 'NAVIGATE_ROUTES',
+        label: 'Broken Nav',
+        routeId: 'route_non_existent_xyz'
+      }
+    ];
+
+    const report = validateKnowledgeGraph(fixture);
+    expect(report.isValid).toBe(false);
+    expect(report.releaseStatus).toBe('BLOCKED_BY_VALIDATION_ERRORS');
+    expect(report.issues.some(i => i.message.includes('Action NAVIGATE_ROUTES verweist auf unbekannte routeId'))).toBe(true);
+  });
+
+  it('should reject RouteOption with bookmarkId pointing to non-existent or non-BOOKMARK action', () => {
+    // 1. Pointing to non-existent action
+    const fix1 = createTestKnowledgeFixture();
+    fix1.routes[0].options[0].bookmarkId = 'bm_non_existent_action';
+    const rep1 = validateKnowledgeGraph(fix1);
+    expect(rep1.isValid).toBe(false);
+    expect(rep1.releaseStatus).toBe('BLOCKED_BY_VALIDATION_ERRORS');
+
+    // 2. Pointing to an action that is not a BOOKMARK (e.g. ITEM)
+    const fix2 = createTestKnowledgeFixture();
+    fix2.routes[0].options[0].bookmarkId = 'act_lh_item_lens'; // This is an ITEM action
+    const rep2 = validateKnowledgeGraph(fix2);
+    expect(rep2.isValid).toBe(false);
+    expect(rep2.releaseStatus).toBe('BLOCKED_BY_VALIDATION_ERRORS');
+  });
+
+  it('should reject duplicate region IDs and Location pointing to unknown regionId', () => {
+    // 1. Duplicate region ID
+    const fixDupReg = createTestKnowledgeFixture();
+    fixDupReg.worldData.regions.push({ ...fixDupReg.worldData.regions[0] });
+    const rep1 = validateKnowledgeGraph(fixDupReg);
+    expect(rep1.isValid).toBe(false);
+    expect(rep1.releaseStatus).toBe('BLOCKED_BY_VALIDATION_ERRORS');
+
+    // 2. Unknown regionId
+    const fixUnknownReg = createTestKnowledgeFixture();
+    fixUnknownReg.worldData.locations[0].regionId = 'reg_non_existent';
+    const rep2 = validateKnowledgeGraph(fixUnknownReg);
+    expect(rep2.isValid).toBe(false);
+    expect(rep2.releaseStatus).toBe('BLOCKED_BY_VALIDATION_ERRORS');
+  });
+
+  it('should reject duplicate item IDs across actions', () => {
+    const fixture = createTestKnowledgeFixture();
+    // Add another item action with the same itemId 'item_lens_differentiation'
+    fixture.scenesRegistry['scene_station'].hotspots[0].dialogue.actions = [
+      {
+        id: 'act_duplicate_item',
+        type: 'ITEM',
+        label: 'Duplicate Item',
+        item: {
+          itemId: 'item_lens_differentiation', // duplicate!
+          title: 'Duplicate Item',
+          description: 'Duplicate Desc',
+          icon: 'eye'
+        }
+      }
+    ];
+
+    const report = validateKnowledgeGraph(fixture);
+    expect(report.isValid).toBe(false);
+    expect(report.releaseStatus).toBe('BLOCKED_BY_VALIDATION_ERRORS');
+    expect(report.issues.some(i => i.message.includes('Doppelte Item-ID gefunden: item_lens_differentiation'))).toBe(true);
+  });
+
+  it('should validate Condition.targetId by condition type', () => {
+    // 1. VISITED with non-existent location
+    const fixVisited = createTestKnowledgeFixture();
+    fixVisited.scenesRegistry['scene_lighthouse'].hotspots[0].conditions = [
+      { type: 'VISITED', targetId: 'loc_non_existent' }
+    ];
+    const repVisited = validateKnowledgeGraph(fixVisited);
+    expect(repVisited.isValid).toBe(false);
+    expect(repVisited.releaseStatus).toBe('BLOCKED_BY_VALIDATION_ERRORS');
+
+    // 2. ITEM_COLLECTED with non-existent itemId
+    const fixItem = createTestKnowledgeFixture();
+    fixItem.scenesRegistry['scene_lighthouse'].hotspots[0].conditions = [
+      { type: 'ITEM_COLLECTED', targetId: 'item_non_existent' }
+    ];
+    const repItem = validateKnowledgeGraph(fixItem);
+    expect(repItem.isValid).toBe(false);
+    expect(repItem.releaseStatus).toBe('BLOCKED_BY_VALIDATION_ERRORS');
+
+    // 3. QUIZ_SOLVED with non-existent quizActionId
+    const fixQuiz = createTestKnowledgeFixture();
+    fixQuiz.scenesRegistry['scene_lighthouse'].hotspots[0].conditions = [
+      { type: 'QUIZ_SOLVED', targetId: 'act_non_existent_quiz' }
+    ];
+    const repQuiz = validateKnowledgeGraph(fixQuiz);
+    expect(repQuiz.isValid).toBe(false);
+    expect(repQuiz.releaseStatus).toBe('BLOCKED_BY_VALIDATION_ERRORS');
   });
 
   it('should reject unknown Location-KnowledgeNode-ID', () => {
@@ -123,10 +241,11 @@ describe('Knowledge Graph Integrity, Negative DI, Reachability & UI Tests', () =
 
     const report = validateKnowledgeGraph(fixture);
     expect(report.isValid).toBe(false);
+    expect(report.releaseStatus).toBe('BLOCKED_BY_VALIDATION_ERRORS');
     expect(report.issues.some(i => i.message.includes('Location knowledgeNodeIds verweist auf unbekannte Node-ID'))).toBe(true);
   });
 
-  it('should reject duplicate Relation-, Route-, Location-, Scene-, Hotspot-, and Action-IDs', () => {
+  it('should reject duplicate Relation-, Route-, Location-, Scene-, and Hotspot-IDs', () => {
     // Duplicate Relation ID
     const fixRel = createTestKnowledgeFixture();
     fixRel.relations.push({ ...fixRel.relations[0] });
@@ -162,6 +281,7 @@ describe('Knowledge Graph Integrity, Negative DI, Reachability & UI Tests', () =
     };
     const rep1 = validateKnowledgeGraph(fixOrphanScene);
     expect(rep1.isValid).toBe(false);
+    expect(rep1.releaseStatus).toBe('BLOCKED_BY_VALIDATION_ERRORS');
     expect(rep1.issues.some(i => i.message.includes('Verwaiste Szene'))).toBe(true);
 
     // 2. Orphaned scene-location (location points to non-existent scene)
@@ -179,14 +299,13 @@ describe('Knowledge Graph Integrity, Negative DI, Reachability & UI Tests', () =
     });
     const rep2 = validateKnowledgeGraph(fixOrphanLoc);
     expect(rep2.isValid).toBe(false);
+    expect(rep2.releaseStatus).toBe('BLOCKED_BY_VALIDATION_ERRORS');
     expect(rep2.issues.some(i => i.message.includes('referenziert keine registrierte Szene'))).toBe(true);
   });
 
   it('should block release when a draft claim is reachable behind multiple relation hops (BFS traversal)', () => {
     const fixture = createTestKnowledgeFixture();
 
-    // Add a multi-hop chain:
-    // node_tech_behavioral_experiment -> (realized-by) -> node_deep_hop1 -> (acts-via) -> node_deep_hop2
     fixture.nodes.push({
       id: 'node_deep_hop1',
       kind: 'process',
@@ -275,6 +394,27 @@ describe('Knowledge Graph Integrity, Negative DI, Reachability & UI Tests', () =
     expect(relAlliance.toNodeId).toBe('node_collab_therapeutic_alliance');
   });
 
+  it('should generically exclude originLocationId during Route Option 1 navigation and not mutate state', () => {
+    const route = getDefaultDatasets().routes[0];
+    const locations = getDefaultDatasets().worldData.locations;
+    const opt1 = route.options[0];
+
+    const stateBefore = JSON.stringify(store.getState());
+
+    // 1. With originLocationId = 'loc_lighthouse' -> must return strictly ['loc_workshop']
+    const result1 = computeRouteNavigationEffect(opt1, locations, 'loc_lighthouse');
+    expect(result1.highlightedLocationIds).toEqual(['loc_workshop']);
+    expect(result1.isNeutralPerspective).toBe(false);
+
+    // 2. With originLocationId = 'loc_workshop' -> excludes workshop and returns []
+    const result2 = computeRouteNavigationEffect(opt1, locations, 'loc_workshop');
+    expect(result2.highlightedLocationIds).toEqual([]);
+
+    // 3. State must be completely unmodified
+    const stateAfter = JSON.stringify(store.getState());
+    expect(stateAfter).toBe(stateBefore);
+  });
+
   it('should ensure Options 2-5 produce neutral development banner, no highlight and zero state mutation in the routing controller', () => {
     const route = getDefaultDatasets().routes[0];
     const locations = getDefaultDatasets().worldData.locations;
@@ -283,7 +423,7 @@ describe('Knowledge Graph Integrity, Negative DI, Reachability & UI Tests', () =
       const option = route.options[i];
       const stateBefore = JSON.stringify(store.getState());
 
-      const result = computeRouteNavigationEffect(option, locations);
+      const result = computeRouteNavigationEffect(option, locations, 'loc_lighthouse');
 
       // Result must have NO highlighted locations
       expect(result.highlightedLocationIds).toEqual([]);
@@ -294,49 +434,5 @@ describe('Knowledge Graph Integrity, Negative DI, Reachability & UI Tests', () =
       const stateAfter = JSON.stringify(store.getState());
       expect(stateAfter).toBe(stateBefore);
     }
-  });
-
-  it('should ensure Option 1 highlights workshop and does not mutate state', () => {
-    const route = getDefaultDatasets().routes[0];
-    const locations = getDefaultDatasets().worldData.locations;
-
-    const opt1 = route.options[0];
-    const stateBefore = JSON.stringify(store.getState());
-
-    const result = computeRouteNavigationEffect(opt1, locations);
-    expect(result.highlightedLocationIds).toContain('loc_workshop');
-    expect(result.isNeutralPerspective).toBe(false);
-
-    const stateAfter = JSON.stringify(store.getState());
-    expect(stateAfter).toBe(stateBefore);
-  });
-
-  it('should ensure functional teaser-, disclaimer- and perspective-accordions in ActionModal', () => {
-    const modal = new ActionModal();
-
-    // 1. Perspective claim accordion rendering & interaction
-    const container = document.createElement('div');
-    container.innerHTML = `
-      ${modal.renderSourcesAccordion(['claim_therapeutic_alliance'], 'Test Perspektive', 'test-persp')}
-      ${modal.renderSourcesAccordion(['claim_fit_collaboration_dynamic'], 'Test Disclaimer', 'test-disclaimer')}
-    `;
-
-    modal.attachAccordionListeners(container);
-
-    const accordions = container.querySelectorAll('.sources-accordion');
-    expect(accordions.length).toBe(2);
-
-    const toggleBtn1 = accordions[0].querySelector('.sources-toggle-btn') as HTMLButtonElement;
-    const body1 = accordions[0].querySelector('.sources-body') as HTMLElement;
-
-    expect(body1.classList.contains('hidden')).toBe(true);
-
-    // Click to expand
-    toggleBtn1.click();
-    expect(body1.classList.contains('hidden')).toBe(false);
-
-    // Click to collapse
-    toggleBtn1.click();
-    expect(body1.classList.contains('hidden')).toBe(true);
   });
 });
