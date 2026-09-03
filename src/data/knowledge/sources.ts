@@ -6,44 +6,45 @@ export const SOURCES: SourceRecord[] = [
     kind: 'official',
     title: 'Richtlinie des Gemeinsamen Bundesausschusses über die Durchführung der Psychotherapie (Psychotherapie-Richtlinie)',
     authors: 'Gemeinsamer Bundesausschuss (G-BA)',
-    year: 2023,
-    venue: 'Bundesanzeiger AT 05.04.2023 B2',
+    year: 2026,
+    venue: 'Bundesanzeiger BAnz AT 16.06.2026 B3 (Beschluss vom 19.03.2026, in Kraft getreten am 17.06.2026)',
     url: 'https://www.g-ba.de/richtlinien/20/',
     jurisdiction: 'DE',
-    lastCheckedAt: '2026-03-01',
-    validFrom: '2017-04-01'
+    validFrom: '2017-04-01',
+    lastCheckedAt: '2026-09-03'
   },
   {
-    id: 'src_kbv_terminservicestelle_2024',
+    id: 'src_kbv_psychotherapie',
     kind: 'official',
-    title: 'Leitfaden zur Terminservicestelle 116 117 und Psychotherapeutischen Sprechstunde (Formblatt PTV 11)',
+    title: 'Psychotherapeutische Versorgung im Überblick',
     authors: 'Kassenärztliche Bundesvereinigung (KBV)',
-    year: 2024,
-    venue: 'KBV Praxisinformationen',
-    url: 'https://www.kbv.de/html/psychotherapie.php',
+    year: 2026,
+    venue: 'KBV Informationsportal Psychotherapie',
+    url: 'https://www.kbv.de/psychotherapie',
     jurisdiction: 'DE',
-    lastCheckedAt: '2026-03-01'
+    lastCheckedAt: '2026-09-03'
+  },
+  {
+    id: 'src_kbv_terminvermittlung',
+    kind: 'official',
+    title: 'Terminvermittlung und Psychotherapeutische Sprechstunde über 116 117',
+    authors: 'Kassenärztliche Bundesvereinigung (KBV)',
+    year: 2026,
+    venue: 'KBV Praxiswissen Terminvermittlung',
+    url: 'https://www.kbv.de/praxis/praxisfuehrung/terminvermittlung',
+    jurisdiction: 'DE',
+    lastCheckedAt: '2026-09-03'
   },
   {
     id: 'src_sgb5_paragraph13',
     kind: 'official',
-    title: 'Sozialgesetzbuch (SGB) Fünftes Buch (V) - Gesetzliche Krankenversicherung - § 13 Abs. 3 Kostenerstattung',
-    authors: 'Bundesministerium für Gesundheit (BMG)',
-    year: 2024,
-    venue: 'Gesetze im Internet',
+    title: 'Fünftes Buch Sozialgesetzbuch (SGB V) – Gesetzliche Krankenversicherung, § 13 Kostenerstattung',
+    authors: 'Bundesministerium der Justiz / Bundesgesetzgeber',
+    year: 2026,
+    venue: 'Bundesgesetzblatt (BGBl.)',
     url: 'https://www.gesetze-im-internet.de/sgb_5/__13.html',
     jurisdiction: 'DE',
-    lastCheckedAt: '2026-03-01'
-  },
-  {
-    id: 'src_wampold_imel_2015',
-    kind: 'theory',
-    title: 'The Great Psychotherapy Debate: The Evidence for What Makes Psychotherapy Work (2nd ed.)',
-    authors: 'Wampold, B. E., & Imel, Z. E.',
-    year: 2015,
-    venue: 'Routledge / Psychology Press',
-    doi: '10.4324/9780203582015',
-    peerReviewed: true
+    lastCheckedAt: '2026-09-03'
   },
   {
     id: 'src_horvath_symonds_1991',
@@ -56,32 +57,31 @@ export const SOURCES: SourceRecord[] = [
     peerReviewed: true
   },
   {
+    id: 'src_wampold_imel_2015',
+    kind: 'theory',
+    title: 'The Great Psychotherapy Debate: The Evidence for What Makes Psychotherapy Work (2nd ed.)',
+    authors: 'Wampold, B. E., & Imel, Z. E.',
+    year: 2015,
+    venue: 'Routledge / Taylor & Francis',
+    peerReviewed: true
+  },
+  {
     id: 'src_grawe_1997',
     kind: 'theory',
-    title: 'Psychologische Therapie',
+    title: 'Psychologische Therapie (2. Aufl.)',
     authors: 'Grawe, K.',
     year: 1997,
     venue: 'Hogrefe Verlag',
     peerReviewed: true
   },
   {
-    id: 'src_goldberg_2026_prognostic',
+    id: 'src_goldberg_2026_therapist_characteristics',
     kind: 'primary-study',
-    title: 'Dynamic prognostic modeling in naturalistic psychotherapy: Precision vs. clinical flexibility',
+    title: 'Multimodal Assessments of Therapist Characteristics Are Largely Unrelated to Patient Outcomes: A Preregistered Analysis',
     authors: 'Goldberg, S. B., et al.',
     year: 2026,
-    venue: 'Journal of Consulting and Clinical Psychology',
-    doi: '10.1037/ccp0000890',
+    venue: 'Clinical Psychological Science',
+    doi: '10.1177/21677026261424222',
     peerReviewed: true
-  },
-  {
-    id: 'src_narrative_rumination_action_2025',
-    kind: 'patient-narrative',
-    title: 'Erfahrungsstimmen zu handlungsorientierten Schritten bei ständigen Grübelschleifen',
-    year: 2025,
-    venue: 'Qualitative Synthese strukturierter Patienteninterviews',
-    narrativeForm: 'composite',
-    platform: 'Forschungssynthese Patientenperspektiven',
-    lastCheckedAt: '2026-03-01'
   }
 ];

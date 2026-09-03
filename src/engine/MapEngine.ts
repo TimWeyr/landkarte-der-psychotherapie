@@ -1,6 +1,7 @@
 import { Application, Container, Sprite, Assets, FederatedPointerEvent } from 'pixi.js';
 import { WorldMapData, LocationNode } from '../types';
 import { LandmarkSprite } from './LandmarkSprite';
+import { calculateDistance, calculatePinchCenter, calculatePinchScale, calculateFitBounds, clampDimension } from './mapGeometry';
 
 export interface MapEngineOptions {
   container: HTMLElement;
@@ -32,7 +33,6 @@ export class MapEngine {
   private activePointers = new Map<number, { x: number; y: number }>();
   private initialPinchDistance: number | null = null;
   private initialPinchScale = 1;
-  private pinchCenter = { x: 0, y: 0 };
 
   constructor(options: MapEngineOptions) {
     this.options = options;
@@ -112,7 +112,7 @@ export class MapEngine {
     stage.eventMode = 'static';
     stage.hitArea = this.app.screen;
 
-    // Pointer events with multi-touch pinch support
+    // Pointer events for panning and pinch-to-zoom
     stage.on('pointerdown', (e: FederatedPointerEvent) => {
       this.activePointers.set(e.pointerId, { x: e.global.x, y: e.global.y });
 
@@ -121,15 +121,10 @@ export class MapEngine {
         this.dragStart = { x: e.global.x, y: e.global.y };
         this.containerStart = { x: this.worldContainer.x, y: this.worldContainer.y };
       } else if (this.activePointers.size === 2) {
-        // Start Pinch
         this.isDragging = false;
         const pts = Array.from(this.activePointers.values());
-        this.initialPinchDistance = Math.hypot(pts[1].x - pts[0].x, pts[1].y - pts[0].y);
+        this.initialPinchDistance = calculateDistance(pts[0], pts[1]);
         this.initialPinchScale = this.currentScale;
-        this.pinchCenter = {
-          x: (pts[0].x + pts[1].x) / 2,
-          y: (pts[0].y + pts[1].y) / 2
-        };
       }
     });
 
@@ -139,27 +134,28 @@ export class MapEngine {
       }
 
       if (this.activePointers.size === 2 && this.initialPinchDistance) {
-        // Multi-touch Pinch Zoom
         const pts = Array.from(this.activePointers.values());
-        const currentDistance = Math.hypot(pts[1].x - pts[0].x, pts[1].y - pts[0].y);
-        const factor = currentDistance / this.initialPinchDistance;
-        const targetScale = Math.max(this.minScale, Math.min(this.maxScale, this.initialPinchScale * factor));
+        const currentDistance = calculateDistance(pts[0], pts[1]);
+        const targetScale = calculatePinchScale(
+          this.initialPinchDistance,
+          currentDistance,
+          this.initialPinchScale,
+          this.minScale,
+          this.maxScale
+        );
 
-        const midX = (pts[0].x + pts[1].x) / 2;
-        const midY = (pts[0].y + pts[1].y) / 2;
-
+        const center = calculatePinchCenter(pts[0], pts[1]);
         const worldPos = {
-          x: (midX - this.worldContainer.x) / this.currentScale,
-          y: (midY - this.worldContainer.y) / this.currentScale
+          x: (center.x - this.worldContainer.x) / this.currentScale,
+          y: (center.y - this.worldContainer.y) / this.currentScale
         };
 
         this.currentScale = targetScale;
         this.worldContainer.scale.set(targetScale);
-        this.worldContainer.x = midX - worldPos.x * targetScale;
-        this.worldContainer.y = midY - worldPos.y * targetScale;
+        this.worldContainer.x = center.x - worldPos.x * targetScale;
+        this.worldContainer.y = center.y - worldPos.y * targetScale;
         this.clampPosition();
       } else if (this.isDragging && this.activePointers.size === 1) {
-        // Single pointer drag pan
         const dx = e.global.x - this.dragStart.x;
         const dy = e.global.y - this.dragStart.y;
         this.worldContainer.x = this.containerStart.x + dx;
@@ -174,7 +170,6 @@ export class MapEngine {
         this.isDragging = false;
         this.initialPinchDistance = null;
       } else if (this.activePointers.size === 1) {
-        // Fall back to single pointer drag
         const remaining = Array.from(this.activePointers.values())[0];
         this.isDragging = true;
         this.dragStart = { x: remaining.x, y: remaining.y };
@@ -257,44 +252,19 @@ export class MapEngine {
       return;
     }
 
-    if (matchedSprites.length === 1) {
-      const loc = matchedSprites[0].locationData;
-      this.focusOnLocation(loc.xPercent, loc.yPercent, 1.2);
-      return;
-    }
+    const points = matchedSprites.map(s => ({ x: s.x, y: s.y }));
+    const transform = calculateFitBounds(
+      points,
+      { width: this.app.screen.width, height: this.app.screen.height },
+      120,
+      this.minScale,
+      1.4
+    );
 
-    // Compute bounding box
-    let minX = Infinity;
-    let maxX = -Infinity;
-    let minY = Infinity;
-    let maxY = -Infinity;
-
-    for (const s of matchedSprites) {
-      minX = Math.min(minX, s.x);
-      maxX = Math.max(maxX, s.x);
-      minY = Math.min(minY, s.y);
-      maxY = Math.max(maxY, s.y);
-    }
-
-    // Add margin
-    const margin = 120;
-    const boxW = Math.max(100, (maxX - minX) + margin * 2);
-    const boxH = Math.max(100, (maxY - minY) + margin * 2);
-
-    const screenW = this.app.screen.width;
-    const screenH = this.app.screen.height;
-
-    const scaleX = screenW / boxW;
-    const scaleY = screenH / boxH;
-    const targetScale = Math.max(this.minScale, Math.min(1.4, Math.min(scaleX, scaleY)));
-
-    const midWorldX = (minX + maxX) / 2;
-    const midWorldY = (minY + maxY) / 2;
-
-    this.currentScale = targetScale;
-    this.worldContainer.scale.set(targetScale);
-    this.worldContainer.x = screenW / 2 - midWorldX * targetScale;
-    this.worldContainer.y = screenH / 2 - midWorldY * targetScale;
+    this.currentScale = transform.scale;
+    this.worldContainer.scale.set(transform.scale);
+    this.worldContainer.x = transform.x;
+    this.worldContainer.y = transform.y;
 
     this.clampPosition();
   }
@@ -338,24 +308,8 @@ export class MapEngine {
     const currentW = this.mapWidth * this.currentScale;
     const currentH = this.mapHeight * this.currentScale;
 
-    // Allow gentle panning margins
-    const margin = 100;
-
-    if (currentW > screenW) {
-      const minX = screenW - currentW - margin;
-      const maxX = margin;
-      this.worldContainer.x = Math.max(minX, Math.min(maxX, this.worldContainer.x));
-    } else {
-      this.worldContainer.x = (screenW - currentW) / 2;
-    }
-
-    if (currentH > screenH) {
-      const minY = screenH - currentH - margin;
-      const maxY = margin;
-      this.worldContainer.y = Math.max(minY, Math.min(maxY, this.worldContainer.y));
-    } else {
-      this.worldContainer.y = (screenH - currentH) / 2;
-    }
+    this.worldContainer.x = clampDimension(this.worldContainer.x, currentW, screenW, 100);
+    this.worldContainer.y = clampDimension(this.worldContainer.y, currentH, screenH, 100);
   }
 
   public destroy(): void {

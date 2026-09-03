@@ -163,11 +163,17 @@ class Application {
     card.style.left = `${pos.x}px`;
     card.style.top = `${pos.y}px`;
 
+    // Render teaser claims if present
+    const teaserSourcesHtml = location.teaserClaimIds && location.teaserClaimIds.length > 0
+      ? this.actionModal.renderSourcesAccordion(location.teaserClaimIds, '📚 Evidenz & Nachweise zu diesem Schauplatz')
+      : '';
+
     card.innerHTML = `
       <div class="preview-badge badge-teaser">${location.badgeText || 'In Entwicklung'}</div>
       <h3 class="preview-title">${location.name}</h3>
       <div class="preview-tagline">${location.tagline}</div>
       <p class="preview-text">${location.teaserText || 'Dieser Ort wird in einer kommenden Version der Psychotherapie-Landkarte begehbar sein.'}</p>
+      ${teaserSourcesHtml}
       <div class="preview-actions">
         <button class="btn btn-secondary btn-sm" id="btn-close-teaser">Verstanden</button>
       </div>
@@ -269,20 +275,29 @@ class Application {
   private handleRouteNavigation(option: RouteOption): void {
     this.closeScene();
 
-    // Resolve target knowledge nodes to world location IDs
-    const matchingLocs = WORLD_DATA.locations.filter(loc =>
-      loc.knowledgeNodeIds?.some(nId => option.targetKnowledgeNodeIds.includes(nId))
-    );
-    const targetLocationIds = matchingLocs.map(l => l.id);
+    // Option 1 has a fully playable cross-school workshop scene
+    if (option.id === 'opt_concrete_action') {
+      const matchingLocs = WORLD_DATA.locations.filter(loc =>
+        loc.knowledgeNodeIds?.some(nId => option.targetKnowledgeNodeIds.includes(nId))
+      );
+      const targetLocationIds = matchingLocs.map(l => l.id);
 
-    this.mapEngine.highlightLocations(targetLocationIds);
-    this.mapEngine.fitLocations(targetLocationIds);
+      this.mapEngine.highlightLocations(targetLocationIds);
+      this.mapEngine.fitLocations(targetLocationIds);
 
-    // Show floating route banner in HUD
-    this.showRouteHighlightBanner(option, matchingLocs.length);
+      this.showRouteHighlightBanner(
+        `🧭 Erkundungsperspektive: <strong>${option.label}</strong> (Werkstatt der Erprobung hervorgehoben)`
+      );
+    } else {
+      // Options 2-5: Do NOT highlight school-specific places. Show neutral development banner.
+      this.mapEngine.clearHighlights();
+      this.showRouteHighlightBanner(
+        `🧭 Diese Erkundungsperspektive ist vorgemerkt. Die zugehörigen schulenübergreifenden Schauplätze sind noch in Entwicklung. Du kannst die Karte weiter frei erkunden.`
+      );
+    }
   }
 
-  private showRouteHighlightBanner(option: RouteOption, count: number): void {
+  private showRouteHighlightBanner(messageHtml: string): void {
     if (this.routeHighlightBanner) {
       this.routeHighlightBanner.remove();
       this.routeHighlightBanner = null;
@@ -292,10 +307,9 @@ class Application {
     banner.className = 'route-highlight-banner';
     banner.innerHTML = `
       <div class="banner-text">
-        <span>🧭</span>
-        <span>Hervorgehoben für: <strong>${option.label}</strong> (${count} Schauplätze)</span>
+        <span>${messageHtml}</span>
       </div>
-      <button class="btn btn-ghost btn-sm" id="btn-clear-highlights" title="Hervorhebung aufheben">✕ Aufheben</button>
+      <button class="btn btn-ghost btn-sm" id="btn-clear-highlights" title="Hinweis schließen">✕ Schließen</button>
     `;
 
     banner.querySelector('#btn-clear-highlights')?.addEventListener('click', () => {
@@ -331,19 +345,15 @@ window.addEventListener('DOMContentLoaded', () => {
       const activeBackpack = document.querySelector('.backpack-modal.active');
       
       if (activeBackdrop) {
-        // Modal / Dialogue is open -> close it
         activeBackdrop.classList.remove('active');
       } else if (activeBackpack) {
-        // Backpack is open -> close it
         activeBackpack.classList.remove('active');
       } else {
-        // Close scene back to map
         app.closeScene();
         app.closeTeaserCard();
         app.clearRouteHighlights();
       }
     } else if (e.key === 'm' || e.key === 'M') {
-      // Don't trigger if typing in an input
       if (document.activeElement?.tagName !== 'INPUT' && document.activeElement?.tagName !== 'TEXTAREA') {
         app.closeScene();
       }

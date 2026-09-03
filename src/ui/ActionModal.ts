@@ -3,6 +3,7 @@ import { store } from '../state/store';
 import { toast } from './Toast';
 import { getClaimById, getSourcesForClaim } from '../data/knowledge';
 import { getExplorationRouteById } from '../data/exploration';
+import { renderClaimCardHtml } from './renderers/evidenceRenderer';
 
 export class ActionModal {
   private backdrop: HTMLElement;
@@ -42,11 +43,22 @@ export class ActionModal {
     const h = this.currentHotspot;
     const d = h.dialogue;
 
-    // Collect all relevant claim IDs for this dialogue
+    // Collect all relevant claim IDs for this dialogue, including nested quiz and item claims
+    const actionClaimIds = d.actions.flatMap(a => {
+      const ids = [...(a.claimIds || [])];
+      if (a.type === 'QUIZ' && a.quiz.explanationClaimIds) {
+        ids.push(...a.quiz.explanationClaimIds);
+      }
+      if (a.type === 'ITEM' && a.item.claimIds) {
+        ids.push(...a.item.claimIds);
+      }
+      return ids;
+    });
+
     const allClaimIds = Array.from(new Set([
       ...(d.claimIds || []),
       ...(d.subtextClaimIds || []),
-      ...(d.actions.flatMap(a => a.claimIds || []))
+      ...actionClaimIds
     ]));
 
     this.backdrop.innerHTML = `
@@ -68,7 +80,7 @@ export class ActionModal {
           <div class="speech-bubble">${d.text}</div>
           ${d.subtext ? `<div class="speech-subtext">${d.subtext}</div>` : ''}
 
-          <!-- Generic Sources & Evidence Section -->
+          <!-- Sources & Evidence Section -->
           ${this.renderSourcesAccordion(allClaimIds)}
 
           ${d.actions && d.actions.length > 0 ? `
@@ -84,14 +96,7 @@ export class ActionModal {
     this.backdrop.querySelector('#btn-close-dialogue')?.addEventListener('click', () => this.close());
 
     // Sources accordion toggle
-    const toggleBtn = this.backdrop.querySelector('#btn-toggle-sources');
-    const sourcesBody = this.backdrop.querySelector('#sources-accordion-body');
-    if (toggleBtn && sourcesBody) {
-      toggleBtn.addEventListener('click', () => {
-        const isHidden = sourcesBody.classList.toggle('hidden');
-        toggleBtn.querySelector('.toggle-arrow')?.classList.toggle('rotated', !isHidden);
-      });
-    }
+    this.setupAccordionToggle('#btn-toggle-sources', '#sources-accordion-body');
 
     // Render actions
     if (d.actions && d.actions.length > 0) {
@@ -104,78 +109,39 @@ export class ActionModal {
     }
   }
 
-  private renderSourcesAccordion(claimIds: string[]): string {
+  private setupAccordionToggle(btnSelector: string, bodySelector: string): void {
+    const toggleBtn = this.backdrop.querySelector(btnSelector);
+    const sourcesBody = this.backdrop.querySelector(bodySelector);
+    if (toggleBtn && sourcesBody) {
+      toggleBtn.addEventListener('click', () => {
+        const isHidden = sourcesBody.classList.toggle('hidden');
+        toggleBtn.querySelector('.toggle-arrow')?.classList.toggle('rotated', !isHidden);
+      });
+    }
+  }
+
+  public renderSourcesAccordion(claimIds: string[], customTitle?: string): string {
     if (claimIds.length === 0) return '';
 
     const claims = claimIds.map(id => getClaimById(id)).filter((c): c is NonNullable<typeof c> => Boolean(c));
     if (claims.length === 0) return '';
 
+    const title = customTitle || `📚 Wissenschaftliche Einordnung & Quellen (${claims.length})`;
+
     return `
       <div class="sources-accordion">
         <button class="sources-toggle-btn" id="btn-toggle-sources" type="button">
-          <span>📚 Wissenschaftliche Einordnung & Quellen (${claims.length})</span>
+          <span>${title}</span>
           <span class="toggle-arrow">▾</span>
         </button>
         <div class="sources-body hidden" id="sources-accordion-body">
           ${claims.map(claim => {
             const citationsWithSources = getSourcesForClaim(claim);
-            return `
-              <div class="claim-card">
-                <div class="claim-header">
-                  <span class="claim-type-badge type-${claim.type}">${this.formatClaimType(claim.type)}</span>
-                  <span class="evidence-level-badge level-${claim.evidenceLevel}">${this.formatEvidenceLevel(claim.evidenceLevel)}</span>
-                  ${claim.reviewStatus === 'draft' ? '<span class="draft-badge">[Entwurf]</span>' : ''}
-                </div>
-                <div class="claim-statement">${claim.statement}</div>
-                <div class="claim-explanation">${claim.publicExplanation}</div>
-                ${claim.limitations ? `<div class="claim-limitations">⚠️ <em>Einschränkung:</em> ${claim.limitations}</div>` : ''}
-                
-                <div class="citations-list">
-                  <div class="citations-title">Nachweise & Fundstellen:</div>
-                  <ul>
-                    ${citationsWithSources.map(c => `
-                      <li class="citation-item">
-                        <strong>${c.source.authors ? `${c.source.authors} (${c.source.year || 'o.J.'}): ` : ''}</strong>
-                        <em>${c.source.title}</em>
-                        ${c.source.venue ? ` • ${c.source.venue}` : ''}
-                        ${c.locator ? ` <span class="citation-locator">[Fundstelle: ${c.locator}]</span>` : ''}
-                        ${c.role === 'background' ? ' <span class="badge-narrative-note">(Hintergrund / Narrativ)</span>' : ''}
-                        ${c.source.url ? ` <a href="${c.source.url}" target="_blank" rel="noopener noreferrer" class="citation-link">↗ Offizielle Quelle</a>` : ''}
-                        ${c.source.doi ? ` <a href="https://doi.org/${c.source.doi}" target="_blank" rel="noopener noreferrer" class="citation-link">↗ DOI</a>` : ''}
-                      </li>
-                    `).join('')}
-                  </ul>
-                </div>
-              </div>
-            `;
+            return renderClaimCardHtml(claim, citationsWithSources);
           }).join('')}
         </div>
       </div>
     `;
-  }
-
-  private formatClaimType(type: string): string {
-    switch (type) {
-      case 'effectiveness': return '🔬 Wirksamkeitsbefund';
-      case 'association': return '📊 Zusammenhang / Prädiktor';
-      case 'process': return '⚙️ Wirkmechanismus';
-      case 'definition': return '📖 Begriffsklärung';
-      case 'care-fact': return '🏛️ Versorgungsregel';
-      case 'theory': return '💡 Theoretisches Fachmodell';
-      case 'experience': return '🗣️ Patientenerfahrung (Kein Wirkbeleg)';
-      default: return type;
-    }
-  }
-
-  private formatEvidenceLevel(level: string): string {
-    switch (level) {
-      case 'well-supported': return 'Gut belegt (Studien/Reviews)';
-      case 'limited': return 'Vorläufige Evidenz';
-      case 'mixed': return 'Widersprüchliche Befunde';
-      case 'not-established': return 'Hypothetisch / Nicht nachgewiesen';
-      case 'not-applicable': return 'Informationswissen';
-      default: return level;
-    }
   }
 
   private createActionElement(action: HotspotAction): HTMLElement {
@@ -221,10 +187,15 @@ export class ActionModal {
       return box;
     }
 
+    const disclaimerSourcesHtml = route.disclaimerClaimIds && route.disclaimerClaimIds.length > 0
+      ? this.renderSourcesAccordion(route.disclaimerClaimIds, `📚 Quelleneinordnung zum Orientierungsprinzip`)
+      : '';
+
     box.innerHTML = `
       <div class="route-header">
         <div class="route-title">🧭 ${route.prompt}</div>
         <div class="route-disclaimer">${route.disclaimer}</div>
+        ${disclaimerSourcesHtml}
       </div>
       <div class="route-options-list">
         ${route.options.map((opt) => `
@@ -232,7 +203,7 @@ export class ActionModal {
             <div class="route-option-label">${opt.label}</div>
             <div class="route-option-desc">${opt.perspectiveDescription}</div>
             <button class="btn btn-primary btn-sm btn-select-route" data-option-id="${opt.id}">
-              <span>Auf der Karte hervorheben</span> ➔
+              <span>Erkundungsperspektive wählen</span> ➔
             </button>
           </div>
         `).join('')}
@@ -288,7 +259,7 @@ export class ActionModal {
           const isCorrect = selectedIdx === quiz.correctIndex;
           store.recordQuizAnswer(action.id, selectedIdx, isCorrect);
           toast.show(isCorrect ? 'Wissensfrage richtig gelöst!' : 'Wissensfrage beantwortet.');
-          this.render(); // re-render dialogue to update state
+          this.render();
         });
       });
     }

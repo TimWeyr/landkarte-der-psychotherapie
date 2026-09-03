@@ -120,7 +120,7 @@ export class SceneView {
     });
   }
 
-  private checkHotspotCompleted(hotspot: Hotspot, state: any): boolean {
+  private checkHotspotCompleted(hotspot: Hotspot, state: import('../types').UserState): boolean {
     const actions = hotspot.dialogue.actions || [];
     if (actions.length === 0) return state.inspectedHotspots.includes(hotspot.id);
 

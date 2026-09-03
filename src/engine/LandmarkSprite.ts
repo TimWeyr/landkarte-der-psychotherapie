@@ -56,7 +56,7 @@ export class LandmarkSprite extends Container {
     this.labelText.y = 16;
     this.addChild(this.labelText);
 
-    // Events with drag tolerance
+    // Single unified pointer handling with drag-tolerance
     let isDown = false;
     let startPos = { x: 0, y: 0 };
 
@@ -71,6 +71,7 @@ export class LandmarkSprite extends Container {
         e.stopPropagation();
         const dx = Math.abs(e.global.x - startPos.x);
         const dy = Math.abs(e.global.y - startPos.y);
+        // Drag tolerance: If moved less than 15px, treat as genuine select/tap
         if (dx < 15 && dy < 15) {
           callbacks.onSelect(this.locationData, { x: e.global.x, y: e.global.y });
         }
@@ -78,9 +79,12 @@ export class LandmarkSprite extends Container {
       isDown = false;
     });
 
-    this.on('pointertap', (e: FederatedPointerEvent) => {
-      e.stopPropagation();
-      callbacks.onSelect(this.locationData, { x: e.global.x, y: e.global.y });
+    this.on('pointerupoutside', () => {
+      isDown = false;
+    });
+
+    this.on('pointercancel', () => {
+      isDown = false;
     });
 
     this.on('pointerenter', (e: FederatedPointerEvent) => {

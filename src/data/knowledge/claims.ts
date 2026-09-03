@@ -3,130 +3,130 @@ import { ClaimRecord } from '../../types';
 export const CLAIMS: ClaimRecord[] = [
   {
     id: 'claim_gba_guidelines',
+    statement: 'Die Psychotherapie-Richtlinie des G-BA regelt die im deutschen Kassensystem anerkannten Richtlinienverfahren und die formalen Schritte zur Kostenübernahme.',
+    publicExplanation: 'Der Gemeinsame Bundesausschuss (G-BA) legt fest, welche psychotherapeutischen Behandlungsverfahren von den gesetzlichen Krankenkassen bezahlt werden (aktuell: Verhaltenstherapie, tiefenpsychologisch fundierte Psychotherapie, analytische Psychotherapie und systemische Therapie).',
     type: 'care-fact',
-    statement: 'In Deutschland sind Richtlinienverfahren durch den Gemeinsamen Bundesausschuss (G-BA) rechtlich für die vertragsärztliche Versorgung anerkannt.',
-    publicExplanation: 'Der G-BA legt verbindlich fest, welche Psychotherapieverfahren von den gesetzlichen Krankenkassen bezahlt werden (Verhaltenstherapie, Tiefenpsychologisch fundierte Psychotherapie, Analytische Psychotherapie, Systemische Therapie).',
     citations: [
       {
         sourceId: 'src_gba_psychotherapie_richtlinie',
         role: 'supports',
-        locator: '§ 11 & § 13',
-        note: 'Aufzählung und Anerkennungsvoraussetzungen der Richtlinienverfahren'
+        locator: '§ 11 & § 13'
       }
     ],
     evidenceLevel: 'not-applicable',
-    reviewStatus: 'draft',
-    scope: 'GKV-Versorgung in Deutschland'
+    reviewStatus: 'draft'
   },
   {
     id: 'claim_therapeutic_alliance',
+    statement: 'Die Qualität der therapeutischen Beziehung (Allianz) ist über verschiedene Therapieschulen hinweg ein robuster statistischer Prädiktor für den Behandlungserfolg.',
+    publicExplanation: 'Zahlreiche Metaanalysen belegen, dass eine vertrauensvolle Zusammenarbeit, ein Konsens über Ziele und ein offener Austausch einen wesentlichen Anteil am Therapieergebnis haben.',
     type: 'association',
-    statement: 'Die Qualität der therapeutischen Beziehung (Allianz) ist ein robuster Prädiktor für den Behandlungserfolg, unabhängig von der Therapieschule.',
-    publicExplanation: 'Zahlreiche Metaanalysen zeigen, dass ein tragfähiges Arbeitsbündnis zwischen Patient und Therapeut über verschiedene Verfahren hinweg messbar mit positiven Behandlungsergebnissen korreliert.',
     citations: [
       {
         sourceId: 'src_horvath_symonds_1991',
         role: 'supports',
-        locator: 'S. 142–146',
-        note: 'Metaanalyse über 24 Studien zur Allianz-Outcome-Korrelation'
-      },
-      {
-        sourceId: 'src_wampold_imel_2015',
-        role: 'supports',
-        locator: 'Kapitel 3, S. 45–68',
-        note: 'Einordnung im Common-Factors-Modell'
+        locator: 'S. 142–146'
       }
     ],
     evidenceLevel: 'well-supported',
-    reviewStatus: 'draft',
-    limitations: 'Allianz ist ein Prädiktor/Korrelat, begründet jedoch keine alleinige Kausalität.'
+    reviewStatus: 'draft'
   },
   {
     id: 'claim_evidence_perspectives',
+    statement: 'Evidenzbasierte Psychotherapie integriert die beste verfügbare empirische Forschung mit klinischer Expertise und individuellen Merkmalen, Werten und Präferenzen.',
+    publicExplanation: 'Wissenschaftliche Orientierung bedeutet nicht nur das Abarbeiten fixer Standardprotokolle, sondern das flexible Abstimmen erprobter Methoden auf die individuelle Person.',
     type: 'definition',
-    statement: 'Evidenzbasierte Psychotherapie verbindet systematische empirische Wirksamkeitsforschung mit klinischer Expertise und Patientenwerten.',
-    publicExplanation: 'Wissenschaftliche Studien liefern fundierte Leitplanken über wirksame Mechanismen. Die konkrete Anwendung erfordert immer das Zusammenspiel mit dem individuellen Fallverständnis und der persönlichen Passung.',
     citations: [
       {
         sourceId: 'src_wampold_imel_2015',
-        role: 'supports',
-        locator: 'Kapitel 1 & 2',
-        note: 'Definition von Evidenzbasierung im Kontext psychologischer Interventionen'
+        role: 'background',
+        locator: 'Kapitel 1 & 2'
       }
     ],
-    evidenceLevel: 'well-supported',
+    evidenceLevel: 'not-applicable',
     reviewStatus: 'draft'
   },
   {
     id: 'claim_care_116117_ptv11',
+    statement: 'Die psychotherapeutische Sprechstunde ist der reguläre Einstieg in die ambulante Versorgung; das Formblatt PTV 11 dokumentiert die Ersteinschätzung.',
+    publicExplanation: 'Über die Terminservicestelle 116 117 können zeitnah Termine für eine Sprechstunde vermittelt werden. Die Sprechstunde dient der ersten diagnostischen Orientierung, nicht automatisch der festen Therapieplatzzusage.',
     type: 'care-fact',
-    statement: 'Die Psychotherapeutische Sprechstunde ist der reguläre Einstieg in die ambulante GKV-Versorgung und wird über die 116 117 oder direkt beim Therapeuten vereinbart.',
-    publicExplanation: 'In der Sprechstunde erfolgt eine erste Abklärung und die Ausstellung des Formblatts PTV 11, auf dem vermerkt wird, ob eine ambulante Therapie empfohlen wird.',
     citations: [
       {
-        sourceId: 'src_kbv_terminservicestelle_2024',
+        sourceId: 'src_kbv_terminvermittlung',
         role: 'supports',
-        locator: 'Abschnitt: Ablauf der Sprechstunde',
-        note: 'Offizielle Regelung zur Terminservicestelle und Formblatt PTV 11'
+        locator: 'Abschnitt Psychotherapeutische Sprechstunde & 116 117'
+      },
+      {
+        sourceId: 'src_kbv_psychotherapie',
+        role: 'supports',
+        locator: 'Abschnitt Formblatt PTV 11'
       }
     ],
     evidenceLevel: 'not-applicable',
-    reviewStatus: 'draft',
-    scope: 'Gesetzliche Krankenversicherung Deutschland'
+    reviewStatus: 'draft'
   },
   {
     id: 'claim_care_funding_paths',
+    statement: 'Gesetzlich Versicherte haben nach § 13 Abs. 3 Satz 1 SGB V unter bestimmten Voraussetzungen Anspruch auf Kostenerstattung einer selbstbeschafften notwendigen Behandlung.',
+    publicExplanation: 'Das Gesetz unterscheidet zwei getrennte Fälle: (1) Eine unaufschiebbare Leistung konnte von der Krankenkasse nicht rechtzeitig erbracht werden, oder (2) eine Leistung wurde zu Unrecht abgelehnt. Erstattet werden die tatsächlich entstandenen Kosten der notwendigen Leistung; behandelnde Psychotherapeutinnen/Psychotherapeuten müssen die Voraussetzungen des § 95c SGB V (Approbation, Fachkunde) erfüllen.',
     type: 'care-fact',
-    statement: 'Neben Therapeuten mit Kassensitz existiert bei unzumutbar langen Wartezeiten das Kostenerstattungsverfahren nach § 13 Abs. 3 SGB V.',
-    publicExplanation: 'Wenn gesetzlich Versicherte nachweislich keinen rechtzeitigen Kassenplatz finden, können die Kosten für eine Behandlung in einer Privatpraxis unter bestimmten Voraussetzungen erstattet werden.',
     citations: [
       {
         sourceId: 'src_sgb5_paragraph13',
         role: 'supports',
-        locator: '§ 13 Abs. 3 SGB V',
-        note: 'Gesetzliche Grundlage der Kostenerstattung bei Systemversagen'
+        locator: '§ 13 Abs. 3 Satz 1 SGB V i.V.m. § 95c SGB V'
       }
     ],
     evidenceLevel: 'not-applicable',
     reviewStatus: 'draft',
-    scope: 'GKV Deutschland'
+    limitations: 'Vorherige Antragstellung und schriftlicher Ablehnungsbescheid sind Voraussetzung bei Alternative 2; bei akuten unaufschiebbaren Notfällen (Alternative 1) greift der Grundsatz der Systemversagens-Kostenerstattung ohne vorherige Wartepflicht auf einen Ablehnungsbescheid.'
   },
   {
     id: 'claim_action_oriented_rumination',
-    type: 'process',
-    statement: 'Konkrete handlungsorientierte Übungen und Verhaltensexperimente können helfen, repetitive kognitive Grübelschleifen zu unterbrechen.',
-    publicExplanation: 'Durch gezieltes Ausprobieren im Alltag (z.B. Aktivitätenaufbau, Exposition, Stuhldialoge) wird der Fokus von passivem Grübeln auf neue, korrigierende Handlungserfahrungen verlagert.',
+    statement: 'In psychotherapeutischen Prozessmodellen wird handlungsorientiertes Ausprobieren als Ansatzpunkt zur Unterbrechung von repetitivem Grübeln beschrieben.',
+    publicExplanation: 'Problembewältigung und konkrete Handlungsaktivierung werden in der Psychotherapieforschung (z. B. Grawe, 1997) als Perspektiven beschrieben, um passive Gedankenschleifen durch neue Erfahrungen im Handeln schrittweise aufzulösen.',
+    type: 'theory',
     citations: [
       {
         sourceId: 'src_grawe_1997',
-        role: 'supports',
-        locator: 'Kapitel: Problembewältigung und Problemaktualisierung',
-        note: 'Theoretische und empirische Wirkmechanismen handlungsorientierter Verfahren'
-      },
-      {
-        sourceId: 'src_narrative_rumination_action_2025',
         role: 'background',
-        locator: 'Synthesebericht S. 4–7',
-        note: 'Subjektive Berichte von Betroffenen über den Wert praktischer Übungen'
+        locator: 'Kapitel Problembewältigung, S. 420–445'
       }
     ],
-    evidenceLevel: 'well-supported',
+    evidenceLevel: 'not-applicable',
     reviewStatus: 'draft'
   },
   {
     id: 'claim_fit_collaboration_dynamic',
+    statement: 'Passung in der Psychotherapie entwickelt sich als partnerschaftlicher Klärungs- und Abstimmungsprozess zwischen Patient und Therapeut.',
+    publicExplanation: 'Therapeutische Passung ist keine starre Vorab-Eigenschaft, sondern wird in den ersten probatorischen Sitzungen im gemeinsamen Erproben von Zielen und Arbeitsweisen kontinuierlich überprüft und angepasst.',
     type: 'theory',
-    statement: 'Therapeutische Passung ist keine statische Vorab-Eigenschaft, sondern ein dynamischer Prozess der gemeinsamen Abstimmung.',
-    publicExplanation: 'Ob eine Methode oder ein Arbeitsstil hilfreich ist, entscheidet sich in der kontinuierlichen Rückmeldung und gemeinsamen Zielklärung zwischen Patient und Behandler.',
     citations: [
       {
-        sourceId: 'src_goldberg_2026_prognostic',
+        sourceId: 'src_wampold_imel_2015',
+        role: 'background',
+        locator: 'Kapitel 3, S. 45–68'
+      }
+    ],
+    evidenceLevel: 'not-applicable',
+    reviewStatus: 'draft'
+  },
+  {
+    id: 'claim_therapist_characteristics_null_finding',
+    statement: 'Die 38 in dieser Untersuchung erhobenen Vorabmerkmale von Therapeutinnen und Therapeuten zeigten weitgehend keine statistische Vorhersagekraft für die Behandlungsergebnisse der untersuchten Patientinnen und Patienten.',
+    publicExplanation: 'In einer großangelegten, präregistrierten Analyse mit 97 Therapeutinnen/Therapeuten und 6.152 Patientinnen/Patienten sagten die 38 multimodalen Vorab-Merkmale (Persönlichkeit, Bindungsstil, soziale Fertigkeiten) das Therapieergebnis kaum vorher (Goldberg et al., 2026, S. 1–18, Tabellen 2 & 3).',
+    type: 'association',
+    citations: [
+      {
+        sourceId: 'src_goldberg_2026_therapist_characteristics',
         role: 'supports',
-        locator: 'Diskussion S. 12–15',
-        note: 'Grenzen statischer Prognosemodelle und Bedeutung kontinuierlicher Verlaufsbeobachtung'
+        locator: 'S. 1–18, insb. Tabellen 2 & 3',
+        note: 'Präregistrierte Nullbefunde zu 38 spezifischen statischen Therapeutenmerkmalen'
       }
     ],
     evidenceLevel: 'limited',
-    reviewStatus: 'draft'
+    reviewStatus: 'draft',
+    limitations: 'Untersuchte ausschließlich 38 statische Vorabmerkmale; keine Aussage über dynamische Prozessmerkmale oder andere Matching-Konzepte (z. B. Präferenz- oder Problem-Matching).'
   }
 ];

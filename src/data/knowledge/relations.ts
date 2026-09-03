@@ -1,76 +1,80 @@
 import { KnowledgeRelation } from '../../types';
 
 export const KNOWLEDGE_RELATIONS: KnowledgeRelation[] = [
+  // 1. Erleben -> Bedürfnis
   {
-    id: 'rel_rumination_to_action',
-    sourceNodeId: 'node_wm_concrete_action',
-    targetNodeId: 'node_exp_constant_rumination',
-    relationType: 'explores-aspect',
-    description: 'Handlungsorientiertes Erproben bietet einen konkreten Gegenpol zu passivem Gedankenkreisen.',
+    id: 'rel_rumination_evokes_coping',
+    fromNodeId: 'node_exp_constant_rumination',
+    toNodeId: 'node_need_structure_coping',
+    type: 'evokes-need',
     claimIds: ['claim_action_oriented_rumination']
   },
+
+  // 2. Bedürfnis -> Arbeitsweise
   {
-    id: 'rel_action_to_behavioral_exp',
-    sourceNodeId: 'node_tech_behavioral_experiment',
-    targetNodeId: 'node_wm_concrete_action',
-    relationType: 'implements',
-    description: 'Verhaltensexperimente setzen die handlungsorientierte Arbeitsweise im Alltag um.',
+    id: 'rel_need_addresses_action',
+    fromNodeId: 'node_need_structure_coping',
+    toNodeId: 'node_wm_concrete_action',
+    type: 'addresses-need',
     claimIds: ['claim_action_oriented_rumination']
   },
+
+  // 3. Arbeitsweise -> Prozess
   {
-    id: 'rel_action_to_chair_work',
-    sourceNodeId: 'node_tech_chair_work',
-    targetNodeId: 'node_wm_concrete_action',
-    relationType: 'implements',
-    description: 'Stuhlarbeit bringt innere Konflikte ins konkrete Handeln und Erleben im Therapieraum.',
-    claimIds: ['claim_evidence_perspectives']
+    id: 'rel_action_acts_via_activation',
+    fromNodeId: 'node_wm_concrete_action',
+    toNodeId: 'node_proc_behavioral_activation',
+    type: 'acts-via',
+    claimIds: ['claim_action_oriented_rumination']
   },
+
+  // 4. Prozess -> Intervention (realized-by)
   {
-    id: 'rel_action_to_systemic_tasks',
-    sourceNodeId: 'node_tech_systemic_tasks',
-    targetNodeId: 'node_wm_concrete_action',
-    relationType: 'implements',
-    description: 'Systemische Aufgaben erproben kleine Verhaltensänderungen im sozialen Umfeld.',
-    claimIds: ['claim_evidence_perspectives']
+    id: 'rel_activation_realized_by_experiment',
+    fromNodeId: 'node_proc_behavioral_activation',
+    toNodeId: 'node_tech_behavioral_experiment',
+    type: 'realized-by',
+    claimIds: ['claim_action_oriented_rumination']
   },
+
+  // 5. Intervention -> Ansätze (cross-school)
   {
-    id: 'rel_exp_to_cbt',
-    sourceNodeId: 'node_tech_behavioral_experiment',
-    targetNodeId: 'node_app_cbt',
-    relationType: 'belongs-to',
-    description: 'Verhaltensexperimente stammen historisch aus der KVT-Tradition.',
-    claimIds: ['claim_gba_guidelines']
+    id: 'rel_experiment_to_cbt',
+    fromNodeId: 'node_tech_behavioral_experiment',
+    toNodeId: 'node_app_cbt',
+    type: 'belongs-to',
+    claimIds: []
   },
   {
     id: 'rel_chair_to_humanistic',
-    sourceNodeId: 'node_tech_chair_work',
-    targetNodeId: 'node_app_humanistic',
-    relationType: 'belongs-to',
-    description: 'Stuhlarbeit entstammt der humanistischen Gestalttherapie und wird heute schulenübergreifend genutzt.',
-    claimIds: ['claim_evidence_perspectives']
+    fromNodeId: 'node_tech_chair_work',
+    toNodeId: 'node_app_humanistic',
+    type: 'belongs-to',
+    claimIds: []
   },
   {
-    id: 'rel_systemic_tasks_to_systemic',
-    sourceNodeId: 'node_tech_systemic_tasks',
-    targetNodeId: 'node_app_systemic',
-    relationType: 'belongs-to',
-    description: 'Beobachtungsaufgaben sind ein Kernbestandteil systemischer Praxis.',
-    claimIds: ['claim_gba_guidelines']
+    id: 'rel_tasks_to_systemic',
+    fromNodeId: 'node_tech_systemic_tasks',
+    toNodeId: 'node_app_systemic',
+    type: 'belongs-to',
+    claimIds: []
   },
+
+  // 6. Arbeitsweise -> Reale Passungsprüfung
   {
-    id: 'rel_action_to_fit',
-    sourceNodeId: 'node_wm_concrete_action',
-    targetNodeId: 'node_collab_fit_examination',
-    relationType: 'examines-fit',
-    description: 'Im Erstgespräch wird gemeinsam erprobt, ob und wie intensiv handlungsorientiert gearbeitet werden soll.',
+    id: 'rel_action_to_fit_collab',
+    fromNodeId: 'node_wm_concrete_action',
+    toNodeId: 'node_collab_fit_examination',
+    type: 'examines-fit',
     claimIds: ['claim_fit_collaboration_dynamic']
   },
+
+  // 7. Passungsprüfung -> Therapeutische Allianz
   {
     id: 'rel_fit_to_alliance',
-    sourceNodeId: 'node_collab_fit_examination',
-    targetNodeId: 'node_collab_therapeutic_alliance',
-    relationType: 'examines-fit',
-    description: 'Die gemeinsame Klärung von Arbeitsweise und Zielen stärkt das therapeutische Arbeitsbündnis.',
+    fromNodeId: 'node_collab_fit_examination',
+    toNodeId: 'node_collab_therapeutic_alliance',
+    type: 'examines-fit',
     claimIds: ['claim_therapeutic_alliance']
   }
 ];

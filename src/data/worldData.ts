@@ -1,149 +1,148 @@
 import { WorldMapData } from '../types';
 
 export const WORLD_DATA: WorldMapData = {
-  id: 'world_central_region',
-  title: 'Zentralregion: Das Tal der Orientierung',
+  id: 'map_central_region',
+  title: 'Landkarte der Psychotherapie – Zentralregion',
   imageSrc: '/assets/map/central_region.jpg',
-  nativeWidth: 1792,
-  nativeHeight: 1024,
+  nativeWidth: 2048,
+  nativeHeight: 1536,
   regions: [
     {
-      id: 'reg_coastal_evidence',
-      name: 'Küste der Grundlagen & Evidenz',
-      description: 'Hier stehen die Wegweiser und Leuchttürme für wissenschaftlich gesicherte Methoden.',
+      id: 'reg_central',
+      name: 'Zentralregion',
+      description: 'Das Herzstück der Psychotherapielandschaft mit den Grundlagen der Evidenz und Versorgung.',
+      color: '#c9933b'
+    },
+    {
+      id: 'reg_behavioral',
+      name: 'Ebene des Handelns (KVT)',
+      description: 'Bereich der konkreten Verhaltensanalysen und kognitiven Methoden.',
       color: '#4a7c8e'
     },
     {
-      id: 'reg_valley_station',
-      name: 'Tal der Versorgung & Wege',
-      description: 'Der zentrale Knotenpunkt für Fahrpläne, Sprechstunden und Versorgungsrealität.',
-      color: '#b2733b'
+      id: 'reg_depth',
+      name: 'Tal der Tiefe (Psychodynamik)',
+      description: 'Bereich der unbewussten Konflikte, Bindungen und lebensgeschichtlichen Muster.',
+      color: '#6a4f9b'
     },
     {
-      id: 'reg_future_traditions',
-      name: 'Pfade der Therapieschulen (in Entwicklung)',
-      description: 'Andeutungen zukünftiger Schauplätze wie Verhaltenstherapie, Tiefenpsychologie und Systemische Ansätze.',
-      color: '#5b8a5b'
+      id: 'reg_systemic',
+      name: 'Netzwerk-Archipel (Systemik)',
+      description: 'Bereich der sozialen Beziehungen, Rollen und familiären Kontexte.',
+      color: '#468058'
     }
   ],
   locations: [
     {
       id: 'loc_lighthouse',
       name: 'Leuchtturm der Evidenz',
-      tagline: 'Wissensarten & wissenschaftliche Fundierung',
+      regionId: 'reg_central',
       type: 'scene',
       sceneId: 'scene_lighthouse',
-      xPercent: 21,
-      yPercent: 28,
-      icon: 'sparkles',
-      regionId: 'reg_coastal_evidence',
-      badgeText: 'Betretbar',
+      xPercent: 18.5,
+      yPercent: 62.0,
+      icon: 'lighthouse',
+      badgeText: 'Begehbar',
+      tagline: 'Wissensarten & Orientierungskompass',
       knowledgeNodeIds: [
-        'node_exp_constant_rumination',
         'node_collab_therapeutic_alliance',
-        'node_wm_thought_distance'
+        'node_exp_constant_rumination',
+        'node_need_structure_coping',
+        'node_wm_concrete_action'
       ]
     },
     {
       id: 'loc_station',
       name: 'Bahnhof der Versorgung',
-      tagline: 'Sprechstunde, 116 117 & Erste Schritte',
+      regionId: 'reg_central',
       type: 'scene',
       sceneId: 'scene_station',
-      xPercent: 55,
-      yPercent: 73,
-      icon: 'navigation',
-      regionId: 'reg_valley_station',
-      badgeText: 'Betretbar',
+      xPercent: 52.0,
+      yPercent: 44.0,
+      icon: 'train',
+      badgeText: 'Begehbar',
+      tagline: 'Sprechstunde & Wege zur Kostenübernahme',
       knowledgeNodeIds: [
         'node_care_consultation_116117',
-        'node_care_funding_paths'
+        'node_care_funding_paths',
+        'node_need_orientation_clarity'
       ]
     },
     {
       id: 'loc_workshop',
       name: 'Werkstatt der Erprobung',
-      tagline: 'Handlungsorientierte Übungen & gemeinsame Passung',
+      regionId: 'reg_central',
       type: 'scene',
       sceneId: 'scene_workshop',
-      xPercent: 44,
-      yPercent: 42,
-      icon: 'compass',
-      regionId: 'reg_coastal_evidence',
-      badgeText: 'Betretbar',
+      xPercent: 36.0,
+      yPercent: 52.0,
+      icon: 'hammer',
+      badgeText: 'Begehbar',
+      tagline: 'Handlungsorientierte Schritte & Passungsprüfung',
       knowledgeNodeIds: [
         'node_wm_concrete_action',
+        'node_proc_behavioral_activation',
         'node_tech_behavioral_experiment',
         'node_tech_chair_work',
+        'node_tech_systemic_tasks',
         'node_collab_fit_examination'
       ]
     },
     {
       id: 'loc_teaser_cbt',
-      name: 'Dorf der Verhaltenstherapie',
-      tagline: 'Gedankenmuster, Exposition & konkrete Übungen',
+      name: 'Plateau der Kognitiven Verhaltenstherapie',
+      regionId: 'reg_behavioral',
       type: 'teaser',
-      xPercent: 68,
-      yPercent: 38,
-      icon: 'home',
-      regionId: 'reg_future_traditions',
-      badgeText: 'In Vorbereitung (V0.2)',
-      teaserText: 'Im Dorf der Verhaltenstherapie (KVT) erforschst du, wie Gedanken, Gefühle und Handlungen zusammenhängen und wie erlernte Muster schrittweise verändert werden können.',
-      knowledgeNodeIds: [
-        'node_app_cbt',
-        'node_tech_behavioral_experiment'
-      ],
-      teaserClaimIds: ['claim_gba_guidelines']
+      xPercent: 78.0,
+      yPercent: 28.0,
+      icon: 'brain',
+      badgeText: 'In Entwicklung',
+      tagline: 'Gedanken, Verhalten & Erprobung',
+      teaserText: 'Auf diesem Plateau wird erkundet, wie Gedankenmuster und Verhaltensweisen analysiert und verändert werden.',
+      teaserClaimIds: ['claim_gba_guidelines'],
+      knowledgeNodeIds: ['node_app_cbt', 'node_proc_behavioral_activation', 'node_tech_behavioral_experiment']
     },
     {
       id: 'loc_teaser_psychoanalysis',
-      name: 'Gipfel der Tiefenpsychologie',
-      tagline: 'Unbewusstes, Konflikte & biografische Wurzeln',
+      name: 'Hain der Tiefenpsychologie',
+      regionId: 'reg_depth',
       type: 'teaser',
-      xPercent: 84,
-      yPercent: 16,
-      icon: 'mountain',
-      regionId: 'reg_future_traditions',
-      badgeText: 'In Vorbereitung (V0.2)',
-      teaserText: 'Auf den Höhen der Tiefenpsychologie und Psychoanalyse blickt man in die Tiefe biografischer Prägungen, innerer Konflikte und unbewusster Beziehungsmuster.',
-      knowledgeNodeIds: [
-        'node_app_psychodynamic',
-        'node_wm_deep_patterns'
-      ],
-      teaserClaimIds: ['claim_gba_guidelines']
+      xPercent: 22.0,
+      yPercent: 24.0,
+      icon: 'tree-pine',
+      badgeText: 'In Entwicklung',
+      tagline: 'Unbewusstes, Biografie & Beziehungsmuster',
+      teaserText: 'Im Hain der Tiefe werden lebensgeschichtliche Ursachen, unbewusste Konflikte und Bindungsmuster beleuchtet.',
+      teaserClaimIds: ['claim_gba_guidelines'],
+      knowledgeNodeIds: ['node_app_psychodynamic', 'node_proc_schema_exploration']
     },
     {
       id: 'loc_teaser_systemic',
-      name: 'Wald der Systemischen Pfade',
-      tagline: 'Beziehungsnetze, Kontexte & Ressourcen',
+      name: 'Lichtung der Systemischen Therapie',
+      regionId: 'reg_systemic',
       type: 'teaser',
-      xPercent: 88,
-      yPercent: 68,
-      icon: 'trees',
-      regionId: 'reg_future_traditions',
-      badgeText: 'In Vorbereitung (V0.2)',
-      teaserText: 'Im systemischen Wald steht der Mensch nicht isoliert da: Hier geht es um familiäre Muster, soziale Geflechte und die Entdeckung verborgener eigener Stärken.',
-      knowledgeNodeIds: [
-        'node_app_systemic',
-        'node_wm_social_context'
-      ],
-      teaserClaimIds: ['claim_gba_guidelines']
+      xPercent: 82.0,
+      yPercent: 70.0,
+      icon: 'network',
+      badgeText: 'In Entwicklung',
+      tagline: 'Muster im Umfeld, Rollen & Kommunikation',
+      teaserText: 'Auf dieser Lichtung werden soziale Systeme, Beziehungsdynamiken und Mehrgenerationen-Perspektiven erkundet.',
+      teaserClaimIds: ['claim_gba_guidelines'],
+      knowledgeNodeIds: ['node_app_systemic', 'node_tech_systemic_tasks']
     },
     {
       id: 'loc_teaser_humanistic',
-      name: 'Bucht der Humanistischen Ansätze',
-      tagline: 'Gesprächspsychotherapie, Gestalt & Selbstentfaltung',
+      name: 'Quelle der Humanistischen Verfahren',
+      regionId: 'reg_central',
       type: 'teaser',
-      xPercent: 26,
-      yPercent: 60,
-      icon: 'sun',
-      regionId: 'reg_future_traditions',
-      badgeText: 'In Vorbereitung (V0.2)',
-      teaserText: 'An dieser ruhigen Bucht stehen Empathie, Wertschätzung und das Vertrauen in die menschliche Wachstums- und Selbstheilungskraft im Mittelpunkt.',
-      knowledgeNodeIds: [
-        'node_app_humanistic',
-        'node_wm_body_emotion'
-      ]
+      xPercent: 44.0,
+      yPercent: 80.0,
+      icon: 'sparkles',
+      badgeText: 'In Entwicklung',
+      tagline: 'Erleben, Selbstentfaltung & Gestalttherapie',
+      teaserText: 'An dieser Quelle stehen das unmittelbare emotionale Erleben im Hier und Jetzt und ganzheitliche Wachstumsprozesse im Mittelpunkt.',
+      teaserClaimIds: ['claim_evidence_perspectives'],
+      knowledgeNodeIds: ['node_app_humanistic', 'node_tech_chair_work']
     }
   ]
 };

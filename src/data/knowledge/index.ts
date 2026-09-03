@@ -1,4 +1,4 @@
-import { SourceRecord, ClaimRecord, KnowledgeNode, KnowledgeRelation } from '../../types';
+import { SourceRecord, ClaimRecord, KnowledgeNode, KnowledgeRelation, ClaimCitation } from '../../types';
 import { SOURCES } from './sources';
 import { CLAIMS } from './claims';
 import { KNOWLEDGE_NODES } from './nodes';
@@ -22,19 +22,17 @@ export function getNodeById(id: string): KnowledgeNode | undefined {
 }
 
 export function getRelationsForNode(nodeId: string): KnowledgeRelation[] {
-  return KNOWLEDGE_RELATIONS.filter(r => r.sourceNodeId === nodeId || r.targetNodeId === nodeId);
+  return KNOWLEDGE_RELATIONS.filter(r => r.fromNodeId === nodeId || r.toNodeId === nodeId);
 }
 
-export function getSourcesForClaim(claim: ClaimRecord): { source: SourceRecord; locator?: string; role: string; note?: string }[] {
-  const result: { source: SourceRecord; locator?: string; role: string; note?: string }[] = [];
+export function getSourcesForClaim(claim: ClaimRecord): { citation: ClaimCitation; source: SourceRecord }[] {
+  const result: { citation: ClaimCitation; source: SourceRecord }[] = [];
   for (const cit of claim.citations) {
     const src = getSourceById(cit.sourceId);
     if (src) {
       result.push({
-        source: src,
-        locator: cit.locator,
-        role: cit.role,
-        note: cit.note
+        citation: cit,
+        source: src
       });
     }
   }

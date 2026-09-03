@@ -1,20 +1,24 @@
 {
   "name": "landkarte-der-psychotherapie",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vitest run && vite build",
-    "preview": "vite preview",
+    "check:technical": "tsc --noEmit && vitest run",
     "test": "vitest run",
-    "test:knowledge": "vitest run tests/knowledgeValidation.test.ts"
+    "test:knowledge": "vitest run tests/knowledgeValidation.test.ts",
+    "build:technical": "tsc && vite build",
+    "validate:release": "tsx scripts/validateRelease.ts",
+    "build": "tsc && vitest run && tsx scripts/validateRelease.ts && vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
     "pixi.js": "^8.6.6",
     "lucide": "^0.475.0"
   },
   "devDependencies": {
+    "tsx": "^4.19.3",
     "typescript": "^5.7.3",
     "vite": "^6.1.0",
     "vitest": "^3.0.7"

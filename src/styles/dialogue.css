@@ -492,10 +492,99 @@
   border: 1px solid var(--accent-slate);
 }
 
-.draft-badge {
-  font-size: 0.7rem;
+.draft-badge-warning {
+  font-size: 0.72rem;
+  font-weight: 700;
   color: var(--ink-muted);
-  font-style: italic;
+  background: var(--bg-parchment-deep);
+  border: 1px dashed var(--border-parchment);
+  padding: 2px 7px;
+  border-radius: var(--radius-pill);
+}
+
+.citation-badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.source-kind-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-parchment);
+  color: var(--ink-secondary);
+  border: 1px solid var(--border-parchment);
+}
+
+.source-kind-badge.kind-primary-study {
+  background: #e8f4f8;
+  color: #1b657e;
+  border-color: #b5dbe7;
+}
+
+.source-kind-badge.kind-systematic-review {
+  background: #eef3eb;
+  color: #2f683a;
+  border-color: #bad3b4;
+}
+
+.source-kind-badge.kind-official {
+  background: #fdf6e7;
+  color: #8c6214;
+  border-color: #ebd39b;
+}
+
+.source-kind-badge.kind-theory {
+  background: #f4edf7;
+  color: #63337a;
+  border-color: #d6bfe0;
+}
+
+.source-kind-badge.kind-patient-narrative {
+  background: #faede9;
+  color: #8a3622;
+  border-color: #e5b9ae;
+}
+
+.source-kind-badge.kind-position-paper {
+  background: #eef1f5;
+  color: #3b4d63;
+  border-color: #c4d0df;
+}
+
+.citation-role-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+}
+
+.citation-role-badge.role-supports {
+  background: var(--accent-sage-light);
+  color: var(--accent-sage);
+  border: 1px solid var(--accent-sage);
+}
+
+.citation-role-badge.role-qualifies {
+  background: var(--accent-gold-light);
+  color: var(--accent-gold-hover);
+  border: 1px solid var(--accent-gold);
+}
+
+.citation-role-badge.role-contradicts {
+  background: var(--accent-terracotta-light);
+  color: var(--accent-terracotta);
+  border: 1px solid var(--accent-terracotta);
+}
+
+.citation-role-badge.role-background {
+  background: var(--accent-slate-light);
+  color: var(--accent-slate);
+  border: 1px solid var(--accent-slate);
 }
 
 .claim-statement {
@@ -545,7 +634,7 @@
   font-size: 0.78rem;
   color: var(--ink-secondary);
   line-height: 1.4;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
 }
 
 .citation-locator {

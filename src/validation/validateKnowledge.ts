@@ -1,3 +1,12 @@
+import {
+  SourceRecord,
+  ClaimRecord,
+  KnowledgeNode,
+  KnowledgeRelation,
+  ExplorationRoute,
+  WorldMapData,
+  Scene
+} from '../types';
 import { SOURCES } from '../data/knowledge/sources';
 import { CLAIMS } from '../data/knowledge/claims';
 import { KNOWLEDGE_NODES } from '../data/knowledge/nodes';
@@ -6,271 +15,452 @@ import { EXPLORATION_ROUTES } from '../data/exploration/routes';
 import { WORLD_DATA } from '../data/worldData';
 import { SCENES_REGISTRY } from '../data/scenes';
 
-export interface ValidationError {
-  entityType: 'SOURCE' | 'CLAIM' | 'NODE' | 'RELATION' | 'ROUTE' | 'LOCATION' | 'SCENE';
+export interface ValidationIssue {
+  level: 'ERROR' | 'WARNING';
+  category: 'ONTOLOGY' | 'CITATION' | 'INTEGRITY' | 'RELEASE_GATE' | 'CONSISTENCY';
   entityId: string;
-  field?: string;
   message: string;
-  severity: 'ERROR' | 'WARNING';
 }
 
 export interface ValidationReport {
   isValid: boolean;
-  errors: ValidationError[];
-  warnings: ValidationError[];
-  releaseStatus: 'RELEASE_READY' | 'BLOCKED_BY_DRAFT_CONTENT' | 'BLOCKED_BY_ERRORS';
-  stats: {
-    sourcesCount: number;
-    claimsCount: number;
-    draftClaimsCount: number;
-    approvedClaimsCount: number;
-    nodesCount: number;
-    relationsCount: number;
-    routesCount: number;
+  releaseStatus: 'RELEASE_READY' | 'BLOCKED_BY_DRAFT_CONTENT' | 'BLOCKED_BY_VALIDATION_ERRORS';
+  errorsCount: number;
+  warningsCount: number;
+  reachableClaimIds: string[];
+  reachableDraftClaimIds: string[];
+  issues: ValidationIssue[];
+}
+
+export interface KnowledgeDatasets {
+  sources: SourceRecord[];
+  claims: ClaimRecord[];
+  nodes: KnowledgeNode[];
+  relations: KnowledgeRelation[];
+  routes: ExplorationRoute[];
+  worldData: WorldMapData;
+  scenesRegistry: Record<string, Scene>;
+}
+
+export function getDefaultDatasets(): KnowledgeDatasets {
+  return {
+    sources: SOURCES,
+    claims: CLAIMS,
+    nodes: KNOWLEDGE_NODES,
+    relations: KNOWLEDGE_RELATIONS,
+    routes: EXPLORATION_ROUTES,
+    worldData: WORLD_DATA,
+    scenesRegistry: SCENES_REGISTRY
   };
 }
 
-export function validateKnowledgeGraph(): ValidationReport {
-  const errors: ValidationError[] = [];
-  const warnings: ValidationError[] = [];
+/**
+ * Ermittelt alle von der Anwendung aus erreichbaren Claim-IDs über Szenen, Aktionen, Routen, Teaser und Relationen
+ */
+export function getReachableClaimIds(data: KnowledgeDatasets): string[] {
+  const reachableClaimIds = new Set<string>();
+  const reachableNodeIds = new Set<string>();
 
-  // Sets for duplicate detection & reference resolution
-  const sourceIds = new Set<string>();
-  const claimIds = new Set<string>();
-  const nodeIds = new Set<string>();
-  const relationIds = new Set<string>();
-  const routeIds = new Set<string>();
-  const locationIds = new Set<string>();
-
-  // 1. Validate Sources
-  for (const src of SOURCES) {
-    if (sourceIds.has(src.id)) {
-      errors.push({ entityType: 'SOURCE', entityId: src.id, message: `Doppelte Source-ID: ${src.id}`, severity: 'ERROR' });
-    }
-    sourceIds.add(src.id);
-
-    if (!src.title) {
-      errors.push({ entityType: 'SOURCE', entityId: src.id, field: 'title', message: 'Quelle benötigt einen Titel', severity: 'ERROR' });
-    }
-
-    if (src.kind === 'official' && !src.jurisdiction) {
-      warnings.push({ entityType: 'SOURCE', entityId: src.id, field: 'jurisdiction', message: 'Offizielle Quelle sollte eine Jurisdiction (z.B. DE) besitzen', severity: 'WARNING' });
-    }
-
-    if (src.kind === 'patient-narrative' && !src.narrativeForm) {
-      errors.push({ entityType: 'SOURCE', entityId: src.id, field: 'narrativeForm', message: 'Patienten-Narrative müssen eine NarrativeForm angeben', severity: 'ERROR' });
+  // 1. Aus Szenen, Dialogen, Subtexten, Quiz-Erklärungen und Items
+  for (const scene of Object.values(data.scenesRegistry)) {
+    for (const hotspot of scene.hotspots) {
+      if (hotspot.dialogue.claimIds) {
+        hotspot.dialogue.claimIds.forEach(id => reachableClaimIds.add(id));
+      }
+      if (hotspot.dialogue.subtextClaimIds) {
+        hotspot.dialogue.subtextClaimIds.forEach(id => reachableClaimIds.add(id));
+      }
+      if (hotspot.dialogue.actions) {
+        for (const action of hotspot.dialogue.actions) {
+          if (action.claimIds) {
+            action.claimIds.forEach(id => reachableClaimIds.add(id));
+          }
+          if (action.type === 'QUIZ' && action.quiz.explanationClaimIds) {
+            action.quiz.explanationClaimIds.forEach(id => reachableClaimIds.add(id));
+          }
+          if (action.type === 'ITEM' && action.item.claimIds) {
+            action.item.claimIds.forEach(id => reachableClaimIds.add(id));
+          }
+        }
+      }
     }
   }
 
-  // 2. Validate Claims
-  let draftClaimsCount = 0;
-  let approvedClaimsCount = 0;
-
-  for (const claim of CLAIMS) {
-    if (claimIds.has(claim.id)) {
-      errors.push({ entityType: 'CLAIM', entityId: claim.id, message: `Doppelte Claim-ID: ${claim.id}`, severity: 'ERROR' });
+  // 2. Aus didaktischen Routen & Optionen
+  for (const route of data.routes) {
+    if (route.triggerNodeId) {
+      reachableNodeIds.add(route.triggerNodeId);
     }
-    claimIds.add(claim.id);
-
-    if (claim.reviewStatus === 'draft') draftClaimsCount++;
-    if (claim.reviewStatus === 'approved') approvedClaimsCount++;
-
-    if (!claim.statement || !claim.publicExplanation) {
-      errors.push({ entityType: 'CLAIM', entityId: claim.id, message: 'Claim benötigt statement und publicExplanation', severity: 'ERROR' });
+    if (route.disclaimerClaimIds) {
+      route.disclaimerClaimIds.forEach(id => reachableClaimIds.add(id));
     }
-
-    if (claim.citations.length === 0) {
-      errors.push({ entityType: 'CLAIM', entityId: claim.id, message: 'Claim muss mindestens eine Citation besitzen', severity: 'ERROR' });
+    for (const opt of route.options) {
+      if (opt.perspectiveClaimIds) {
+        opt.perspectiveClaimIds.forEach(id => reachableClaimIds.add(id));
+      }
+      if (opt.targetKnowledgeNodeIds) {
+        opt.targetKnowledgeNodeIds.forEach(nId => reachableNodeIds.add(nId));
+      }
     }
+  }
 
-    for (const cit of claim.citations) {
-      if (!sourceIds.has(cit.sourceId)) {
-        errors.push({ entityType: 'CLAIM', entityId: claim.id, field: 'citations', message: `Referenzierte Source-ID '${cit.sourceId}' existiert nicht`, severity: 'ERROR' });
+  // 3. Aus Schauplätzen & Teasern
+  for (const loc of data.worldData.locations) {
+    if (loc.teaserClaimIds) {
+      loc.teaserClaimIds.forEach(id => reachableClaimIds.add(id));
+    }
+    if (loc.knowledgeNodeIds) {
+      loc.knowledgeNodeIds.forEach(nId => reachableNodeIds.add(nId));
+    }
+  }
+
+  // 4. Aus erreichbaren Knowledge-Nodes
+  for (const nodeId of reachableNodeIds) {
+    const node = data.nodes.find(n => n.id === nodeId);
+    if (node && node.claimIds) {
+      node.claimIds.forEach(id => reachableClaimIds.add(id));
+    }
+  }
+
+  // 5. Aus erreichbaren Relationen (sofern fromNode oder toNode erreichbar ist)
+  for (const rel of data.relations) {
+    if (reachableNodeIds.has(rel.fromNodeId) || reachableNodeIds.has(rel.toNodeId)) {
+      if (rel.claimIds) {
+        rel.claimIds.forEach(id => reachableClaimIds.add(id));
+      }
+    }
+  }
+
+  return Array.from(reachableClaimIds);
+}
+
+/**
+ * Validiert die semantische und strukturelle Integrität des gesamten Wissensgraphen
+ */
+export function validateKnowledgeGraph(customData?: KnowledgeDatasets): ValidationReport {
+  const data = customData || getDefaultDatasets();
+  const issues: ValidationIssue[] = [];
+
+  const sourceMap = new Map<string, SourceRecord>();
+  const claimMap = new Map<string, ClaimRecord>();
+  const nodeMap = new Map<string, KnowledgeNode>();
+
+  // 1. Validierung der Quellen
+  for (const src of data.sources) {
+    if (sourceMap.has(src.id)) {
+      issues.push({
+        level: 'ERROR',
+        category: 'INTEGRITY',
+        entityId: src.id,
+        message: `Doppelte Source-ID gefunden: ${src.id}`
+      });
+    }
+    sourceMap.set(src.id, src);
+
+    if (src.kind === 'official') {
+      if (!src.jurisdiction) {
+        issues.push({
+          level: 'ERROR',
+          category: 'CITATION',
+          entityId: src.id,
+          message: `Offizielle Quelle ${src.id} erfordert das Feld 'jurisdiction' (z. B. 'DE').`
+        });
+      }
+      if (!src.url || !src.url.startsWith('http')) {
+        issues.push({
+          level: 'ERROR',
+          category: 'CITATION',
+          entityId: src.id,
+          message: `Offizielle Quelle ${src.id} erfordert eine gültige HTTP(S)-URL.`
+        });
+      }
+      if (!src.lastCheckedAt || isNaN(Date.parse(src.lastCheckedAt))) {
+        issues.push({
+          level: 'ERROR',
+          category: 'CITATION',
+          entityId: src.id,
+          message: `Offizielle Quelle ${src.id} erfordert ein valides ISO-Prüfdatum in 'lastCheckedAt'.`
+        });
       } else {
-        const src = SOURCES.find(s => s.id === cit.sourceId);
-        // Narrative cannot be 'supports' for effectiveness claims
-        if (src?.kind === 'patient-narrative' && cit.role === 'supports' && (claim.type === 'effectiveness' || claim.evidenceLevel === 'well-supported')) {
-          errors.push({
-            entityType: 'CLAIM',
+        const checkDate = new Date(src.lastCheckedAt);
+        const today = new Date();
+        if (checkDate > today) {
+          issues.push({
+            level: 'ERROR',
+            category: 'CITATION',
+            entityId: src.id,
+            message: `Prüfdatum 'lastCheckedAt' der Quelle ${src.id} liegt in der Zukunft (${src.lastCheckedAt}).`
+          });
+        }
+      }
+    }
+
+    if (src.kind === 'patient-narrative') {
+      if (!src.narrativeForm) {
+        issues.push({
+          level: 'ERROR',
+          category: 'CITATION',
+          entityId: src.id,
+          message: `Patientennarrativ ${src.id} erfordert ein 'narrativeForm'-Feld.`
+        });
+      }
+      if (!src.valence) {
+        issues.push({
+          level: 'ERROR',
+          category: 'CITATION',
+          entityId: src.id,
+          message: `Patientennarrativ ${src.id} erfordert ein 'valence'-Feld ('positive', 'negative' oder 'mixed').`
+        });
+      }
+      if (!src.provenance) {
+        issues.push({
+          level: 'ERROR',
+          category: 'CITATION',
+          entityId: src.id,
+          message: `Patientennarrativ ${src.id} erfordert ein 'provenance'-Feld.`
+        });
+      }
+      if (!src.publishedDate || isNaN(Date.parse(src.publishedDate))) {
+        issues.push({
+          level: 'ERROR',
+          category: 'CITATION',
+          entityId: src.id,
+          message: `Patientennarrativ ${src.id} erfordert ein 'publishedDate'-Feld.`
+        });
+      }
+      if (!src.locatorOrUrl) {
+        issues.push({
+          level: 'ERROR',
+          category: 'CITATION',
+          entityId: src.id,
+          message: `Patientennarrativ ${src.id} erfordert ein 'locatorOrUrl'-Feld.`
+        });
+      }
+    }
+  }
+
+  // 2. Validierung der Claims
+  for (const claim of data.claims) {
+    if (claimMap.has(claim.id)) {
+      issues.push({
+        level: 'ERROR',
+        category: 'INTEGRITY',
+        entityId: claim.id,
+        message: `Doppelte Claim-ID gefunden: ${claim.id}`
+      });
+    }
+    claimMap.set(claim.id, claim);
+
+    for (const citation of claim.citations) {
+      const src = sourceMap.get(citation.sourceId);
+      if (!src) {
+        issues.push({
+          level: 'ERROR',
+          category: 'CITATION',
+          entityId: claim.id,
+          message: `Claim verweist auf unbekannte Source-ID: ${citation.sourceId}`
+        });
+      } else {
+        // Narrative dürfen ausschließlich als 'supports' an 'experience'-Claims hängen
+        if (src.kind === 'patient-narrative' && citation.role === 'supports' && claim.type !== 'experience') {
+          issues.push({
+            level: 'ERROR',
+            category: 'CITATION',
             entityId: claim.id,
-            field: 'citations',
-            message: `Patienten-Narrativ '${cit.sourceId}' darf nicht als Wirksamkeitsbeleg ('supports') für einen Claim verwendet werden`,
-            severity: 'ERROR'
+            message: `Patientennarrativ ${src.id} darf nicht als 'supports' an Nicht-Experience-Claim ${claim.id} (Typ: ${claim.type}) hängen.`
+          });
+        }
+      }
+    }
+
+    if ((claim.type === 'definition' || claim.type === 'theory') && claim.evidenceLevel === 'well-supported') {
+      issues.push({
+        level: 'ERROR',
+        category: 'CITATION',
+        entityId: claim.id,
+        message: `Claim ${claim.id} vom Typ ${claim.type} darf nicht als 'well-supported' deklariert werden.`
+      });
+    }
+  }
+
+  // 3. Validierung der Nodes
+  for (const node of data.nodes) {
+    if (nodeMap.has(node.id)) {
+      issues.push({
+        level: 'ERROR',
+        category: 'INTEGRITY',
+        entityId: node.id,
+        message: `Doppelte Node-ID gefunden: ${node.id}`
+      });
+    }
+    nodeMap.set(node.id, node);
+
+    for (const cId of node.claimIds) {
+      if (!claimMap.has(cId)) {
+        issues.push({
+          level: 'ERROR',
+          category: 'ONTOLOGY',
+          entityId: node.id,
+          message: `Node verweist auf unbekannte Claim-ID: ${cId}`
+        });
+      }
+    }
+  }
+
+  // 4. Validierung der Relationen
+  for (const rel of data.relations) {
+    if (!nodeMap.has(rel.fromNodeId)) {
+      issues.push({
+        level: 'ERROR',
+        category: 'ONTOLOGY',
+        entityId: rel.id,
+        message: `Relation fromNodeId nicht gefunden: ${rel.fromNodeId}`
+      });
+    }
+    if (!nodeMap.has(rel.toNodeId)) {
+      issues.push({
+        level: 'ERROR',
+        category: 'ONTOLOGY',
+        entityId: rel.id,
+        message: `Relation toNodeId nicht gefunden: ${rel.toNodeId}`
+      });
+    }
+    for (const cId of rel.claimIds) {
+      if (!claimMap.has(cId)) {
+        issues.push({
+          level: 'ERROR',
+          category: 'ONTOLOGY',
+          entityId: rel.id,
+          message: `Relation verweist auf unbekannte Claim-ID: ${cId}`
+        });
+      }
+    }
+  }
+
+  // 5. Validierung der Exploration-Routen
+  for (const route of data.routes) {
+    const triggerNode = nodeMap.get(route.triggerNodeId);
+    if (!triggerNode || triggerNode.kind !== 'experience') {
+      issues.push({
+        level: 'ERROR',
+        category: 'ONTOLOGY',
+        entityId: route.id,
+        message: `Route ${route.id} triggerNodeId muss ein existierender Node vom Typ 'experience' sein.`
+      });
+    }
+
+    if (route.options.length !== 5) {
+      issues.push({
+        level: 'ERROR',
+        category: 'ONTOLOGY',
+        entityId: route.id,
+        message: `Route ${route.id} muss genau 5 Optionen enthalten (aktuell: ${route.options.length}).`
+      });
+    }
+
+    const seenOptionIds = new Set<string>();
+    route.options.forEach((opt, idx) => {
+      if (seenOptionIds.has(opt.id)) {
+        issues.push({
+          level: 'ERROR',
+          category: 'ONTOLOGY',
+          entityId: opt.id,
+          message: `Doppelte Option-ID in Route ${route.id}: ${opt.id}`
+        });
+      }
+      seenOptionIds.add(opt.id);
+
+      // Optionen dürfen NIEMALS direkt auf Approach-Knoten zeigen
+      for (const tId of opt.targetKnowledgeNodeIds) {
+        const targetNode = nodeMap.get(tId);
+        if (!targetNode) {
+          issues.push({
+            level: 'ERROR',
+            category: 'ONTOLOGY',
+            entityId: opt.id,
+            message: `RouteOption ${opt.id} verweist auf unbekannten Node ${tId}.`
+          });
+        } else if (targetNode.kind === 'approach') {
+          issues.push({
+            level: 'ERROR',
+            category: 'ONTOLOGY',
+            entityId: opt.id,
+            message: `RouteOption ${opt.id} darf nicht direkt auf einen 'approach'-Knoten (${tId}) zeigen (Schul-Matching-Verbot).`
+          });
+        } else if (targetNode.kind !== 'need' && targetNode.kind !== 'working-mode') {
+          issues.push({
+            level: 'ERROR',
+            category: 'ONTOLOGY',
+            entityId: opt.id,
+            message: `RouteOption ${opt.id} targetKnowledgeNodeIds darf nur 'need' oder 'working-mode' Knoten enthalten (enthält: ${targetNode.kind}).`
+          });
+        }
+      }
+
+      // Optionen 2-5 dürfen kein bookmarkId Property besitzen
+      if (idx > 0 && opt.bookmarkId !== undefined) {
+        issues.push({
+          level: 'ERROR',
+          category: 'ONTOLOGY',
+          entityId: opt.id,
+          message: `RouteOption ${opt.id} (Option ${idx + 1}) darf kein 'bookmarkId'-Property besitzen.`
+        });
+      }
+    });
+  }
+
+  // 6. Validierung der Weltkarte & Szenen-Konsistenz
+  for (const loc of data.worldData.locations) {
+    if (loc.type === 'scene') {
+      if (!loc.sceneId || !data.scenesRegistry[loc.sceneId]) {
+        issues.push({
+          level: 'ERROR',
+          category: 'CONSISTENCY',
+          entityId: loc.id,
+          message: `Begehbare Location ${loc.id} referenziert keine registrierte Szene (${loc.sceneId}).`
+        });
+      } else {
+        const scene = data.scenesRegistry[loc.sceneId];
+        if (scene.locationId !== loc.id) {
+          issues.push({
+            level: 'ERROR',
+            category: 'CONSISTENCY',
+            entityId: loc.id,
+            message: `Szenen-Location-Mismatch: Szene ${scene.id} hat locationId '${scene.locationId}', erwartet '${loc.id}'.`
           });
         }
       }
     }
   }
 
-  // 3. Validate Knowledge Nodes
-  for (const node of KNOWLEDGE_NODES) {
-    if (nodeIds.has(node.id)) {
-      errors.push({ entityType: 'NODE', entityId: node.id, message: `Doppelte Node-ID: ${node.id}`, severity: 'ERROR' });
-    }
-    nodeIds.add(node.id);
+  // 7. Reachability Traversal & Release-Gate Status
+  const reachableClaimIds = getReachableClaimIds(data);
+  const reachableDraftClaimIds: string[] = [];
 
-    for (const cId of node.claimIds) {
-      if (!claimIds.has(cId)) {
-        errors.push({ entityType: 'NODE', entityId: node.id, field: 'claimIds', message: `Referenzierte Claim-ID '${cId}' existiert nicht`, severity: 'ERROR' });
-      }
+  for (const cId of reachableClaimIds) {
+    const claim = claimMap.get(cId);
+    if (claim && claim.reviewStatus === 'draft') {
+      reachableDraftClaimIds.push(cId);
     }
   }
 
-  // 4. Validate Knowledge Relations
-  for (const rel of KNOWLEDGE_RELATIONS) {
-    if (relationIds.has(rel.id)) {
-      errors.push({ entityType: 'RELATION', entityId: rel.id, message: `Doppelte Relation-ID: ${rel.id}`, severity: 'ERROR' });
-    }
-    relationIds.add(rel.id);
+  const errors = issues.filter(i => i.level === 'ERROR');
+  const warnings = issues.filter(i => i.level === 'WARNING');
 
-    if (!nodeIds.has(rel.sourceNodeId)) {
-      errors.push({ entityType: 'RELATION', entityId: rel.id, field: 'sourceNodeId', message: `Source-Node '${rel.sourceNodeId}' existiert nicht`, severity: 'ERROR' });
-    }
-    if (!nodeIds.has(rel.targetNodeId)) {
-      errors.push({ entityType: 'RELATION', entityId: rel.id, field: 'targetNodeId', message: `Target-Node '${rel.targetNodeId}' existiert nicht`, severity: 'ERROR' });
-    }
-
-    if (rel.claimIds) {
-      for (const cId of rel.claimIds) {
-        if (!claimIds.has(cId)) {
-          errors.push({ entityType: 'RELATION', entityId: rel.id, field: 'claimIds', message: `Referenzierte Claim-ID '${cId}' in Relation existiert nicht`, severity: 'ERROR' });
-        }
-      }
-    }
-  }
-
-  // 5. Validate Exploration Routes
-  for (const route of EXPLORATION_ROUTES) {
-    if (routeIds.has(route.id)) {
-      errors.push({ entityType: 'ROUTE', entityId: route.id, message: `Doppelte Route-ID: ${route.id}`, severity: 'ERROR' });
-    }
-    routeIds.add(route.id);
-
-    if (!nodeIds.has(route.triggerNodeId)) {
-      errors.push({ entityType: 'ROUTE', entityId: route.id, field: 'triggerNodeId', message: `Trigger-Node '${route.triggerNodeId}' existiert nicht`, severity: 'ERROR' });
-    }
-
-    if (route.disclaimerClaimIds) {
-      for (const cId of route.disclaimerClaimIds) {
-        if (!claimIds.has(cId)) {
-          errors.push({ entityType: 'ROUTE', entityId: route.id, field: 'disclaimerClaimIds', message: `Disclaimer Claim-ID '${cId}' existiert nicht`, severity: 'ERROR' });
-        }
-      }
-    }
-
-    for (const opt of route.options) {
-      for (const nId of opt.targetKnowledgeNodeIds) {
-        if (!nodeIds.has(nId)) {
-          errors.push({ entityType: 'ROUTE', entityId: route.id, field: 'targetKnowledgeNodeIds', message: `Option '${opt.id}' referenziert nicht existierenden Node '${nId}'`, severity: 'ERROR' });
-        }
-      }
-      if (opt.perspectiveClaimIds) {
-        for (const cId of opt.perspectiveClaimIds) {
-          if (!claimIds.has(cId)) {
-            errors.push({ entityType: 'ROUTE', entityId: route.id, field: 'perspectiveClaimIds', message: `Option '${opt.id}' referenziert nicht existierenden Claim '${cId}'`, severity: 'ERROR' });
-          }
-        }
-      }
-    }
-  }
-
-  // 6. Validate World Locations
-  for (const loc of WORLD_DATA.locations) {
-    if (locationIds.has(loc.id)) {
-      errors.push({ entityType: 'LOCATION', entityId: loc.id, message: `Doppelte Location-ID: ${loc.id}`, severity: 'ERROR' });
-    }
-    locationIds.add(loc.id);
-
-    if (loc.knowledgeNodeIds) {
-      for (const nId of loc.knowledgeNodeIds) {
-        if (!nodeIds.has(nId)) {
-          errors.push({ entityType: 'LOCATION', entityId: loc.id, field: 'knowledgeNodeIds', message: `Location '${loc.id}' referenziert nicht existierenden Node '${nId}'`, severity: 'ERROR' });
-        }
-      }
-    }
-
-    if (loc.teaserClaimIds) {
-      for (const cId of loc.teaserClaimIds) {
-        if (!claimIds.has(cId)) {
-          errors.push({ entityType: 'LOCATION', entityId: loc.id, field: 'teaserClaimIds', message: `Location '${loc.id}' referenziert nicht existierenden Claim '${cId}'`, severity: 'ERROR' });
-        }
-      }
-    }
-  }
-
-  // 7. Validate Scenes
-  for (const [sceneId, scene] of Object.entries(SCENES_REGISTRY)) {
-    if (!locationIds.has(scene.locationId)) {
-      errors.push({ entityType: 'SCENE', entityId: sceneId, field: 'locationId', message: `Szene '${sceneId}' verweist auf ungültige Location-ID '${scene.locationId}'`, severity: 'ERROR' });
-    }
-
-    for (const hotspot of scene.hotspots) {
-      if (hotspot.dialogue.claimIds) {
-        for (const cId of hotspot.dialogue.claimIds) {
-          if (!claimIds.has(cId)) {
-            errors.push({ entityType: 'SCENE', entityId: `${sceneId}:${hotspot.id}`, field: 'claimIds', message: `Hotspot '${hotspot.id}' referenziert nicht existierenden Claim '${cId}'`, severity: 'ERROR' });
-          }
-        }
-      }
-      if (hotspot.dialogue.subtextClaimIds) {
-        for (const cId of hotspot.dialogue.subtextClaimIds) {
-          if (!claimIds.has(cId)) {
-            errors.push({ entityType: 'SCENE', entityId: `${sceneId}:${hotspot.id}`, field: 'subtextClaimIds', message: `Hotspot '${hotspot.id}' referenziert nicht existierenden Claim '${cId}'`, severity: 'ERROR' });
-          }
-        }
-      }
-
-      for (const action of hotspot.dialogue.actions) {
-        if (action.claimIds) {
-          for (const cId of action.claimIds) {
-            if (!claimIds.has(cId)) {
-              errors.push({ entityType: 'SCENE', entityId: `${sceneId}:${action.id}`, field: 'action.claimIds', message: `Aktion '${action.id}' referenziert nicht existierenden Claim '${cId}'`, severity: 'ERROR' });
-            }
-          }
-        }
-        if (action.type === 'NAVIGATE_ROUTES') {
-          if (!routeIds.has(action.routeId)) {
-            errors.push({ entityType: 'SCENE', entityId: `${sceneId}:${action.id}`, field: 'routeId', message: `Aktion '${action.id}' referenziert nicht existierende Route '${action.routeId}'`, severity: 'ERROR' });
-          }
-        }
-        if (action.type === 'QUIZ' && action.quiz.explanationClaimIds) {
-          for (const cId of action.quiz.explanationClaimIds) {
-            if (!claimIds.has(cId)) {
-              errors.push({ entityType: 'SCENE', entityId: `${sceneId}:${action.id}`, field: 'explanationClaimIds', message: `Quiz '${action.id}' referenziert nicht existierenden Claim '${cId}'`, severity: 'ERROR' });
-            }
-          }
-        }
-        if (action.type === 'ITEM' && action.item.claimIds) {
-          for (const cId of action.item.claimIds) {
-            if (!claimIds.has(cId)) {
-              errors.push({ entityType: 'SCENE', entityId: `${sceneId}:${action.id}`, field: 'item.claimIds', message: `Item '${action.item.itemId}' referenziert nicht existierenden Claim '${cId}'`, severity: 'ERROR' });
-            }
-          }
-        }
-      }
-    }
-  }
-
-  let releaseStatus: 'RELEASE_READY' | 'BLOCKED_BY_DRAFT_CONTENT' | 'BLOCKED_BY_ERRORS' = 'RELEASE_READY';
+  let releaseStatus: ValidationReport['releaseStatus'] = 'RELEASE_READY';
   if (errors.length > 0) {
-    releaseStatus = 'BLOCKED_BY_ERRORS';
-  } else if (draftClaimsCount > 0) {
+    releaseStatus = 'BLOCKED_BY_VALIDATION_ERRORS';
+  } else if (reachableDraftClaimIds.length > 0) {
     releaseStatus = 'BLOCKED_BY_DRAFT_CONTENT';
   }
 
   return {
     isValid: errors.length === 0,
-    errors,
-    warnings,
     releaseStatus,
-    stats: {
-      sourcesCount: SOURCES.length,
-      claimsCount: CLAIMS.length,
-      draftClaimsCount,
-      approvedClaimsCount,
-      nodesCount: KNOWLEDGE_NODES.length,
-      relationsCount: KNOWLEDGE_RELATIONS.length,
-      routesCount: EXPLORATION_ROUTES.length
-    }
+    errorsCount: errors.length,
+    warningsCount: warnings.length,
+    reachableClaimIds,
+    reachableDraftClaimIds,
+    issues
   };
 }
