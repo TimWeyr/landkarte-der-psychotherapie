@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#2d261e" flood-opacity="0.35"/>
+    </filter>
+    <linearGradient id="grad-loc_fog_marsh" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6b7d7f"/>
+      <stop offset="100%" stop-color="#2d261e"/>
+    </linearGradient>
+  </defs>
+  <g filter="url(#shadow)">
+    <!-- Base Circular Shield Badge -->
+    <circle cx="256" cy="256" r="220" fill="#f6f1e8" stroke="#6b7d7f" stroke-width="12"/>
+    <circle cx="256" cy="256" r="200" fill="none" stroke="#ede4d3" stroke-width="4" stroke-dasharray="8 6"/>
+
+    <!-- Distinct Silhouette Icons -->
+    
+        <!-- Marsh and Lantern -->
+        <path d="M120,380 Q256,410 392,380 L392,410 Q256,430 120,410 Z" fill="#6b7d7f"/>
+        <line x1="160" y1="380" x2="160" y2="300" stroke="#2d261e" stroke-width="8"/>
+        <line x1="256" y1="390" x2="256" y2="200" stroke="#2d261e" stroke-width="12"/>
+        <line x1="352" y1="380" x2="352" y2="320" stroke="#2d261e" stroke-width="8"/>
+        <!-- Lantern head -->
+        <polygon points="230,200 282,200 292,150 220,150" fill="#c68a35" stroke="#2d261e" stroke-width="8"/>
+        <rect x="236" y="150" width="40" height="40" fill="#fffdf8" stroke="#2d261e" stroke-width="6"/>
+        <circle cx="256" cy="170" r="10" fill="#c68a35"/>
+        <path d="M210,150 Q256,120 302,150" fill="#2d261e"/>
+      
+
+    <!-- Outer Decorative Compass Nodule -->
+    <circle cx="256" cy="46" r="10" fill="#6b7d7f"/>
+    <circle cx="256" cy="466" r="10" fill="#6b7d7f"/>
+    <circle cx="46" cy="256" r="10" fill="#6b7d7f"/>
+    <circle cx="466" cy="256" r="10" fill="#6b7d7f"/>
+  </g>
+</svg>

@@ -1,0 +1,276 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1350" width="1600" height="1350">
+    <rect width="1600" height="1350" fill="#2d261e"/>
+    <text x="50" y="60" font-family="'Georgia', serif" font-size="32" fill="#f6f1e8" font-weight="bold">Kontaktübersicht: 30 Szenen-Konzeptbilder (Innerer Atlas V0.1)</text>
+    <text x="50" y="90" font-family="sans-serif" font-size="16" fill="#ede4d3">16:9 Point-and-Click Entwürfe mit 4–6 visuellen Fokuspunkten</text>
+    <g transform="translate(50, 120)">
+        <rect width="280" height="175" fill="#f6f1e8" rx="6" stroke="#c68a35" stroke-width="2"/>
+        <g transform="translate(10, 10) scale(0.27)">
+          <rect width="960" height="540" fill="#c8d6df"/>
+          <path d="M0,280 Q480,220 960,260 L960,540 L0,540 Z" fill="#a5b5a2"/>
+          <rect x="360" y="180" width="240" height="180" fill="#f6f1e8" stroke="#2d261e" stroke-width="12"/>
+          <polygon points="320,180 480,80 640,180" fill="#446473"/>
+        </g>
+        <text x="140" y="165" font-family="sans-serif" font-size="10" fill="#2d261e" font-weight="bold" text-anchor="middle">Windmühle der Gedanken</text>
+      </g><g transform="translate(350, 120)">
+        <rect width="280" height="175" fill="#f6f1e8" rx="6" stroke="#c68a35" stroke-width="2"/>
+        <g transform="translate(10, 10) scale(0.27)">
+          <rect width="960" height="540" fill="#d2d7d9"/>
+          <path d="M0,280 Q480,220 960,260 L960,540 L0,540 Z" fill="#8c9c8e"/>
+          <rect x="360" y="180" width="240" height="180" fill="#f6f1e8" stroke="#2d261e" stroke-width="12"/>
+          <polygon points="320,180 480,80 640,180" fill="#6b7d7f"/>
+        </g>
+        <text x="140" y="165" font-family="sans-serif" font-size="10" fill="#2d261e" font-weight="bold" text-anchor="middle">Nebelmoor der Erschöpfung</text>
+      </g><g transform="translate(650, 120)">
+        <rect width="280" height="175" fill="#f6f1e8" rx="6" stroke="#c68a35" stroke-width="2"/>
+        <g transform="translate(10, 10) scale(0.27)">
+          <rect width="960" height="540" fill="#d8c2b5"/>
+          <path d="M0,280 Q480,220 960,260 L960,540 L0,540 Z" fill="#8a796e"/>
+          <rect x="360" y="180" width="240" height="180" fill="#f6f1e8" stroke="#2d261e" stroke-width="12"/>
+          <polygon points="320,180 480,80 640,180" fill="#b25838"/>
+        </g>
+        <text x="140" y="165" font-family="sans-serif" font-size="10" fill="#2d261e" font-weight="bold" text-anchor="middle">Alarmklippen</text>
+      </g><g transform="translate(950, 120)">
+        <rect width="280" height="175" fill="#f6f1e8" rx="6" stroke="#c68a35" stroke-width="2"/>
+        <g transform="translate(10, 10) scale(0.27)">
+          <rect width="960" height="540" fill="#cfdcd5"/>
+          <path d="M0,280 Q480,220 960,260 L960,540 L0,540 Z" fill="#6f8f7c"/>
+          <rect x="360" y="180" width="240" height="180" fill="#f6f1e8" stroke="#2d261e" stroke-width="12"/>
+          <polygon points="320,180 480,80 640,180" fill="#50755a"/>
+        </g>
+        <text x="140" y="165" font-family="sans-serif" font-size="10" fill="#2d261e" font-weight="bold" text-anchor="middle">Stillwassersee</text>
+      </g><g transform="translate(1250, 120)">
+        <rect width="280" height="175" fill="#f6f1e8" rx="6" stroke="#c68a35" stroke-width="2"/>
+        <g transform="translate(10, 10) scale(0.27)">
+          <rect width="960" height="540" fill="#e8dcce"/>
+          <path d="M0,280 Q480,220 960,260 L960,540 L0,540 Z" fill="#b8a695"/>
+          <rect x="360" y="180" width="240" height="180" fill="#f6f1e8" stroke="#2d261e" stroke-width="12"/>
+          <polygon points="320,180 480,80 640,180" fill="#c68a35"/>
+        </g>
+        <text x="140" y="165" font-family="sans-serif" font-size="10" fill="#2d261e" font-weight="bold" text-anchor="middle">Maskenmarkt</text>
+      </g><g transform="translate(50, 320)">
+        <rect width="280" height="175" fill="#f6f1e8" rx="6" stroke="#c68a35" stroke-width="2"/>
+        <g transform="translate(10, 10) scale(0.27)">
+          <rect width="960" height="540" fill="#e5dbcd"/>
+          <path d="M0,280 Q480,220 960,260 L960,540 L0,540 Z" fill="#9fa893"/>
+          <rect x="360" y="180" width="240" height="180" fill="#f6f1e8" stroke="#2d261e" stroke-width="12"/>
+          <polygon points="320,180 480,80 640,180" fill="#c68a35"/>
+        </g>
+        <text x="140" y="165" font-family="sans-serif" font-size="10" fill="#2d261e" font-weight="bold" text-anchor="middle">Schutzhaus</text>
+      </g><g transform="translate(350, 320)">
+        <rect width="280" height="175" fill="#f6f1e8" rx="6" stroke="#c68a35" stroke-width="2"/>
+        <g transform="translate(10, 10) scale(0.27)">
+          <rect width="960" height="540" fill="#dce6db"/>
+          <path d="M0,280 Q480,220 960,260 L960,540 L0,540 Z" fill="#769476"/>
+          <rect x="360" y="180" width="240" height="180" fill="#f6f1e8" stroke="#2d261e" stroke-width="12"/>
+          <polygon points="320,180 480,80 640,180" fill="#50755a"/>
+        </g>
+        <text x="140" y="165" font-family="sans-serif" font-size="10" fill="#2d261e" font-weight="bold" text-anchor="middle">Garten der Selbstfreundlichkeit</text>
+      </g><g transform="translate(650, 320)">
+        <rect width="280" height="175" fill="#f6f1e8" rx="6" stroke="#c68a35" stroke-width="2"/>
+        <g transform="translate(10, 10) scale(0.27)">
+          <rect width="960" height="540" fill="#d9e8dc"/>
+          <path d="M0,280 Q480,220 960,260 L960,540 L0,540 Z" fill="#638a63"/>
+          <rect x="360" y="180" width="240" height="180" fill="#f6f1e8" stroke="#2d261e" stroke-width="12"/>
+          <polygon points="320,180 480,80 640,180" fill="#50755a"/>
+        </g>
+        <text x="140" y="165" font-family="sans-serif" font-size="10" fill="#2d261e" font-weight="bold" text-anchor="middle">Ressourcenhain</text>
+      </g><g transform="translate(950, 320)">
+        <rect width="280" height="175" fill="#f6f1e8" rx="6" stroke="#c68a35" stroke-width="2"/>
+        <g transform="translate(10, 10) scale(0.27)">
+          <rect width="960" height="540" fill="#e6ded3"/>
+          <path d="M0,280 Q480,220 960,260 L960,540 L0,540 Z" fill="#8f7e71"/>
+          <rect x="360" y="180" width="240" height="180" fill="#f6f1e8" stroke="#2d261e" stroke-width="12"/>
+          <polygon points="320,180 480,80 640,180" fill="#b25838"/>
+        </g>
+        <text x="140" y="165" font-family="sans-serif" font-size="10" fill="#2d261e" font-weight="bold" text-anchor="middle">Grenzbrücke</text>
+      </g><g transform="translate(1250, 320)">
+        <rect width="280" height="175" fill="#f6f1e8" rx="6" stroke="#c68a35" stroke-width="2"/>
+        <g transform="translate(10, 10) scale(0.27)">
+          <rect width="960" height="540" fill="#2b3a4a"/>
+          <path d="M0,280 Q480,220 960,260 L960,540 L0,540 Z" fill="#5c6b75"/>
+          <rect x="360" y="180" width="240" height="180" fill="#f6f1e8" stroke="#2d261e" stroke-width="12"/>
+          <polygon points="320,180 480,80 640,180" fill="#446473"/>
+        </g>
+        <text x="140" y="165" font-family="sans-serif" font-size="10" fill="#2d261e" font-weight="bold" text-anchor="middle">Sternwarte der Werte</text>
+      </g><g transform="translate(50, 520)">
+        <rect width="280" height="175" fill="#f6f1e8" rx="6" stroke="#c68a35" stroke-width="2"/>
+        <g transform="translate(10, 10) scale(0.27)">
+          <rect width="960" height="540" fill="#e3dcd1"/>
+          <path d="M0,280 Q480,220 960,260 L960,540 L0,540 Z" fill="#9e9182"/>
+          <rect x="360" y="180" width="240" height="180" fill="#f6f1e8" stroke="#2d261e" stroke-width="12"/>
+          <polygon points="320,180 480,80 640,180" fill="#c68a35"/>
+        </g>
+        <text x="140" y="165" font-family="sans-serif" font-size="10" fill="#2d261e" font-weight="bold" text-anchor="middle">Archiv der Lebensspuren</text>
+      </g><g transform="translate(350, 520)">
+        <rect width="280" height="175" fill="#f6f1e8" rx="6" stroke="#c68a35" stroke-width="2"/>
+        <g transform="translate(10, 10) scale(0.27)">
+          <rect width="960" height="540" fill="#c2bcb3"/>
+          <path d="M0,280 Q480,220 960,260 L960,540 L0,540 Z" fill="#5c544b"/>
+          <rect x="360" y="180" width="240" height="180" fill="#f6f1e8" stroke="#2d261e" stroke-width="12"/>
+          <polygon points="320,180 480,80 640,180" fill="#5a5043"/>
+        </g>
+        <text x="140" y="165" font-family="sans-serif" font-size="10" fill="#2d261e" font-weight="bold" text-anchor="middle">Echohöhle der Muster</text>
+      </g><g transform="translate(650, 520)">
+        <rect width="280" height="175" fill="#f6f1e8" rx="6" stroke="#c68a35" stroke-width="2"/>
+        <g transform="translate(10, 10) scale(0.27)">
+          <rect width="960" height="540" fill="#d4dee3"/>
+          <path d="M0,280 Q480,220 960,260 L960,540 L0,540 Z" fill="#75878f"/>
+          <rect x="360" y="180" width="240" height="180" fill="#f6f1e8" stroke="#2d261e" stroke-width="12"/>
+          <polygon points="320,180 480,80 640,180" fill="#446473"/>
+        </g>
+        <text x="140" y="165" font-family="sans-serif" font-size="10" fill="#2d261e" font-weight="bold" text-anchor="middle">Passage von Nähe und Abstand</text>
+      </g><g transform="translate(950, 520)">
+        <rect width="280" height="175" fill="#f6f1e8" rx="6" stroke="#c68a35" stroke-width="2"/>
+        <g transform="translate(10, 10) scale(0.27)">
+          <rect width="960" height="540" fill="#e8ded4"/>
+          <path d="M0,280 Q480,220 960,260 L960,540 L0,540 Z" fill="#998a7d"/>
+          <rect x="360" y="180" width="240" height="180" fill="#f6f1e8" stroke="#2d261e" stroke-width="12"/>
+          <polygon points="320,180 480,80 640,180" fill="#b25838"/>
+        </g>
+        <text x="140" y="165" font-family="sans-serif" font-size="10" fill="#2d261e" font-weight="bold" text-anchor="middle">Haus der inneren Stimmen</text>
+      </g><g transform="translate(1250, 520)">
+        <rect width="280" height="175" fill="#f6f1e8" rx="6" stroke="#c68a35" stroke-width="2"/>
+        <g transform="translate(10, 10) scale(0.27)">
+          <rect width="960" height="540" fill="#ede6dc"/>
+          <path d="M0,280 Q480,220 960,260 L960,540 L0,540 Z" fill="#9e9182"/>
+          <rect x="360" y="180" width="240" height="180" fill="#f6f1e8" stroke="#2d261e" stroke-width="12"/>
+          <polygon points="320,180 480,80 640,180" fill="#c68a35"/>
+        </g>
+        <text x="140" y="165" font-family="sans-serif" font-size="10" fill="#2d261e" font-weight="bold" text-anchor="middle">Kartenkammer der Erklärungsmodelle</text>
+      </g><g transform="translate(50, 720)">
+        <rect width="280" height="175" fill="#f6f1e8" rx="6" stroke="#c68a35" stroke-width="2"/>
+        <g transform="translate(10, 10) scale(0.27)">
+          <rect width="960" height="540" fill="#e5e1d5"/>
+          <path d="M0,280 Q480,220 960,260 L960,540 L0,540 Z" fill="#8c947c"/>
+          <rect x="360" y="180" width="240" height="180" fill="#f6f1e8" stroke="#2d261e" stroke-width="12"/>
+          <polygon points="320,180 480,80 640,180" fill="#c68a35"/>
+        </g>
+        <text x="140" y="165" font-family="sans-serif" font-size="10" fill="#2d261e" font-weight="bold" text-anchor="middle">Gedankenlabor</text>
+      </g><g transform="translate(350, 720)">
+        <rect width="280" height="175" fill="#f6f1e8" rx="6" stroke="#c68a35" stroke-width="2"/>
+        <g transform="translate(10, 10) scale(0.27)">
+          <rect width="960" height="540" fill="#ebdccc"/>
+          <path d="M0,280 Q480,220 960,260 L960,540 L0,540 Z" fill="#8a6e5b"/>
+          <rect x="360" y="180" width="240" height="180" fill="#f6f1e8" stroke="#2d261e" stroke-width="12"/>
+          <polygon points="320,180 480,80 640,180" fill="#b25838"/>
+        </g>
+        <text x="140" y="165" font-family="sans-serif" font-size="10" fill="#2d261e" font-weight="bold" text-anchor="middle">Gefühlsatelier</text>
+      </g><g transform="translate(650, 720)">
+        <rect width="280" height="175" fill="#f6f1e8" rx="6" stroke="#c68a35" stroke-width="2"/>
+        <g transform="translate(10, 10) scale(0.27)">
+          <rect width="960" height="540" fill="#dfe8e1"/>
+          <path d="M0,280 Q480,220 960,260 L960,540 L0,540 Z" fill="#738a79"/>
+          <rect x="360" y="180" width="240" height="180" fill="#f6f1e8" stroke="#2d261e" stroke-width="12"/>
+          <polygon points="320,180 480,80 640,180" fill="#50755a"/>
+        </g>
+        <text x="140" y="165" font-family="sans-serif" font-size="10" fill="#2d261e" font-weight="bold" text-anchor="middle">Körperobservatorium</text>
+      </g><g transform="translate(950, 720)">
+        <rect width="280" height="175" fill="#f6f1e8" rx="6" stroke="#c68a35" stroke-width="2"/>
+        <g transform="translate(10, 10) scale(0.27)">
+          <rect width="960" height="540" fill="#e3dcd1"/>
+          <path d="M0,280 Q480,220 960,260 L960,540 L0,540 Z" fill="#8c7765"/>
+          <rect x="360" y="180" width="240" height="180" fill="#f6f1e8" stroke="#2d261e" stroke-width="12"/>
+          <polygon points="320,180 480,80 640,180" fill="#b25838"/>
+        </g>
+        <text x="140" y="165" font-family="sans-serif" font-size="10" fill="#2d261e" font-weight="bold" text-anchor="middle">Mutpfad</text>
+      </g><g transform="translate(1250, 720)">
+        <rect width="280" height="175" fill="#f6f1e8" rx="6" stroke="#c68a35" stroke-width="2"/>
+        <g transform="translate(10, 10) scale(0.27)">
+          <rect width="960" height="540" fill="#d6e2e8"/>
+          <path d="M0,280 Q480,220 960,260 L960,540 L0,540 Z" fill="#6a8494"/>
+          <rect x="360" y="180" width="240" height="180" fill="#f6f1e8" stroke="#2d261e" stroke-width="12"/>
+          <polygon points="320,180 480,80 640,180" fill="#446473"/>
+        </g>
+        <text x="140" y="165" font-family="sans-serif" font-size="10" fill="#2d261e" font-weight="bold" text-anchor="middle">Achtsamkeitspavillon</text>
+      </g><g transform="translate(50, 920)">
+        <rect width="280" height="175" fill="#f6f1e8" rx="6" stroke="#c68a35" stroke-width="2"/>
+        <g transform="translate(10, 10) scale(0.27)">
+          <rect width="960" height="540" fill="#e3dcce"/>
+          <path d="M0,280 Q480,220 960,260 L960,540 L0,540 Z" fill="#8c806f"/>
+          <rect x="360" y="180" width="240" height="180" fill="#f6f1e8" stroke="#2d261e" stroke-width="12"/>
+          <polygon points="320,180 480,80 640,180" fill="#c68a35"/>
+        </g>
+        <text x="140" y="165" font-family="sans-serif" font-size="10" fill="#2d261e" font-weight="bold" text-anchor="middle">Bündnisbrücke</text>
+      </g><g transform="translate(350, 920)">
+        <rect width="280" height="175" fill="#f6f1e8" rx="6" stroke="#c68a35" stroke-width="2"/>
+        <g transform="translate(10, 10) scale(0.27)">
+          <rect width="960" height="540" fill="#d4dfdf"/>
+          <path d="M0,280 Q480,220 960,260 L960,540 L0,540 Z" fill="#6c8585"/>
+          <rect x="360" y="180" width="240" height="180" fill="#f6f1e8" stroke="#2d261e" stroke-width="12"/>
+          <polygon points="320,180 480,80 640,180" fill="#446473"/>
+        </g>
+        <text x="140" y="165" font-family="sans-serif" font-size="10" fill="#2d261e" font-weight="bold" text-anchor="middle">Reparaturdock</text>
+      </g><g transform="translate(650, 920)">
+        <rect width="280" height="175" fill="#f6f1e8" rx="6" stroke="#c68a35" stroke-width="2"/>
+        <g transform="translate(10, 10) scale(0.27)">
+          <rect width="960" height="540" fill="#e0e5da"/>
+          <path d="M0,280 Q480,220 960,260 L960,540 L0,540 Z" fill="#7a8c75"/>
+          <rect x="360" y="180" width="240" height="180" fill="#f6f1e8" stroke="#2d261e" stroke-width="12"/>
+          <polygon points="320,180 480,80 640,180" fill="#50755a"/>
+        </g>
+        <text x="140" y="165" font-family="sans-serif" font-size="10" fill="#2d261e" font-weight="bold" text-anchor="middle">Platz der Perspektiven</text>
+      </g><g transform="translate(950, 920)">
+        <rect width="280" height="175" fill="#f6f1e8" rx="6" stroke="#c68a35" stroke-width="2"/>
+        <g transform="translate(10, 10) scale(0.27)">
+          <rect width="960" height="540" fill="#e6dfd5"/>
+          <path d="M0,280 Q480,220 960,260 L960,540 L0,540 Z" fill="#8f7d6e"/>
+          <rect x="360" y="180" width="240" height="180" fill="#f6f1e8" stroke="#2d261e" stroke-width="12"/>
+          <polygon points="320,180 480,80 640,180" fill="#b25838"/>
+        </g>
+        <text x="140" y="165" font-family="sans-serif" font-size="10" fill="#2d261e" font-weight="bold" text-anchor="middle">Netzwerkhof</text>
+      </g><g transform="translate(1250, 920)">
+        <rect width="280" height="175" fill="#f6f1e8" rx="6" stroke="#c68a35" stroke-width="2"/>
+        <g transform="translate(10, 10) scale(0.27)">
+          <rect width="960" height="540" fill="#3b3228"/>
+          <path d="M0,280 Q480,220 960,260 L960,540 L0,540 Z" fill="#544638"/>
+          <rect x="360" y="180" width="240" height="180" fill="#f6f1e8" stroke="#2d261e" stroke-width="12"/>
+          <polygon points="320,180 480,80 640,180" fill="#b25838"/>
+        </g>
+        <text x="140" y="165" font-family="sans-serif" font-size="10" fill="#2d261e" font-weight="bold" text-anchor="middle">Gruppenfeuer</text>
+      </g><g transform="translate(50, 1120)">
+        <rect width="280" height="175" fill="#f6f1e8" rx="6" stroke="#c68a35" stroke-width="2"/>
+        <g transform="translate(10, 10) scale(0.27)">
+          <rect width="960" height="540" fill="#e8e2d8"/>
+          <path d="M0,280 Q480,220 960,260 L960,540 L0,540 Z" fill="#9e9182"/>
+          <rect x="360" y="180" width="240" height="180" fill="#f6f1e8" stroke="#2d261e" stroke-width="12"/>
+          <polygon points="320,180 480,80 640,180" fill="#c68a35"/>
+        </g>
+        <text x="140" y="165" font-family="sans-serif" font-size="10" fill="#2d261e" font-weight="bold" text-anchor="middle">Bibliothek der Verfahren</text>
+      </g><g transform="translate(350, 1120)">
+        <rect width="280" height="175" fill="#f6f1e8" rx="6" stroke="#c68a35" stroke-width="2"/>
+        <g transform="translate(10, 10) scale(0.27)">
+          <rect width="960" height="540" fill="#ebe0d1"/>
+          <path d="M0,280 Q480,220 960,260 L960,540 L0,540 Z" fill="#87705f"/>
+          <rect x="360" y="180" width="240" height="180" fill="#f6f1e8" stroke="#2d261e" stroke-width="12"/>
+          <polygon points="320,180 480,80 640,180" fill="#c68a35"/>
+        </g>
+        <text x="140" y="165" font-family="sans-serif" font-size="10" fill="#2d261e" font-weight="bold" text-anchor="middle">Zielschmiede</text>
+      </g><g transform="translate(650, 1120)">
+        <rect width="280" height="175" fill="#f6f1e8" rx="6" stroke="#c68a35" stroke-width="2"/>
+        <g transform="translate(10, 10) scale(0.27)">
+          <rect width="960" height="540" fill="#dce5eb"/>
+          <path d="M0,280 Q480,220 960,260 L960,540 L0,540 Z" fill="#6a7d8c"/>
+          <rect x="360" y="180" width="240" height="180" fill="#f6f1e8" stroke="#2d261e" stroke-width="12"/>
+          <polygon points="320,180 480,80 640,180" fill="#446473"/>
+        </g>
+        <text x="140" y="165" font-family="sans-serif" font-size="10" fill="#2d261e" font-weight="bold" text-anchor="middle">Verlaufswarte</text>
+      </g><g transform="translate(950, 1120)">
+        <rect width="280" height="175" fill="#f6f1e8" rx="6" stroke="#c68a35" stroke-width="2"/>
+        <g transform="translate(10, 10) scale(0.27)">
+          <rect width="960" height="540" fill="#e2e7df"/>
+          <path d="M0,280 Q480,220 960,260 L960,540 L0,540 Z" fill="#7f917d"/>
+          <rect x="360" y="180" width="240" height="180" fill="#f6f1e8" stroke="#2d261e" stroke-width="12"/>
+          <polygon points="320,180 480,80 640,180" fill="#50755a"/>
+        </g>
+        <text x="140" y="165" font-family="sans-serif" font-size="10" fill="#2d261e" font-weight="bold" text-anchor="middle">Haus der zweiten Meinung</text>
+      </g><g transform="translate(1250, 1120)">
+        <rect width="280" height="175" fill="#f6f1e8" rx="6" stroke="#c68a35" stroke-width="2"/>
+        <g transform="translate(10, 10) scale(0.27)">
+          <rect width="960" height="540" fill="#2f3542"/>
+          <path d="M0,280 Q480,220 960,260 L960,540 L0,540 Z" fill="#57606f"/>
+          <rect x="360" y="180" width="240" height="180" fill="#f6f1e8" stroke="#2d261e" stroke-width="12"/>
+          <polygon points="320,180 480,80 640,180" fill="#b25838"/>
+        </g>
+        <text x="140" y="165" font-family="sans-serif" font-size="10" fill="#2d261e" font-weight="bold" text-anchor="middle">Krisenwache</text>
+      </g>
+  </svg>

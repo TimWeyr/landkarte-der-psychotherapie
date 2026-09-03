@@ -80,6 +80,8 @@ export function renderTeaserCardHtml(location: LocationNode, actionModal: Action
   `;
 }
 
+import { InnerAtlasView } from './prototypes/innerAtlas/ui/InnerAtlasView';
+
 export class Application {
   private root: HTMLElement;
   private mapContainer!: HTMLElement;
@@ -90,6 +92,7 @@ export class Application {
   private currentSceneLocationId: string | null = null;
   private activeTeaserCard: HTMLElement | null = null;
   private routeHighlightBanner: HTMLElement | null = null;
+  private innerAtlasView: InnerAtlasView | null = null;
 
   constructor(customRoot?: HTMLElement) {
     this.root = customRoot || (document.getElementById('app') as HTMLElement);
@@ -99,6 +102,12 @@ export class Application {
   }
 
   private async init(): Promise<void> {
+    const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+    if (urlParams?.get('prototype') === 'inner-atlas-v01') {
+      this.renderInnerAtlasPrototype();
+      return;
+    }
+
     this.buildBaseDOM();
     this.backpackPanel = new BackpackPanel();
     this.actionModal = new ActionModal();
@@ -137,6 +146,41 @@ export class Application {
     });
   }
 
+  private renderInnerAtlasPrototype(): void {
+    if (!this.actionModal) {
+      this.actionModal = new ActionModal();
+    }
+    this.root.innerHTML = '';
+    this.innerAtlasView = new InnerAtlasView({
+      container: this.root,
+      onEnterActiveScene: (sceneId: string) => {
+        const scene = getSceneById(sceneId);
+        const loc = WORLD_DATA.locations.find(l => l.id === scene?.locationId) || {
+          id: sceneId,
+          name: scene?.title || 'Szene',
+          regionId: 'reg_central',
+          xPercent: 50,
+          yPercent: 50,
+          isAccessible: true,
+          tagline: ''
+        };
+        if (scene) {
+          const region = WORLD_DATA.regions.find(r => r.id === loc.regionId);
+          this.openScene(scene, region?.name || 'Zentralregion');
+        }
+      },
+      onBackToProduction: () => {
+        if (typeof window !== 'undefined') {
+          const url = new URL(window.location.href);
+          url.searchParams.delete('prototype');
+          window.history.pushState({}, '', url.toString());
+        }
+        this.init();
+      }
+    });
+    this.root.appendChild(this.innerAtlasView.getElement());
+  }
+
   private buildBaseDOM(): void {
     this.root.innerHTML = `
       <!-- Header HUD -->
@@ -152,6 +196,9 @@ export class Application {
         </div>
 
         <div class="header-right">
+          <button class="btn btn-sm btn-secondary" id="btn-open-atlas-proto" style="margin-right: 0.75rem; border-color: #c68a35;" title="Öffne den 37-Orte-Explorationsatlas">
+            🌟 Atlas (37 Orte)
+          </button>
           <button class="btn-backpack" id="btn-toggle-backpack" aria-label="Rucksack öffnen">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M4 10a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"/>
@@ -187,6 +234,15 @@ export class Application {
     this.mapContainer = this.root.querySelector('#map-container') as HTMLElement;
 
     // Button Listeners
+    this.root.querySelector('#btn-open-atlas-proto')?.addEventListener('click', () => {
+      if (typeof window !== 'undefined') {
+        const url = new URL(window.location.href);
+        url.searchParams.set('prototype', 'inner-atlas-v01');
+        window.history.pushState({}, '', url.toString());
+      }
+      this.renderInnerAtlasPrototype();
+    });
+
     this.root.querySelector('#btn-toggle-backpack')?.addEventListener('click', () => {
       this.backpackPanel.open();
     });

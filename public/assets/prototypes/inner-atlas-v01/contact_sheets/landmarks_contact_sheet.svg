@@ -1,0 +1,407 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1200" width="1600" height="1200">
+    <rect width="1600" height="1200" fill="#f6f1e8"/>
+    <text x="50" y="60" font-family="'Georgia', serif" font-size="32" fill="#2d261e" font-weight="bold">Kontaktübersicht: 30 Landmark-Silhouetten (Innerer Atlas V0.1)</text>
+    <text x="50" y="90" font-family="sans-serif" font-size="16" fill="#5a5043">Alle 30 neuen Schauplätze • Transparente Vektor-Silhouetten</text>
+    <g transform="translate(50, 120)">
+        <rect width="230" height="190" fill="#ede4d3" rx="8" stroke="#c68a35" stroke-width="1"/>
+        <g transform="translate(45, 10) scale(0.27)">
+          
+        <!-- Windmill -->
+        <polygon points="216,400 296,400 276,220 236,220" fill="#446473" stroke="#2d261e" stroke-width="8"/>
+        <path d="M226,220 Q256,180 286,220" fill="#c68a35" stroke="#2d261e" stroke-width="6"/>
+        <circle cx="256" cy="210" r="18" fill="#2d261e"/>
+        <!-- Blades -->
+        <line x1="256" y1="210" x2="150" y2="110" stroke="#2d261e" stroke-width="10" stroke-linecap="round"/>
+        <line x1="256" y1="210" x2="362" y2="110" stroke="#2d261e" stroke-width="10" stroke-linecap="round"/>
+        <line x1="256" y1="210" x2="362" y2="310" stroke="#2d261e" stroke-width="10" stroke-linecap="round"/>
+        <line x1="256" y1="210" x2="150" y2="310" stroke="#2d261e" stroke-width="10" stroke-linecap="round"/>
+        <rect x="130" y="90" width="40" height="40" fill="#f6f1e8" stroke="#446473" stroke-width="4"/>
+        <rect x="342" y="90" width="40" height="40" fill="#f6f1e8" stroke="#446473" stroke-width="4"/>
+        <rect x="342" y="290" width="40" height="40" fill="#f6f1e8" stroke="#446473" stroke-width="4"/>
+        <rect x="130" y="290" width="40" height="40" fill="#f6f1e8" stroke="#446473" stroke-width="4"/>
+      
+        </g>
+        <text x="115" y="165" font-family="sans-serif" font-size="11" fill="#2d261e" font-weight="bold" text-anchor="middle">Windmühle der Gedanken</text>
+        <text x="115" y="180" font-family="sans-serif" font-size="9" fill="#877a6a" text-anchor="middle">Wetter des Erlebens</text>
+      </g><g transform="translate(300, 120)">
+        <rect width="230" height="190" fill="#ede4d3" rx="8" stroke="#c68a35" stroke-width="1"/>
+        <g transform="translate(45, 10) scale(0.27)">
+          
+        <!-- Marsh and Lantern -->
+        <path d="M120,380 Q256,410 392,380 L392,410 Q256,430 120,410 Z" fill="#6b7d7f"/>
+        <line x1="160" y1="380" x2="160" y2="300" stroke="#2d261e" stroke-width="8"/>
+        <line x1="256" y1="390" x2="256" y2="200" stroke="#2d261e" stroke-width="12"/>
+        <line x1="352" y1="380" x2="352" y2="320" stroke="#2d261e" stroke-width="8"/>
+        <!-- Lantern head -->
+        <polygon points="230,200 282,200 292,150 220,150" fill="#c68a35" stroke="#2d261e" stroke-width="8"/>
+        <rect x="236" y="150" width="40" height="40" fill="#fffdf8" stroke="#2d261e" stroke-width="6"/>
+        <circle cx="256" cy="170" r="10" fill="#c68a35"/>
+        <path d="M210,150 Q256,120 302,150" fill="#2d261e"/>
+      
+        </g>
+        <text x="115" y="165" font-family="sans-serif" font-size="11" fill="#2d261e" font-weight="bold" text-anchor="middle">Nebelmoor der Erschöpfung</text>
+        <text x="115" y="180" font-family="sans-serif" font-size="9" fill="#877a6a" text-anchor="middle">Wetter des Erlebens</text>
+      </g><g transform="translate(550, 120)">
+        <rect width="230" height="190" fill="#ede4d3" rx="8" stroke="#c68a35" stroke-width="1"/>
+        <g transform="translate(45, 10) scale(0.27)">
+          
+        <!-- Cliffs and Station -->
+        <polygon points="120,420 220,260 290,320 392,420" fill="#8a796e" stroke="#2d261e" stroke-width="8"/>
+        <rect x="220" y="220" width="70" height="50" fill="#b25838" stroke="#2d261e" stroke-width="8"/>
+        <polygon points="210,220 255,180 300,220" fill="#b25838" stroke="#2d261e" stroke-width="6"/>
+        <line x1="255" y1="180" x2="255" y2="120" stroke="#2d261e" stroke-width="6"/>
+        <polygon points="255,120 295,135 255,150" fill="#b25838"/>
+      
+        </g>
+        <text x="115" y="165" font-family="sans-serif" font-size="11" fill="#2d261e" font-weight="bold" text-anchor="middle">Alarmklippen</text>
+        <text x="115" y="180" font-family="sans-serif" font-size="9" fill="#877a6a" text-anchor="middle">Wetter des Erlebens</text>
+      </g><g transform="translate(800, 120)">
+        <rect width="230" height="190" fill="#ede4d3" rx="8" stroke="#c68a35" stroke-width="1"/>
+        <g transform="translate(45, 10) scale(0.27)">
+          
+        <!-- Lake & Boathouse -->
+        <ellipse cx="256" cy="360" rx="140" ry="40" fill="#50755a" opacity="0.6"/>
+        <rect x="210" y="220" width="92" height="90" fill="#fffdf8" stroke="#2d261e" stroke-width="8"/>
+        <polygon points="190,220 256,160 322,220" fill="#50755a" stroke="#2d261e" stroke-width="8"/>
+        <rect x="240" y="260" width="32" height="50" fill="#2d261e"/>
+        <line x1="160" y1="360" x2="240" y2="310" stroke="#2d261e" stroke-width="8"/>
+      
+        </g>
+        <text x="115" y="165" font-family="sans-serif" font-size="11" fill="#2d261e" font-weight="bold" text-anchor="middle">Stillwassersee</text>
+        <text x="115" y="180" font-family="sans-serif" font-size="9" fill="#877a6a" text-anchor="middle">Wetter des Erlebens</text>
+      </g><g transform="translate(1050, 120)">
+        <rect width="230" height="190" fill="#ede4d3" rx="8" stroke="#c68a35" stroke-width="1"/>
+        <g transform="translate(45, 10) scale(0.27)">
+          
+        <!-- Default Classic Landmark Shield -->
+        <rect x="186" y="210" width="140" height="150" fill="#f6f1e8" stroke="#2d261e" stroke-width="8"/>
+        <polygon points="166,210 256,140 346,210" fill="#c68a35" stroke="#2d261e" stroke-width="8"/>
+        <circle cx="256" cy="280" r="28" fill="#c68a35"/>
+      
+        </g>
+        <text x="115" y="165" font-family="sans-serif" font-size="11" fill="#2d261e" font-weight="bold" text-anchor="middle">Maskenmarkt</text>
+        <text x="115" y="180" font-family="sans-serif" font-size="9" fill="#877a6a" text-anchor="middle">Wetter des Erlebens</text>
+      </g><g transform="translate(1300, 120)">
+        <rect width="230" height="190" fill="#ede4d3" rx="8" stroke="#c68a35" stroke-width="1"/>
+        <g transform="translate(45, 10) scale(0.27)">
+          
+        <!-- Sanctuary House -->
+        <rect x="180" y="220" width="152" height="160" fill="#f6f1e8" stroke="#2d261e" stroke-width="10"/>
+        <polygon points="160,220 256,130 352,220" fill="#c68a35" stroke="#2d261e" stroke-width="10"/>
+        <path d="M236,380 L236,300 Q256,280 276,300 L276,380 Z" fill="#c68a35" stroke="#2d261e" stroke-width="6"/>
+        <circle cx="256" cy="200" r="16" fill="#c68a35"/>
+      
+        </g>
+        <text x="115" y="165" font-family="sans-serif" font-size="11" fill="#2d261e" font-weight="bold" text-anchor="middle">Schutzhaus</text>
+        <text x="115" y="180" font-family="sans-serif" font-size="9" fill="#877a6a" text-anchor="middle">Bedürfnisse & Ressourcen</text>
+      </g><g transform="translate(50, 330)">
+        <rect width="230" height="190" fill="#ede4d3" rx="8" stroke="#c68a35" stroke-width="1"/>
+        <g transform="translate(45, 10) scale(0.27)">
+          
+        <!-- Default Classic Landmark Shield -->
+        <rect x="186" y="210" width="140" height="150" fill="#f6f1e8" stroke="#2d261e" stroke-width="8"/>
+        <polygon points="166,210 256,140 346,210" fill="#50755a" stroke="#2d261e" stroke-width="8"/>
+        <circle cx="256" cy="280" r="28" fill="#50755a"/>
+      
+        </g>
+        <text x="115" y="165" font-family="sans-serif" font-size="11" fill="#2d261e" font-weight="bold" text-anchor="middle">Garten der Selbstfreundlichkeit</text>
+        <text x="115" y="180" font-family="sans-serif" font-size="9" fill="#877a6a" text-anchor="middle">Bedürfnisse & Ressourcen</text>
+      </g><g transform="translate(300, 330)">
+        <rect width="230" height="190" fill="#ede4d3" rx="8" stroke="#c68a35" stroke-width="1"/>
+        <g transform="translate(45, 10) scale(0.27)">
+          
+        <!-- Default Classic Landmark Shield -->
+        <rect x="186" y="210" width="140" height="150" fill="#f6f1e8" stroke="#2d261e" stroke-width="8"/>
+        <polygon points="166,210 256,140 346,210" fill="#50755a" stroke="#2d261e" stroke-width="8"/>
+        <circle cx="256" cy="280" r="28" fill="#50755a"/>
+      
+        </g>
+        <text x="115" y="165" font-family="sans-serif" font-size="11" fill="#2d261e" font-weight="bold" text-anchor="middle">Ressourcenhain</text>
+        <text x="115" y="180" font-family="sans-serif" font-size="9" fill="#877a6a" text-anchor="middle">Bedürfnisse & Ressourcen</text>
+      </g><g transform="translate(550, 330)">
+        <rect width="230" height="190" fill="#ede4d3" rx="8" stroke="#c68a35" stroke-width="1"/>
+        <g transform="translate(45, 10) scale(0.27)">
+          
+        <!-- Drawbridge -->
+        <rect x="160" y="200" width="40" height="180" fill="#2d261e"/>
+        <rect x="312" y="200" width="40" height="180" fill="#2d261e"/>
+        <line x1="160" y1="360" x2="330" y2="280" stroke="#b25838" stroke-width="16"/>
+        <line x1="180" y1="210" x2="330" y2="280" stroke="#2d261e" stroke-width="4" stroke-dasharray="6 4"/>
+      
+        </g>
+        <text x="115" y="165" font-family="sans-serif" font-size="11" fill="#2d261e" font-weight="bold" text-anchor="middle">Grenzbrücke</text>
+        <text x="115" y="180" font-family="sans-serif" font-size="9" fill="#877a6a" text-anchor="middle">Bedürfnisse & Ressourcen</text>
+      </g><g transform="translate(800, 330)">
+        <rect width="230" height="190" fill="#ede4d3" rx="8" stroke="#c68a35" stroke-width="1"/>
+        <g transform="translate(45, 10) scale(0.27)">
+          
+        <!-- Observatory Dome -->
+        <rect x="196" y="260" width="120" height="120" fill="#f6f1e8" stroke="#2d261e" stroke-width="10"/>
+        <path d="M196,260 A60,60 0 0,1 316,260 Z" fill="#446473" stroke="#2d261e" stroke-width="10"/>
+        <line x1="240" y1="240" x2="340" y2="150" stroke="#c68a35" stroke-width="16" stroke-linecap="round"/>
+        <line x1="240" y1="240" x2="340" y2="150" stroke="#2d261e" stroke-width="6" stroke-linecap="round"/>
+        <circle cx="345" cy="145" r="10" fill="#c68a35"/>
+      
+        </g>
+        <text x="115" y="165" font-family="sans-serif" font-size="11" fill="#2d261e" font-weight="bold" text-anchor="middle">Sternwarte der Werte</text>
+        <text x="115" y="180" font-family="sans-serif" font-size="9" fill="#877a6a" text-anchor="middle">Bedürfnisse & Ressourcen</text>
+      </g><g transform="translate(1050, 330)">
+        <rect width="230" height="190" fill="#ede4d3" rx="8" stroke="#c68a35" stroke-width="1"/>
+        <g transform="translate(45, 10) scale(0.27)">
+          
+        <!-- Scroll Archive -->
+        <rect x="176" y="200" width="160" height="170" fill="#f6f1e8" stroke="#2d261e" stroke-width="10"/>
+        <line x1="176" y1="260" x2="336" y2="260" stroke="#2d261e" stroke-width="6"/>
+        <line x1="176" y1="320" x2="336" y2="320" stroke="#2d261e" stroke-width="6"/>
+        <!-- Scrolls -->
+        <ellipse cx="216" cy="230" rx="20" ry="12" fill="#c68a35"/>
+        <ellipse cx="296" cy="230" rx="20" ry="12" fill="#c68a35"/>
+        <ellipse cx="256" cy="290" rx="24" ry="14" fill="#b25838"/>
+        <polygon points="156,200 256,130 356,200" fill="#c68a35" stroke="#2d261e" stroke-width="8"/>
+      
+        </g>
+        <text x="115" y="165" font-family="sans-serif" font-size="11" fill="#2d261e" font-weight="bold" text-anchor="middle">Archiv der Lebensspuren</text>
+        <text x="115" y="180" font-family="sans-serif" font-size="9" fill="#877a6a" text-anchor="middle">Lebensgeschichte & Muster</text>
+      </g><g transform="translate(1300, 330)">
+        <rect width="230" height="190" fill="#ede4d3" rx="8" stroke="#c68a35" stroke-width="1"/>
+        <g transform="translate(45, 10) scale(0.27)">
+          
+        <!-- Default Classic Landmark Shield -->
+        <rect x="186" y="210" width="140" height="150" fill="#f6f1e8" stroke="#2d261e" stroke-width="8"/>
+        <polygon points="166,210 256,140 346,210" fill="#5a5043" stroke="#2d261e" stroke-width="8"/>
+        <circle cx="256" cy="280" r="28" fill="#5a5043"/>
+      
+        </g>
+        <text x="115" y="165" font-family="sans-serif" font-size="11" fill="#2d261e" font-weight="bold" text-anchor="middle">Echohöhle der Muster</text>
+        <text x="115" y="180" font-family="sans-serif" font-size="9" fill="#877a6a" text-anchor="middle">Lebensgeschichte & Muster</text>
+      </g><g transform="translate(50, 540)">
+        <rect width="230" height="190" fill="#ede4d3" rx="8" stroke="#c68a35" stroke-width="1"/>
+        <g transform="translate(45, 10) scale(0.27)">
+          
+        <!-- Default Classic Landmark Shield -->
+        <rect x="186" y="210" width="140" height="150" fill="#f6f1e8" stroke="#2d261e" stroke-width="8"/>
+        <polygon points="166,210 256,140 346,210" fill="#446473" stroke="#2d261e" stroke-width="8"/>
+        <circle cx="256" cy="280" r="28" fill="#446473"/>
+      
+        </g>
+        <text x="115" y="165" font-family="sans-serif" font-size="11" fill="#2d261e" font-weight="bold" text-anchor="middle">Passage von Nähe und Abstand</text>
+        <text x="115" y="180" font-family="sans-serif" font-size="9" fill="#877a6a" text-anchor="middle">Lebensgeschichte & Muster</text>
+      </g><g transform="translate(300, 540)">
+        <rect width="230" height="190" fill="#ede4d3" rx="8" stroke="#c68a35" stroke-width="1"/>
+        <g transform="translate(45, 10) scale(0.27)">
+          
+        <!-- Default Classic Landmark Shield -->
+        <rect x="186" y="210" width="140" height="150" fill="#f6f1e8" stroke="#2d261e" stroke-width="8"/>
+        <polygon points="166,210 256,140 346,210" fill="#b25838" stroke="#2d261e" stroke-width="8"/>
+        <circle cx="256" cy="280" r="28" fill="#b25838"/>
+      
+        </g>
+        <text x="115" y="165" font-family="sans-serif" font-size="11" fill="#2d261e" font-weight="bold" text-anchor="middle">Haus der inneren Stimmen</text>
+        <text x="115" y="180" font-family="sans-serif" font-size="9" fill="#877a6a" text-anchor="middle">Lebensgeschichte & Muster</text>
+      </g><g transform="translate(550, 540)">
+        <rect width="230" height="190" fill="#ede4d3" rx="8" stroke="#c68a35" stroke-width="1"/>
+        <g transform="translate(45, 10) scale(0.27)">
+          
+        <!-- Default Classic Landmark Shield -->
+        <rect x="186" y="210" width="140" height="150" fill="#f6f1e8" stroke="#2d261e" stroke-width="8"/>
+        <polygon points="166,210 256,140 346,210" fill="#c68a35" stroke="#2d261e" stroke-width="8"/>
+        <circle cx="256" cy="280" r="28" fill="#c68a35"/>
+      
+        </g>
+        <text x="115" y="165" font-family="sans-serif" font-size="11" fill="#2d261e" font-weight="bold" text-anchor="middle">Kartenkammer der Erklärungsmodelle</text>
+        <text x="115" y="180" font-family="sans-serif" font-size="9" fill="#877a6a" text-anchor="middle">Lebensgeschichte & Muster</text>
+      </g><g transform="translate(800, 540)">
+        <rect width="230" height="190" fill="#ede4d3" rx="8" stroke="#c68a35" stroke-width="1"/>
+        <g transform="translate(45, 10) scale(0.27)">
+          
+        <!-- Scales and Prism -->
+        <line x1="256" y1="160" x2="256" y2="380" stroke="#2d261e" stroke-width="10"/>
+        <line x1="170" y1="200" x2="342" y2="200" stroke="#2d261e" stroke-width="8"/>
+        <!-- Left Pan -->
+        <line x1="170" y1="200" x2="150" y2="270" stroke="#2d261e" stroke-width="4"/>
+        <line x1="170" y1="200" x2="190" y2="270" stroke="#2d261e" stroke-width="4"/>
+        <path d="M140,270 Q170,290 200,270 Z" fill="#c68a35" stroke="#2d261e" stroke-width="6"/>
+        <!-- Right Pan -->
+        <line x1="342" y1="200" x2="322" y2="270" stroke="#2d261e" stroke-width="4"/>
+        <line x1="342" y1="200" x2="362" y2="270" stroke="#2d261e" stroke-width="4"/>
+        <path d="M312,270 Q342,290 372,270 Z" fill="#c68a35" stroke="#2d261e" stroke-width="6"/>
+        <polygon points="256,340 230,380 282,380" fill="#2d261e"/>
+      
+        </g>
+        <text x="115" y="165" font-family="sans-serif" font-size="11" fill="#2d261e" font-weight="bold" text-anchor="middle">Gedankenlabor</text>
+        <text x="115" y="180" font-family="sans-serif" font-size="9" fill="#877a6a" text-anchor="middle">Veränderungsprozesse</text>
+      </g><g transform="translate(1050, 540)">
+        <rect width="230" height="190" fill="#ede4d3" rx="8" stroke="#c68a35" stroke-width="1"/>
+        <g transform="translate(45, 10) scale(0.27)">
+          
+        <!-- Default Classic Landmark Shield -->
+        <rect x="186" y="210" width="140" height="150" fill="#f6f1e8" stroke="#2d261e" stroke-width="8"/>
+        <polygon points="166,210 256,140 346,210" fill="#b25838" stroke="#2d261e" stroke-width="8"/>
+        <circle cx="256" cy="280" r="28" fill="#b25838"/>
+      
+        </g>
+        <text x="115" y="165" font-family="sans-serif" font-size="11" fill="#2d261e" font-weight="bold" text-anchor="middle">Gefühlsatelier</text>
+        <text x="115" y="180" font-family="sans-serif" font-size="9" fill="#877a6a" text-anchor="middle">Veränderungsprozesse</text>
+      </g><g transform="translate(1300, 540)">
+        <rect width="230" height="190" fill="#ede4d3" rx="8" stroke="#c68a35" stroke-width="1"/>
+        <g transform="translate(45, 10) scale(0.27)">
+          
+        <!-- Default Classic Landmark Shield -->
+        <rect x="186" y="210" width="140" height="150" fill="#f6f1e8" stroke="#2d261e" stroke-width="8"/>
+        <polygon points="166,210 256,140 346,210" fill="#50755a" stroke="#2d261e" stroke-width="8"/>
+        <circle cx="256" cy="280" r="28" fill="#50755a"/>
+      
+        </g>
+        <text x="115" y="165" font-family="sans-serif" font-size="11" fill="#2d261e" font-weight="bold" text-anchor="middle">Körperobservatorium</text>
+        <text x="115" y="180" font-family="sans-serif" font-size="9" fill="#877a6a" text-anchor="middle">Veränderungsprozesse</text>
+      </g><g transform="translate(50, 750)">
+        <rect width="230" height="190" fill="#ede4d3" rx="8" stroke="#c68a35" stroke-width="1"/>
+        <g transform="translate(45, 10) scale(0.27)">
+          
+        <!-- Default Classic Landmark Shield -->
+        <rect x="186" y="210" width="140" height="150" fill="#f6f1e8" stroke="#2d261e" stroke-width="8"/>
+        <polygon points="166,210 256,140 346,210" fill="#b25838" stroke="#2d261e" stroke-width="8"/>
+        <circle cx="256" cy="280" r="28" fill="#b25838"/>
+      
+        </g>
+        <text x="115" y="165" font-family="sans-serif" font-size="11" fill="#2d261e" font-weight="bold" text-anchor="middle">Mutpfad</text>
+        <text x="115" y="180" font-family="sans-serif" font-size="9" fill="#877a6a" text-anchor="middle">Veränderungsprozesse</text>
+      </g><g transform="translate(300, 750)">
+        <rect width="230" height="190" fill="#ede4d3" rx="8" stroke="#c68a35" stroke-width="1"/>
+        <g transform="translate(45, 10) scale(0.27)">
+          
+        <!-- Default Classic Landmark Shield -->
+        <rect x="186" y="210" width="140" height="150" fill="#f6f1e8" stroke="#2d261e" stroke-width="8"/>
+        <polygon points="166,210 256,140 346,210" fill="#446473" stroke="#2d261e" stroke-width="8"/>
+        <circle cx="256" cy="280" r="28" fill="#446473"/>
+      
+        </g>
+        <text x="115" y="165" font-family="sans-serif" font-size="11" fill="#2d261e" font-weight="bold" text-anchor="middle">Achtsamkeitspavillon</text>
+        <text x="115" y="180" font-family="sans-serif" font-size="9" fill="#877a6a" text-anchor="middle">Veränderungsprozesse</text>
+      </g><g transform="translate(550, 750)">
+        <rect width="230" height="190" fill="#ede4d3" rx="8" stroke="#c68a35" stroke-width="1"/>
+        <g transform="translate(45, 10) scale(0.27)">
+          
+        <!-- Alliance Arch Bridge -->
+        <path d="M140,360 Q256,210 372,360 L352,380 Q256,260 160,380 Z" fill="#c68a35" stroke="#2d261e" stroke-width="8"/>
+        <rect x="236" y="210" width="40" height="50" fill="#f6f1e8" stroke="#2d261e" stroke-width="6"/>
+        <polygon points="226,210 256,170 286,210" fill="#b25838" stroke="#2d261e" stroke-width="6"/>
+        <circle cx="256" cy="240" r="8" fill="#c68a35"/>
+      
+        </g>
+        <text x="115" y="165" font-family="sans-serif" font-size="11" fill="#2d261e" font-weight="bold" text-anchor="middle">Bündnisbrücke</text>
+        <text x="115" y="180" font-family="sans-serif" font-size="9" fill="#877a6a" text-anchor="middle">Beziehung & Kontext</text>
+      </g><g transform="translate(800, 750)">
+        <rect width="230" height="190" fill="#ede4d3" rx="8" stroke="#c68a35" stroke-width="1"/>
+        <g transform="translate(45, 10) scale(0.27)">
+          
+        <!-- Default Classic Landmark Shield -->
+        <rect x="186" y="210" width="140" height="150" fill="#f6f1e8" stroke="#2d261e" stroke-width="8"/>
+        <polygon points="166,210 256,140 346,210" fill="#446473" stroke="#2d261e" stroke-width="8"/>
+        <circle cx="256" cy="280" r="28" fill="#446473"/>
+      
+        </g>
+        <text x="115" y="165" font-family="sans-serif" font-size="11" fill="#2d261e" font-weight="bold" text-anchor="middle">Reparaturdock</text>
+        <text x="115" y="180" font-family="sans-serif" font-size="9" fill="#877a6a" text-anchor="middle">Beziehung & Kontext</text>
+      </g><g transform="translate(1050, 750)">
+        <rect width="230" height="190" fill="#ede4d3" rx="8" stroke="#c68a35" stroke-width="1"/>
+        <g transform="translate(45, 10) scale(0.27)">
+          
+        <!-- Default Classic Landmark Shield -->
+        <rect x="186" y="210" width="140" height="150" fill="#f6f1e8" stroke="#2d261e" stroke-width="8"/>
+        <polygon points="166,210 256,140 346,210" fill="#50755a" stroke="#2d261e" stroke-width="8"/>
+        <circle cx="256" cy="280" r="28" fill="#50755a"/>
+      
+        </g>
+        <text x="115" y="165" font-family="sans-serif" font-size="11" fill="#2d261e" font-weight="bold" text-anchor="middle">Platz der Perspektiven</text>
+        <text x="115" y="180" font-family="sans-serif" font-size="9" fill="#877a6a" text-anchor="middle">Beziehung & Kontext</text>
+      </g><g transform="translate(1300, 750)">
+        <rect width="230" height="190" fill="#ede4d3" rx="8" stroke="#c68a35" stroke-width="1"/>
+        <g transform="translate(45, 10) scale(0.27)">
+          
+        <!-- Default Classic Landmark Shield -->
+        <rect x="186" y="210" width="140" height="150" fill="#f6f1e8" stroke="#2d261e" stroke-width="8"/>
+        <polygon points="166,210 256,140 346,210" fill="#b25838" stroke="#2d261e" stroke-width="8"/>
+        <circle cx="256" cy="280" r="28" fill="#b25838"/>
+      
+        </g>
+        <text x="115" y="165" font-family="sans-serif" font-size="11" fill="#2d261e" font-weight="bold" text-anchor="middle">Netzwerkhof</text>
+        <text x="115" y="180" font-family="sans-serif" font-size="9" fill="#877a6a" text-anchor="middle">Beziehung & Kontext</text>
+      </g><g transform="translate(50, 960)">
+        <rect width="230" height="190" fill="#ede4d3" rx="8" stroke="#c68a35" stroke-width="1"/>
+        <g transform="translate(45, 10) scale(0.27)">
+          
+        <!-- Default Classic Landmark Shield -->
+        <rect x="186" y="210" width="140" height="150" fill="#f6f1e8" stroke="#2d261e" stroke-width="8"/>
+        <polygon points="166,210 256,140 346,210" fill="#b25838" stroke="#2d261e" stroke-width="8"/>
+        <circle cx="256" cy="280" r="28" fill="#b25838"/>
+      
+        </g>
+        <text x="115" y="165" font-family="sans-serif" font-size="11" fill="#2d261e" font-weight="bold" text-anchor="middle">Gruppenfeuer</text>
+        <text x="115" y="180" font-family="sans-serif" font-size="9" fill="#877a6a" text-anchor="middle">Beziehung & Kontext</text>
+      </g><g transform="translate(300, 960)">
+        <rect width="230" height="190" fill="#ede4d3" rx="8" stroke="#c68a35" stroke-width="1"/>
+        <g transform="translate(45, 10) scale(0.27)">
+          
+        <!-- Default Classic Landmark Shield -->
+        <rect x="186" y="210" width="140" height="150" fill="#f6f1e8" stroke="#2d261e" stroke-width="8"/>
+        <polygon points="166,210 256,140 346,210" fill="#c68a35" stroke="#2d261e" stroke-width="8"/>
+        <circle cx="256" cy="280" r="28" fill="#c68a35"/>
+      
+        </g>
+        <text x="115" y="165" font-family="sans-serif" font-size="11" fill="#2d261e" font-weight="bold" text-anchor="middle">Bibliothek der Verfahren</text>
+        <text x="115" y="180" font-family="sans-serif" font-size="9" fill="#877a6a" text-anchor="middle">Orientierung & Sicherheit</text>
+      </g><g transform="translate(550, 960)">
+        <rect width="230" height="190" fill="#ede4d3" rx="8" stroke="#c68a35" stroke-width="1"/>
+        <g transform="translate(45, 10) scale(0.27)">
+          
+        <!-- Default Classic Landmark Shield -->
+        <rect x="186" y="210" width="140" height="150" fill="#f6f1e8" stroke="#2d261e" stroke-width="8"/>
+        <polygon points="166,210 256,140 346,210" fill="#c68a35" stroke="#2d261e" stroke-width="8"/>
+        <circle cx="256" cy="280" r="28" fill="#c68a35"/>
+      
+        </g>
+        <text x="115" y="165" font-family="sans-serif" font-size="11" fill="#2d261e" font-weight="bold" text-anchor="middle">Zielschmiede</text>
+        <text x="115" y="180" font-family="sans-serif" font-size="9" fill="#877a6a" text-anchor="middle">Orientierung & Sicherheit</text>
+      </g><g transform="translate(800, 960)">
+        <rect width="230" height="190" fill="#ede4d3" rx="8" stroke="#c68a35" stroke-width="1"/>
+        <g transform="translate(45, 10) scale(0.27)">
+          
+        <!-- Default Classic Landmark Shield -->
+        <rect x="186" y="210" width="140" height="150" fill="#f6f1e8" stroke="#2d261e" stroke-width="8"/>
+        <polygon points="166,210 256,140 346,210" fill="#446473" stroke="#2d261e" stroke-width="8"/>
+        <circle cx="256" cy="280" r="28" fill="#446473"/>
+      
+        </g>
+        <text x="115" y="165" font-family="sans-serif" font-size="11" fill="#2d261e" font-weight="bold" text-anchor="middle">Verlaufswarte</text>
+        <text x="115" y="180" font-family="sans-serif" font-size="9" fill="#877a6a" text-anchor="middle">Orientierung & Sicherheit</text>
+      </g><g transform="translate(1050, 960)">
+        <rect width="230" height="190" fill="#ede4d3" rx="8" stroke="#c68a35" stroke-width="1"/>
+        <g transform="translate(45, 10) scale(0.27)">
+          
+        <!-- Default Classic Landmark Shield -->
+        <rect x="186" y="210" width="140" height="150" fill="#f6f1e8" stroke="#2d261e" stroke-width="8"/>
+        <polygon points="166,210 256,140 346,210" fill="#50755a" stroke="#2d261e" stroke-width="8"/>
+        <circle cx="256" cy="280" r="28" fill="#50755a"/>
+      
+        </g>
+        <text x="115" y="165" font-family="sans-serif" font-size="11" fill="#2d261e" font-weight="bold" text-anchor="middle">Haus der zweiten Meinung</text>
+        <text x="115" y="180" font-family="sans-serif" font-size="9" fill="#877a6a" text-anchor="middle">Orientierung & Sicherheit</text>
+      </g><g transform="translate(1300, 960)">
+        <rect width="230" height="190" fill="#ede4d3" rx="8" stroke="#c68a35" stroke-width="1"/>
+        <g transform="translate(45, 10) scale(0.27)">
+          
+        <!-- Crisis Watch Station -->
+        <rect x="180" y="190" width="152" height="190" fill="#2d261e" stroke="#b25838" stroke-width="10"/>
+        <polygon points="160,190 256,110 352,190" fill="#b25838" stroke="#2d261e" stroke-width="8"/>
+        <circle cx="256" cy="250" r="28" fill="#c68a35" stroke="#f6f1e8" stroke-width="6"/>
+        <!-- Cross / SOS Shield -->
+        <rect x="250" y="235" width="12" height="30" fill="#f6f1e8"/>
+        <rect x="241" y="244" width="30" height="12" fill="#f6f1e8"/>
+        <rect x="236" y="320" width="40" height="60" fill="#c68a35"/>
+      
+        </g>
+        <text x="115" y="165" font-family="sans-serif" font-size="11" fill="#2d261e" font-weight="bold" text-anchor="middle">Krisenwache</text>
+        <text x="115" y="180" font-family="sans-serif" font-size="9" fill="#877a6a" text-anchor="middle">Orientierung & Sicherheit</text>
+      </g>
+  </svg>

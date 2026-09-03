@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#2d261e" flood-opacity="0.35"/>
+    </filter>
+    <linearGradient id="grad-loc_parts_house" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#b25838"/>
+      <stop offset="100%" stop-color="#2d261e"/>
+    </linearGradient>
+  </defs>
+  <g filter="url(#shadow)">
+    <!-- Base Circular Shield Badge -->
+    <circle cx="256" cy="256" r="220" fill="#f6f1e8" stroke="#b25838" stroke-width="12"/>
+    <circle cx="256" cy="256" r="200" fill="none" stroke="#ede4d3" stroke-width="4" stroke-dasharray="8 6"/>
+
+    <!-- Distinct Silhouette Icons -->
+    
+        <!-- Default Classic Landmark Shield -->
+        <rect x="186" y="210" width="140" height="150" fill="#f6f1e8" stroke="#2d261e" stroke-width="8"/>
+        <polygon points="166,210 256,140 346,210" fill="#b25838" stroke="#2d261e" stroke-width="8"/>
+        <circle cx="256" cy="280" r="28" fill="#b25838"/>
+      
+
+    <!-- Outer Decorative Compass Nodule -->
+    <circle cx="256" cy="46" r="10" fill="#b25838"/>
+    <circle cx="256" cy="466" r="10" fill="#b25838"/>
+    <circle cx="46" cy="256" r="10" fill="#b25838"/>
+    <circle cx="466" cy="256" r="10" fill="#b25838"/>
+  </g>
+</svg>
