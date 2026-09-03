@@ -51,7 +51,7 @@ Ausgangspunkt: *„Ich kann nicht abschalten und grüble ständig.“*
 ### 3.3 Szene C: Werkstatt der Erprobung (`scene_workshop`)
 * **Handlungsorientiertes Arbeiten:** Praktische Übungen aus KVT (Verhaltensexperimente), Gestalttherapie (Stuhlarbeit) und Systemik (Beobachtungsaufgaben).
 * **Passungsprüfung:** Partnerschaftliche Abstimmung vor und während der Therapie als dynamischer Prozess (`claim_fit_collaboration_dynamic`).
-* **Grenzen statischer Merkmale (Goldberg et al., 2026):** Nullbefunde zu 38 Vorabmerkmalen (`claim_therapist_characteristics_null_finding`) – statische Eigenschaften von Therapeuten besitzen kaum Vorhersagekraft für Behandlungsergebnisse.
+* **Grenzen statischer Merkmale (Goldberg et al., 2026):** Nullbefunde zu 38 Vorabmerkmalen (`claim_therapist_characteristics_null_finding`) – die 38 in dieser Untersuchung erhobenen statischen Vorabmerkmale von Therapeutinnen und Therapeuten zeigten weitgehend keine statistische Vorhersagekraft für die Behandlungsergebnisse.
 * **Reflexionsfrage:** Speichern der Leitfrage für das persönliche Erstgespräch im Rucksack.
 
 ---

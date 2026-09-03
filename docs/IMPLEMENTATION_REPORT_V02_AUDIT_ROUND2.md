@@ -5,7 +5,7 @@
 **Freigegebener Plan / Parent des Code-Commits:** `6d6e96c`  
 **Code-Commit (SHA):** `7bc09c8`  
 **Datum:** 03. September 2026  
-**Status:** Audit-Korrekturen implementiert, verifiziert und getestet
+**Status:** Audit-Korrekturen implementiert, verifiziert und dokumentiert
 
 ---
 
@@ -48,7 +48,7 @@ Die folgenden 12 Dateien wurden im Code-Commit `7bc09c8` modifiziert bzw. erstel
 
 ### 2.3 Trennung von G-BA und Goldberg 2026
 * `lighthouse.ts` (`lh_wall_charts`): G-BA-Richtlinienverfahren als formaler sozialrechtlicher Erstattungsrahmen ohne vergleichende Rangfolge oder qualitative Überlegenheitsaussage.
-* `workshop.ts` (`ws_collaboration_desk`): Goldberg et al. (2026) ist ausschließlich der separaten `INTEREST`-Aktion (`act_ws_interest_goldberg_fit`) zugeordnet und als begrenzter Nullbefund der 38 statischen Vorabmerkmale beschrieben.
+* `workshop.ts` (`ws_collaboration_desk`): Goldberg et al. (2026) ist ausschließlich der separaten `INTEREST`-Aktion (`act_ws_interest_goldberg_fit`) zugeordnet und als begrenzter Nullbefund der 38 statischen Vorabmerkmale beschrieben („Die 38 in dieser Untersuchung erhobenen Vorabmerkmale zeigten weitgehend keine statistische Vorhersagekraft für die Behandlungsergebnisse“).
 * Das dynamische Passungsmodell („Passung entwickelt sich im Dialog“) ist eigenständig über `claim_fit_collaboration_dynamic` begründet.
 
 ### 2.4 Generisches Routing & ARIA-Grundfunktionalität
@@ -83,7 +83,7 @@ Die folgenden 12 Dateien wurden im Code-Commit `7bc09c8` modifiziert bzw. erstel
 * **Berechnungsmethode:** SHA-256 Hash des alphabetisch sortierten SHA-256-Dateimanifests des `dist/`-Verzeichnisses.
 * **Manifest-Hash vor `npm run build`:** `07836959084a3da70291e42ac456103bcd81e56eb6e5458c4f165db4c919f5f3`
 * **Manifest-Hash nach fehlgeschlagenem `npm run build`:** `07836959084a3da70291e42ac456103bcd81e56eb6e5458c4f165db4c919f5f3`
-* **Ergebnis:** Bytegenaue Identität (100% unverändert).
+* **Hinweis zur Reproduzierbarkeit:** Der Hash belegt die exakte, bitgenaue Unverändertheit innerhalb der Ausführungsumgebung vor und nach dem Abbruch des Release-Gates. Bei Cross-Plattform-Vergleichen (z. B. Linux vs. Windows) können sich absolute Prüfsummen durch Zeilenenden im Manifest unterscheiden; entscheidend ist die Invarianz innerhalb desselben Systems.
 
 ---
 
@@ -117,5 +117,13 @@ Die folgenden 12 Dateien wurden im Code-Commit `7bc09c8` modifiziert bzw. erstel
 
 ---
 
-## 5. Abweichungen vom Plan
-* Keine Abweichungen. Alle Vorgaben aus dem freigegebenen Plan `6d6e96c` und die drei zusätzlichen Ausführungsdetails wurden vollständig und exakt umgesetzt.
+## 5. Begründete Abweichungen vom Plan
+
+1. **Signatur von `renderTeaserCardHtml`:**
+   * *Plan:* `renderTeaserCardHtml(location, knowledgeNodes)`
+   * *Umsetzung:* `renderTeaserCardHtml(location, actionModal)`
+   * *Begründung:* Durch Übergabe der `ActionModal`-Instanz löst der Renderer die `knowledgeNodeIds` der Location direkt typsicher über `getNodeById()` auf und verwendet die etablierte Methode `actionModal.renderSourcesAccordion()` zur konsistenten HTML-Generierung der ARIA-Akkordeons.
+
+2. **Ausschluss-Test beim Routing:**
+   * *Plan:* Verwendung eines künstlich erzeugten Orts für den Ausschluss.
+   * *Umsetzung:* Verwendung von `loc_workshop` als realem Schauplatz im Test `computeRouteNavigationEffect(opt1, locations, 'loc_workshop')`, was deterministisch `[]` liefert, da die Werkstatt der einzige passende Zielort ist und durch die Angabe als Ausgangsort korrekt ausgeschlossen wird.

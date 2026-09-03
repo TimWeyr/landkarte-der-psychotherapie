@@ -9,7 +9,7 @@ Die **Psychotherapie-Landkarte** ist als erweiterbare, interaktive Wissenswelt i
 * **Testrunner & Validierung:** Vitest 3 (`npm test`, `npm run check:technical`)
 * **2D-Karten-Engine:** PixiJS v8 (`Application`, `Container`, `Sprite`, `Assets`, `FederatedPointerEvent` mit `pointerupoutside`/`pointercancel`, reine Geometrie-Extraktion in `src/engine/mapGeometry.ts`)
 * **UI & Dialogsystem:** Vanilla HTML5 / CSS3 mit CSS Custom Properties (Kartografisches Theme, getrennte Badges für `SourceKind` und `CitationRole`, Draft-Schutz, ARIA-Attribute)
-* **Zustandsverwaltung & Persistenz:** Reaktiver `AppStore` mit `localStorage`-Adapter, Schema-Versionierung (`schemaVersion: 1`), Failover-In-Memory-Modus bei Backup-Fehlern und JSON-Export/Import.
+* **Zustandsverwaltung & Persistenz:** Reaktiver `AppStore` mit `localStorage`-Adapter, Schema-Versionierung (`schemaVersion: 1`), Failover-In-Memory-Modus bei Backup-Fehlern und JSON-Export/Import (`exporter.ts`).
 
 ---
 
@@ -58,7 +58,7 @@ landkarte-der-psychotherapie/
 │   ├── state/                 # Zustandsmanagement
 │   │   ├── store.ts           # Reaktiver Store (Observer-Pattern)
 │   │   ├── storage.ts         # Tiefe Validierung, Recovery-Key, Failover-Schutz vor Überschreiben
-│   │   └── initialData.ts     # Standard-Zustand
+│   │   └── exporter.ts        # JSON-Export und Import von Spielständen
 │   ├── engine/                # PixiJS 2D Karten-Engine & Geometrie
 │   │   ├── MapEngine.ts       # Viewport, Zoom, Pan, Highlights
 │   │   ├── LandmarkSprite.ts  # Interaktive Marker & Pins
@@ -67,6 +67,7 @@ landkarte-der-psychotherapie/
 │   │   ├── ActionModal.ts     # Hotspot-Interaktionsmodal, ARIA-Akkordeons, Schauplatz-Evidenz
 │   │   ├── SceneView.ts       # Szenenansicht mit Hotspot-Layer & Evidenz-Button
 │   │   ├── BackpackPanel.ts   # Rucksack (Artefakte, Interessen, Notizen, Lesezeichen)
+│   │   ├── SettingsModal.ts   # Einstellungen & Spielstand-Verwaltung
 │   │   ├── IntroScreen.ts     # Onboarding-Overlay
 │   │   ├── Toast.ts           # Benachrichtigungstoasts
 │   │   └── renderers/
@@ -86,3 +87,20 @@ landkarte-der-psychotherapie/
     ├── CORRECTION_PLAN_V02_AUDIT_ROUND2.md # Verbindlicher Korrekturplan Runde 2
     └── IMPLEMENTATION_REPORT_V02_AUDIT_ROUND2.md # Abschlussbericht
 ```
+
+---
+
+## 3. Skripte & Release-Gate-Hierarchie
+
+Zur Trennung von reiner technischer Prüfbarkeit und inhaltlicher Release-Freigabe sind die npm-Skripte hierarchisch gegliedert:
+
+1. **`npm test` (`vitest run`):**
+   Führt alle 39 Unit- und Integrationstests (Storage, Geometrie, Evidenz-Rendering, Ontologie, negative DI und UI-Interaktionstests) aus. Erwarteter Exit-Code: `0`.
+2. **`npm run check:technical` (`tsc --noEmit && vitest run`):**
+   Kombiniert strikte statische Typüberprüfung des gesamten Projekts mit dem Vitest-Testlauf. Erwarteter Exit-Code: `0`.
+3. **`npm run build:technical` (`tsc && vite build`):**
+   Erzeugt das kompilierte Produktions-Bundle im Verzeichnis `dist/`, ohne eine inhaltliche Freigabeprüfung der wissenschaftlichen Zitate durchzuführen. Dient der rein technischen Validierung des Bundlers. Erwarteter Exit-Code: `0`.
+4. **`npm run validate:release` (`tsx scripts/validateRelease.ts`):**
+   Führt die zweistufige Fail-Closed-Validierung und den BFS-Reachability-Traversal über den Wissensgraphen aus. Bricht mit Exit-Code `1` (`BLOCKED_BY_DRAFT_CONTENT`) ab, solange erreichbare Fach-Claims noch den Status `'draft'` tragen.
+5. **`npm run build` (`tsc && vitest run && tsx scripts/validateRelease.ts && vite build`):**
+   Der vollständige Release-Gate-Build. Führt Typenprüfung, Test-Suite und Release-Validierung sequentiell aus. Da `validateRelease.ts` vor `vite build` geschaltet ist, bricht der Build bei vorhandenen Draft-Inhalten mit Exit-Code `1` ab, bevor das Produktions-Bundle erzeugt oder überschrieben werden kann.
