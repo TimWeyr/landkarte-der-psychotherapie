@@ -1,7 +1,7 @@
-import { Hotspot, HotspotAction, Scene, RouteOption } from '../types';
+import { Hotspot, HotspotAction, Scene, RouteOption, LocationNode } from '../types';
 import { store } from '../state/store';
 import { toast } from './Toast';
-import { getClaimById, getSourcesForClaim } from '../data/knowledge';
+import { getClaimById, getSourcesForClaim, getNodeById } from '../data/knowledge';
 import { getExplorationRouteById } from '../data/exploration';
 import { renderClaimCardHtml } from './renderers/evidenceRenderer';
 
@@ -33,6 +33,51 @@ export class ActionModal {
     this.backdrop.classList.add('active');
   }
 
+  public openSceneEvidenceModal(scene: Scene, location?: LocationNode): void {
+    const nodeIds = location?.knowledgeNodeIds || [];
+    const nodes = nodeIds.map(id => getNodeById(id)).filter((n): n is NonNullable<typeof n> => Boolean(n));
+
+    this.backdrop.innerHTML = `
+      <div class="dialogue-modal-box scene-evidence-box">
+        <div class="dialogue-header">
+          <div class="speaker-badge">
+            <div class="speaker-avatar">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            </div>
+            <div>
+              <div class="speaker-title">Schauplatz-Evidenz & Fachkonzepte</div>
+              <div class="speaker-role">${scene.title} • ${location?.tagline || 'Kanonische Wissensknoten'}</div>
+            </div>
+          </div>
+          <button class="btn btn-ghost btn-icon" id="btn-close-evidence-modal" title="Schließen (ESC)">✕</button>
+        </div>
+
+        <div class="dialogue-content">
+          <div class="speech-subtext" style="margin-bottom: 14px;">
+            Die folgenden fundierten Fachknoten und wissenschaftlichen Claims sind diesem Schauplatz zugeordnet:
+          </div>
+
+          <div class="scene-nodes-list" style="display: flex; flex-direction: column; gap: 14px;">
+            ${nodes.map(node => `
+              <div class="scene-node-card" style="border: 1px solid var(--border-parchment); border-radius: var(--radius-sm); padding: 12px; background: var(--bg-parchment);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                  <strong style="color: var(--ink-primary); font-size: 0.95rem;">${node.title}</strong>
+                  <span class="claim-type-badge" style="font-size: 0.7rem;">${node.kind}</span>
+                </div>
+                <div style="font-size: 0.84rem; color: var(--ink-secondary); margin-bottom: 8px;">${node.plainDescription}</div>
+                ${this.renderSourcesAccordion(node.claimIds, `Nachweise zu ${node.title} (${node.claimIds.length})`, `node-${node.id}`)}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+
+    this.backdrop.querySelector('#btn-close-evidence-modal')?.addEventListener('click', () => this.close());
+    this.attachAccordionListeners(this.backdrop);
+    this.backdrop.classList.add('active');
+  }
+
   public close(): void {
     this.backdrop.classList.remove('active');
   }
@@ -49,7 +94,7 @@ export class ActionModal {
       if (a.type === 'QUIZ' && a.quiz.explanationClaimIds) {
         ids.push(...a.quiz.explanationClaimIds);
       }
-      if (a.type === 'ITEM' && a.item.claimIds) {
+      if (a.type === 'ITEM' && a.item && a.item.claimIds) {
         ids.push(...a.item.claimIds);
       }
       return ids;
@@ -81,7 +126,7 @@ export class ActionModal {
           ${d.subtext ? `<div class="speech-subtext">${d.subtext}</div>` : ''}
 
           <!-- Sources & Evidence Section -->
-          ${this.renderSourcesAccordion(allClaimIds)}
+          ${this.renderSourcesAccordion(allClaimIds, undefined, `dialogue-${h.id}`)}
 
           ${d.actions && d.actions.length > 0 ? `
             <div class="actions-section">
@@ -94,9 +139,7 @@ export class ActionModal {
     `;
 
     this.backdrop.querySelector('#btn-close-dialogue')?.addEventListener('click', () => this.close());
-
-    // Sources accordion toggle
-    this.setupAccordionToggle('#btn-toggle-sources', '#sources-accordion-body');
+    this.attachAccordionListeners(this.backdrop);
 
     // Render actions
     if (d.actions && d.actions.length > 0) {
@@ -109,32 +152,45 @@ export class ActionModal {
     }
   }
 
-  private setupAccordionToggle(btnSelector: string, bodySelector: string): void {
-    const toggleBtn = this.backdrop.querySelector(btnSelector);
-    const sourcesBody = this.backdrop.querySelector(bodySelector);
-    if (toggleBtn && sourcesBody) {
-      toggleBtn.addEventListener('click', () => {
-        const isHidden = sourcesBody.classList.toggle('hidden');
-        toggleBtn.querySelector('.toggle-arrow')?.classList.toggle('rotated', !isHidden);
-      });
-    }
+  /**
+   * Bindet Akkordeon-Klickhandler für alle .sources-accordion Elemente innerhalb des Containers
+   */
+  public attachAccordionListeners(container: HTMLElement): void {
+    const accordions = container.querySelectorAll<HTMLElement>('.sources-accordion');
+    accordions.forEach(acc => {
+      const btn = acc.querySelector<HTMLButtonElement>('.sources-toggle-btn');
+      const body = acc.querySelector<HTMLElement>('.sources-body');
+      const arrow = acc.querySelector<HTMLElement>('.toggle-arrow');
+
+      if (btn && body && !btn.dataset.hasAccordionListener) {
+        btn.dataset.hasAccordionListener = 'true';
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const isHidden = body.classList.toggle('hidden');
+          if (arrow) {
+            arrow.classList.toggle('rotated', !isHidden);
+          }
+        });
+      }
+    });
   }
 
-  public renderSourcesAccordion(claimIds: string[], customTitle?: string): string {
-    if (claimIds.length === 0) return '';
+  public renderSourcesAccordion(claimIds: string[], customTitle?: string, uniquePrefix?: string): string {
+    if (!claimIds || claimIds.length === 0) return '';
 
     const claims = claimIds.map(id => getClaimById(id)).filter((c): c is NonNullable<typeof c> => Boolean(c));
     if (claims.length === 0) return '';
 
     const title = customTitle || `📚 Wissenschaftliche Einordnung & Quellen (${claims.length})`;
+    const prefix = uniquePrefix || `acc-${Math.random().toString(36).substr(2, 6)}`;
 
     return `
-      <div class="sources-accordion">
-        <button class="sources-toggle-btn" id="btn-toggle-sources" type="button">
+      <div class="sources-accordion" data-accordion-id="${prefix}">
+        <button class="sources-toggle-btn" type="button" aria-expanded="false">
           <span>${title}</span>
           <span class="toggle-arrow">▾</span>
         </button>
-        <div class="sources-body hidden" id="sources-accordion-body">
+        <div class="sources-body hidden">
           ${claims.map(claim => {
             const citationsWithSources = getSourcesForClaim(claim);
             return renderClaimCardHtml(claim, citationsWithSources);
@@ -188,7 +244,7 @@ export class ActionModal {
     }
 
     const disclaimerSourcesHtml = route.disclaimerClaimIds && route.disclaimerClaimIds.length > 0
-      ? this.renderSourcesAccordion(route.disclaimerClaimIds, `📚 Quelleneinordnung zum Orientierungsprinzip`)
+      ? this.renderSourcesAccordion(route.disclaimerClaimIds, `📚 Quelleneinordnung zum Orientierungsprinzip`, `disclaimer-${route.id}`)
       : '';
 
     box.innerHTML = `
@@ -198,15 +254,22 @@ export class ActionModal {
         ${disclaimerSourcesHtml}
       </div>
       <div class="route-options-list">
-        ${route.options.map((opt) => `
-          <div class="route-option-card" data-option-id="${opt.id}">
-            <div class="route-option-label">${opt.label}</div>
-            <div class="route-option-desc">${opt.perspectiveDescription}</div>
-            <button class="btn btn-primary btn-sm btn-select-route" data-option-id="${opt.id}">
-              <span>Erkundungsperspektive wählen</span> ➔
-            </button>
-          </div>
-        `).join('')}
+        ${route.options.map((opt) => {
+          const perspectiveSourcesHtml = opt.perspectiveClaimIds && opt.perspectiveClaimIds.length > 0
+            ? this.renderSourcesAccordion(opt.perspectiveClaimIds, `📚 Evidenz & Modellkontext dieser Perspektive`, `opt-${opt.id}`)
+            : '';
+
+          return `
+            <div class="route-option-card" data-option-id="${opt.id}">
+              <div class="route-option-label">${opt.label}</div>
+              <div class="route-option-desc">${opt.perspectiveDescription}</div>
+              ${perspectiveSourcesHtml}
+              <button class="btn btn-primary btn-sm btn-select-route" data-option-id="${opt.id}">
+                <span>Erkundungsperspektive wählen</span> ➔
+              </button>
+            </div>
+          `;
+        }).join('')}
       </div>
     `;
 
@@ -223,6 +286,7 @@ export class ActionModal {
       });
     });
 
+    this.attachAccordionListeners(box);
     return box;
   }
 

@@ -14,10 +14,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "pixi.js": "^8.6.6",
-    "lucide": "^0.475.0"
+    "lucide": "^0.475.0",
+    "pixi.js": "^8.6.6"
   },
   "devDependencies": {
+    "happy-dom": "^20.13.2",
     "tsx": "^4.19.3",
     "typescript": "^5.7.3",
     "vite": "^6.1.0",

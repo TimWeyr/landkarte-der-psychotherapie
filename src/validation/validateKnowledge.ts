@@ -55,78 +55,94 @@ export function getDefaultDatasets(): KnowledgeDatasets {
 }
 
 /**
- * Ermittelt alle von der Anwendung aus erreichbaren Claim-IDs über Szenen, Aktionen, Routen, Teaser und Relationen
+ * Zyklensicherer BFS-Reachability-Traversal über alle erreichbaren UI-Einstiegspunkte und Relationen
  */
 export function getReachableClaimIds(data: KnowledgeDatasets): string[] {
   const reachableClaimIds = new Set<string>();
-  const reachableNodeIds = new Set<string>();
+  const visitedNodeIds = new Set<string>();
+  const nodeQueue: string[] = [];
 
-  // 1. Aus Szenen, Dialogen, Subtexten, Quiz-Erklärungen und Items
+  const addClaim = (id?: string) => {
+    if (id) reachableClaimIds.add(id);
+  };
+  const addClaims = (ids?: string[]) => {
+    if (ids) ids.forEach(id => addClaim(id));
+  };
+
+  // 1. Wurzelknoten aus Schauplätzen und Teasern
+  for (const loc of data.worldData.locations) {
+    addClaims(loc.teaserClaimIds);
+    if (loc.knowledgeNodeIds) {
+      for (const nId of loc.knowledgeNodeIds) {
+        if (!visitedNodeIds.has(nId)) {
+          visitedNodeIds.add(nId);
+          nodeQueue.push(nId);
+        }
+      }
+    }
+  }
+
+  // 2. Wurzelknoten aus Szenen, Dialogen, Subtexten, Quizzen und Items
   for (const scene of Object.values(data.scenesRegistry)) {
     for (const hotspot of scene.hotspots) {
-      if (hotspot.dialogue.claimIds) {
-        hotspot.dialogue.claimIds.forEach(id => reachableClaimIds.add(id));
-      }
-      if (hotspot.dialogue.subtextClaimIds) {
-        hotspot.dialogue.subtextClaimIds.forEach(id => reachableClaimIds.add(id));
-      }
+      addClaims(hotspot.dialogue.claimIds);
+      addClaims(hotspot.dialogue.subtextClaimIds);
       if (hotspot.dialogue.actions) {
         for (const action of hotspot.dialogue.actions) {
-          if (action.claimIds) {
-            action.claimIds.forEach(id => reachableClaimIds.add(id));
+          addClaims(action.claimIds);
+          if (action.type === 'QUIZ') {
+            addClaims(action.quiz.explanationClaimIds);
           }
-          if (action.type === 'QUIZ' && action.quiz.explanationClaimIds) {
-            action.quiz.explanationClaimIds.forEach(id => reachableClaimIds.add(id));
-          }
-          if (action.type === 'ITEM' && action.item.claimIds) {
-            action.item.claimIds.forEach(id => reachableClaimIds.add(id));
+          if (action.type === 'ITEM' && action.item) {
+            addClaims(action.item.claimIds);
           }
         }
       }
     }
   }
 
-  // 2. Aus didaktischen Routen & Optionen
+  // 3. Wurzelknoten aus didaktischen Routen & Perspektiven
   for (const route of data.routes) {
-    if (route.triggerNodeId) {
-      reachableNodeIds.add(route.triggerNodeId);
-    }
-    if (route.disclaimerClaimIds) {
-      route.disclaimerClaimIds.forEach(id => reachableClaimIds.add(id));
+    addClaims(route.disclaimerClaimIds);
+    if (route.triggerNodeId && !visitedNodeIds.has(route.triggerNodeId)) {
+      visitedNodeIds.add(route.triggerNodeId);
+      nodeQueue.push(route.triggerNodeId);
     }
     for (const opt of route.options) {
-      if (opt.perspectiveClaimIds) {
-        opt.perspectiveClaimIds.forEach(id => reachableClaimIds.add(id));
+      addClaims(opt.perspectiveClaimIds);
+      for (const nId of opt.targetKnowledgeNodeIds) {
+        if (!visitedNodeIds.has(nId)) {
+          visitedNodeIds.add(nId);
+          nodeQueue.push(nId);
+        }
       }
-      if (opt.targetKnowledgeNodeIds) {
-        opt.targetKnowledgeNodeIds.forEach(nId => reachableNodeIds.add(nId));
-      }
     }
   }
 
-  // 3. Aus Schauplätzen & Teasern
-  for (const loc of data.worldData.locations) {
-    if (loc.teaserClaimIds) {
-      loc.teaserClaimIds.forEach(id => reachableClaimIds.add(id));
-    }
-    if (loc.knowledgeNodeIds) {
-      loc.knowledgeNodeIds.forEach(nId => reachableNodeIds.add(nId));
+  // 4. Claims der initialen Wurzelknoten aufnehmen
+  for (const nId of Array.from(visitedNodeIds)) {
+    const node = data.nodes.find(n => n.id === nId);
+    if (node) {
+      addClaims(node.claimIds);
     }
   }
 
-  // 4. Aus erreichbaren Knowledge-Nodes
-  for (const nodeId of reachableNodeIds) {
-    const node = data.nodes.find(n => n.id === nodeId);
-    if (node && node.claimIds) {
-      node.claimIds.forEach(id => reachableClaimIds.add(id));
-    }
-  }
+  // 5. Zyklensichere BFS-Traversierung über gerichtete Relationen (fromNodeId -> toNodeId)
+  while (nodeQueue.length > 0) {
+    const currentNodeId = nodeQueue.shift()!;
+    const outgoingRelations = data.relations.filter(r => r.fromNodeId === currentNodeId);
 
-  // 5. Aus erreichbaren Relationen (sofern fromNode oder toNode erreichbar ist)
-  for (const rel of data.relations) {
-    if (reachableNodeIds.has(rel.fromNodeId) || reachableNodeIds.has(rel.toNodeId)) {
-      if (rel.claimIds) {
-        rel.claimIds.forEach(id => reachableClaimIds.add(id));
+    for (const rel of outgoingRelations) {
+      addClaims(rel.claimIds);
+      const targetNodeId = rel.toNodeId;
+      const targetNode = data.nodes.find(n => n.id === targetNodeId);
+
+      if (targetNode) {
+        addClaims(targetNode.claimIds);
+        if (!visitedNodeIds.has(targetNodeId)) {
+          visitedNodeIds.add(targetNodeId);
+          nodeQueue.push(targetNodeId);
+        }
       }
     }
   }
@@ -135,7 +151,7 @@ export function getReachableClaimIds(data: KnowledgeDatasets): string[] {
 }
 
 /**
- * Validiert die semantische und strukturelle Integrität des gesamten Wissensgraphen
+ * Validiert sämtliche Entitäten und Referenzen fail-closed
  */
 export function validateKnowledgeGraph(customData?: KnowledgeDatasets): ValidationReport {
   const data = customData || getDefaultDatasets();
@@ -144,8 +160,39 @@ export function validateKnowledgeGraph(customData?: KnowledgeDatasets): Validati
   const sourceMap = new Map<string, SourceRecord>();
   const claimMap = new Map<string, ClaimRecord>();
   const nodeMap = new Map<string, KnowledgeNode>();
+  const relationMap = new Map<string, KnowledgeRelation>();
+  const routeMap = new Map<string, ExplorationRoute>();
+  const optionMap = new Map<string, string>(); // optId -> routeId
+  const locationMap = new Map<string, import('../types').LocationNode>();
+  const sceneMap = new Map<string, Scene>();
+  const hotspotMap = new Map<string, string>(); // hotspotId -> sceneId
+  const actionMap = new Map<string, string>(); // actionId -> hotspotId
 
-  // 1. Validierung der Quellen
+  // Helper zum Prüfen von Claim-Referenzen
+  const checkClaimExists = (claimId: string, context: string, entityId: string) => {
+    if (!claimMap.has(claimId)) {
+      issues.push({
+        level: 'ERROR',
+        category: 'CITATION',
+        entityId,
+        message: `${context} verweist auf unbekannte Claim-ID: ${claimId}`
+      });
+    }
+  };
+
+  // Helper zum Prüfen von Node-Referenzen
+  const checkNodeExists = (nodeId: string, context: string, entityId: string) => {
+    if (!nodeMap.has(nodeId)) {
+      issues.push({
+        level: 'ERROR',
+        category: 'ONTOLOGY',
+        entityId,
+        message: `${context} verweist auf unbekannte Node-ID: ${nodeId}`
+      });
+    }
+  };
+
+  // 1. Quellen-Integrität
   for (const src of data.sources) {
     if (sourceMap.has(src.id)) {
       issues.push({
@@ -239,7 +286,7 @@ export function validateKnowledgeGraph(customData?: KnowledgeDatasets): Validati
     }
   }
 
-  // 2. Validierung der Claims
+  // 2. Claim-Integrität & Zitierungsprüfung
   for (const claim of data.claims) {
     if (claimMap.has(claim.id)) {
       issues.push({
@@ -260,16 +307,13 @@ export function validateKnowledgeGraph(customData?: KnowledgeDatasets): Validati
           entityId: claim.id,
           message: `Claim verweist auf unbekannte Source-ID: ${citation.sourceId}`
         });
-      } else {
-        // Narrative dürfen ausschließlich als 'supports' an 'experience'-Claims hängen
-        if (src.kind === 'patient-narrative' && citation.role === 'supports' && claim.type !== 'experience') {
-          issues.push({
-            level: 'ERROR',
-            category: 'CITATION',
-            entityId: claim.id,
-            message: `Patientennarrativ ${src.id} darf nicht als 'supports' an Nicht-Experience-Claim ${claim.id} (Typ: ${claim.type}) hängen.`
-          });
-        }
+      } else if (src.kind === 'patient-narrative' && citation.role === 'supports' && claim.type !== 'experience') {
+        issues.push({
+          level: 'ERROR',
+          category: 'CITATION',
+          entityId: claim.id,
+          message: `Patientennarrativ ${src.id} darf nicht als 'supports' an Nicht-Experience-Claim ${claim.id} hängen.`
+        });
       }
     }
 
@@ -283,7 +327,7 @@ export function validateKnowledgeGraph(customData?: KnowledgeDatasets): Validati
     }
   }
 
-  // 3. Validierung der Nodes
+  // 3. Node-Integrität
   for (const node of data.nodes) {
     if (nodeMap.has(node.id)) {
       issues.push({
@@ -296,49 +340,42 @@ export function validateKnowledgeGraph(customData?: KnowledgeDatasets): Validati
     nodeMap.set(node.id, node);
 
     for (const cId of node.claimIds) {
-      if (!claimMap.has(cId)) {
-        issues.push({
-          level: 'ERROR',
-          category: 'ONTOLOGY',
-          entityId: node.id,
-          message: `Node verweist auf unbekannte Claim-ID: ${cId}`
-        });
-      }
+      checkClaimExists(cId, 'KnowledgeNode', node.id);
     }
   }
 
-  // 4. Validierung der Relationen
+  // 4. Relations-Integrität
   for (const rel of data.relations) {
-    if (!nodeMap.has(rel.fromNodeId)) {
+    if (relationMap.has(rel.id)) {
       issues.push({
         level: 'ERROR',
-        category: 'ONTOLOGY',
+        category: 'INTEGRITY',
         entityId: rel.id,
-        message: `Relation fromNodeId nicht gefunden: ${rel.fromNodeId}`
+        message: `Doppelte Relation-ID gefunden: ${rel.id}`
       });
     }
-    if (!nodeMap.has(rel.toNodeId)) {
-      issues.push({
-        level: 'ERROR',
-        category: 'ONTOLOGY',
-        entityId: rel.id,
-        message: `Relation toNodeId nicht gefunden: ${rel.toNodeId}`
-      });
-    }
+    relationMap.set(rel.id, rel);
+
+    checkNodeExists(rel.fromNodeId, 'Relation fromNodeId', rel.id);
+    checkNodeExists(rel.toNodeId, 'Relation toNodeId', rel.id);
+
     for (const cId of rel.claimIds) {
-      if (!claimMap.has(cId)) {
-        issues.push({
-          level: 'ERROR',
-          category: 'ONTOLOGY',
-          entityId: rel.id,
-          message: `Relation verweist auf unbekannte Claim-ID: ${cId}`
-        });
-      }
+      checkClaimExists(cId, 'Relation', rel.id);
     }
   }
 
-  // 5. Validierung der Exploration-Routen
+  // 5. Exploration-Routen & Optionen
   for (const route of data.routes) {
+    if (routeMap.has(route.id)) {
+      issues.push({
+        level: 'ERROR',
+        category: 'INTEGRITY',
+        entityId: route.id,
+        message: `Doppelte Route-ID gefunden: ${route.id}`
+      });
+    }
+    routeMap.set(route.id, route);
+
     const triggerNode = nodeMap.get(route.triggerNodeId);
     if (!triggerNode || triggerNode.kind !== 'experience') {
       issues.push({
@@ -347,6 +384,12 @@ export function validateKnowledgeGraph(customData?: KnowledgeDatasets): Validati
         entityId: route.id,
         message: `Route ${route.id} triggerNodeId muss ein existierender Node vom Typ 'experience' sein.`
       });
+    }
+
+    if (route.disclaimerClaimIds) {
+      for (const cId of route.disclaimerClaimIds) {
+        checkClaimExists(cId, 'Route disclaimerClaimIds', route.id);
+      }
     }
 
     if (route.options.length !== 5) {
@@ -358,19 +401,26 @@ export function validateKnowledgeGraph(customData?: KnowledgeDatasets): Validati
       });
     }
 
-    const seenOptionIds = new Set<string>();
     route.options.forEach((opt, idx) => {
-      if (seenOptionIds.has(opt.id)) {
+      if (optionMap.has(opt.id)) {
         issues.push({
           level: 'ERROR',
-          category: 'ONTOLOGY',
+          category: 'INTEGRITY',
           entityId: opt.id,
-          message: `Doppelte Option-ID in Route ${route.id}: ${opt.id}`
+          message: `Doppelte Option-ID gefunden: ${opt.id}`
         });
       }
-      seenOptionIds.add(opt.id);
+      optionMap.set(opt.id, route.id);
 
-      // Optionen dürfen NIEMALS direkt auf Approach-Knoten zeigen
+      if (opt.perspectiveClaimIds) {
+        for (const cId of opt.perspectiveClaimIds) {
+          checkClaimExists(cId, `RouteOption perspectiveClaimIds`, opt.id);
+        }
+      }
+
+      let hasNeed = false;
+      let hasWorkingMode = false;
+
       for (const tId of opt.targetKnowledgeNodeIds) {
         const targetNode = nodeMap.get(tId);
         if (!targetNode) {
@@ -380,21 +430,27 @@ export function validateKnowledgeGraph(customData?: KnowledgeDatasets): Validati
             entityId: opt.id,
             message: `RouteOption ${opt.id} verweist auf unbekannten Node ${tId}.`
           });
-        } else if (targetNode.kind === 'approach') {
-          issues.push({
-            level: 'ERROR',
-            category: 'ONTOLOGY',
-            entityId: opt.id,
-            message: `RouteOption ${opt.id} darf nicht direkt auf einen 'approach'-Knoten (${tId}) zeigen (Schul-Matching-Verbot).`
-          });
-        } else if (targetNode.kind !== 'need' && targetNode.kind !== 'working-mode') {
-          issues.push({
-            level: 'ERROR',
-            category: 'ONTOLOGY',
-            entityId: opt.id,
-            message: `RouteOption ${opt.id} targetKnowledgeNodeIds darf nur 'need' oder 'working-mode' Knoten enthalten (enthält: ${targetNode.kind}).`
-          });
+        } else {
+          if (targetNode.kind === 'need') hasNeed = true;
+          if (targetNode.kind === 'working-mode') hasWorkingMode = true;
+          if (targetNode.kind === 'approach') {
+            issues.push({
+              level: 'ERROR',
+              category: 'ONTOLOGY',
+              entityId: opt.id,
+              message: `RouteOption ${opt.id} darf nicht direkt auf einen 'approach'-Knoten (${tId}) zeigen (Schul-Matching-Verbot).`
+            });
+          }
         }
+      }
+
+      if (!hasNeed || !hasWorkingMode) {
+        issues.push({
+          level: 'ERROR',
+          category: 'ONTOLOGY',
+          entityId: opt.id,
+          message: `RouteOption ${opt.id} muss mindestens einen 'need'- und mindestens einen 'working-mode'-Knoten enthalten.`
+        });
       }
 
       // Optionen 2-5 dürfen kein bookmarkId Property besitzen
@@ -409,8 +465,30 @@ export function validateKnowledgeGraph(customData?: KnowledgeDatasets): Validati
     });
   }
 
-  // 6. Validierung der Weltkarte & Szenen-Konsistenz
+  // 6. Locations & Weltkarte
   for (const loc of data.worldData.locations) {
+    if (locationMap.has(loc.id)) {
+      issues.push({
+        level: 'ERROR',
+        category: 'INTEGRITY',
+        entityId: loc.id,
+        message: `Doppelte Location-ID gefunden: ${loc.id}`
+      });
+    }
+    locationMap.set(loc.id, loc);
+
+    if (loc.teaserClaimIds) {
+      for (const cId of loc.teaserClaimIds) {
+        checkClaimExists(cId, `Location teaserClaimIds`, loc.id);
+      }
+    }
+
+    if (loc.knowledgeNodeIds) {
+      for (const nId of loc.knowledgeNodeIds) {
+        checkNodeExists(nId, `Location knowledgeNodeIds`, loc.id);
+      }
+    }
+
     if (loc.type === 'scene') {
       if (!loc.sceneId || !data.scenesRegistry[loc.sceneId]) {
         issues.push({
@@ -433,7 +511,92 @@ export function validateKnowledgeGraph(customData?: KnowledgeDatasets): Validati
     }
   }
 
-  // 7. Reachability Traversal & Release-Gate Status
+  // 7. Szenen, Hotspots und Actions
+  for (const [sceneKey, scene] of Object.entries(data.scenesRegistry)) {
+    if (sceneMap.has(scene.id)) {
+      issues.push({
+        level: 'ERROR',
+        category: 'INTEGRITY',
+        entityId: scene.id,
+        message: `Doppelte Scene-ID gefunden: ${scene.id}`
+      });
+    }
+    sceneMap.set(scene.id, scene);
+
+    const matchingLoc = data.worldData.locations.find(l => l.id === scene.locationId);
+    if (!matchingLoc) {
+      issues.push({
+        level: 'ERROR',
+        category: 'CONSISTENCY',
+        entityId: scene.id,
+        message: `Verwaiste Szene: Szene ${scene.id} verweist auf unbekannte locationId '${scene.locationId}'.`
+      });
+    } else if (matchingLoc.type !== 'scene' || matchingLoc.sceneId !== scene.id) {
+      issues.push({
+        level: 'ERROR',
+        category: 'CONSISTENCY',
+        entityId: scene.id,
+        message: `Inkonsistenz: Location ${matchingLoc.id} verweist nicht korrekt auf Szene ${scene.id}.`
+      });
+    }
+
+    for (const hotspot of scene.hotspots) {
+      if (hotspotMap.has(hotspot.id)) {
+        issues.push({
+          level: 'ERROR',
+          category: 'INTEGRITY',
+          entityId: hotspot.id,
+          message: `Doppelte Hotspot-ID gefunden: ${hotspot.id} (in Szene ${scene.id})`
+        });
+      }
+      hotspotMap.set(hotspot.id, scene.id);
+
+      if (hotspot.dialogue.claimIds) {
+        for (const cId of hotspot.dialogue.claimIds) {
+          checkClaimExists(cId, `Hotspot dialogue.claimIds`, hotspot.id);
+        }
+      }
+      if (hotspot.dialogue.subtextClaimIds) {
+        for (const cId of hotspot.dialogue.subtextClaimIds) {
+          checkClaimExists(cId, `Hotspot dialogue.subtextClaimIds`, hotspot.id);
+        }
+      }
+
+      if (hotspot.dialogue.actions) {
+        for (const action of hotspot.dialogue.actions) {
+          if (actionMap.has(action.id)) {
+            issues.push({
+              level: 'ERROR',
+              category: 'INTEGRITY',
+              entityId: action.id,
+              message: `Doppelte Action-ID gefunden: ${action.id} (in Hotspot ${hotspot.id})`
+            });
+          }
+          actionMap.set(action.id, hotspot.id);
+
+          if (action.claimIds) {
+            for (const cId of action.claimIds) {
+              checkClaimExists(cId, `Action claimIds`, action.id);
+            }
+          }
+
+          if (action.type === 'QUIZ' && action.quiz.explanationClaimIds) {
+            for (const cId of action.quiz.explanationClaimIds) {
+              checkClaimExists(cId, `Quiz explanationClaimIds`, action.id);
+            }
+          }
+
+          if (action.type === 'ITEM' && action.item && action.item.claimIds) {
+            for (const cId of action.item.claimIds) {
+              checkClaimExists(cId, `Item claimIds`, action.id);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // 8. Reachability Traversal & Release-Gate Status
   const reachableClaimIds = getReachableClaimIds(data);
   const reachableDraftClaimIds: string[] = [];
 

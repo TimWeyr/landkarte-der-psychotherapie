@@ -14,7 +14,36 @@ import { ActionModal } from './ui/ActionModal';
 import { SceneView } from './ui/SceneView';
 import { LocationNode, Scene, RouteOption, UserState } from './types';
 
-class Application {
+export interface RouteNavigationResult {
+  highlightedLocationIds: string[];
+  bannerHtml: string;
+  isNeutralPerspective: boolean;
+}
+
+/**
+ * Reine Routing-Logik zur Berechnung der Karteneffekte bei Routennavigation (ohne Seiteneffekte)
+ */
+export function computeRouteNavigationEffect(option: RouteOption, locations: LocationNode[]): RouteNavigationResult {
+  if (option.id === 'opt_concrete_action') {
+    const matchingLocs = locations.filter(loc =>
+      loc.knowledgeNodeIds?.some(nId => option.targetKnowledgeNodeIds.includes(nId))
+    );
+    const targetLocationIds = matchingLocs.map(l => l.id);
+    return {
+      highlightedLocationIds: targetLocationIds,
+      bannerHtml: `🧭 Erkundungsperspektive: <strong>${option.label}</strong> (Werkstatt der Erprobung hervorgehoben)`,
+      isNeutralPerspective: false
+    };
+  } else {
+    return {
+      highlightedLocationIds: [],
+      bannerHtml: `🧭 Diese Erkundungsperspektive ist vorgemerkt. Die zugehörigen schulenübergreifenden Schauplätze sind noch in Entwicklung. Du kannst die Karte weiter frei erkunden.`,
+      isNeutralPerspective: true
+    };
+  }
+}
+
+export class Application {
   private root: HTMLElement;
   private mapContainer!: HTMLElement;
   private mapEngine!: MapEngine;
@@ -24,9 +53,11 @@ class Application {
   private activeTeaserCard: HTMLElement | null = null;
   private routeHighlightBanner: HTMLElement | null = null;
 
-  constructor() {
-    this.root = document.getElementById('app') as HTMLElement;
-    this.init();
+  constructor(customRoot?: HTMLElement) {
+    this.root = customRoot || (document.getElementById('app') as HTMLElement);
+    if (this.root) {
+      this.init();
+    }
   }
 
   private async init(): Promise<void> {
@@ -40,7 +71,7 @@ class Application {
       worldData: WORLD_DATA,
       onLocationSelect: (loc, pos) => this.handleLocationSelect(loc, pos),
       onLocationHover: (_loc, _pos) => {
-        // Subtle hover handling if needed
+        // Hover handling
       }
     });
 
@@ -165,7 +196,7 @@ class Application {
 
     // Render teaser claims if present
     const teaserSourcesHtml = location.teaserClaimIds && location.teaserClaimIds.length > 0
-      ? this.actionModal.renderSourcesAccordion(location.teaserClaimIds, '📚 Evidenz & Nachweise zu diesem Schauplatz')
+      ? this.actionModal.renderSourcesAccordion(location.teaserClaimIds, '📚 Evidenz & Nachweise zu diesem Schauplatz', `teaser-${location.id}`)
       : '';
 
     card.innerHTML = `
@@ -185,6 +216,7 @@ class Application {
 
     this.root.appendChild(card);
     this.activeTeaserCard = card;
+    this.actionModal.attachAccordionListeners(card);
   }
 
   public closeTeaserCard(): void {
@@ -232,10 +264,13 @@ class Application {
       });
     }
 
+    const location = WORLD_DATA.locations.find(l => l.id === scene.locationId);
+
     this.currentSceneView = new SceneView(
       {
         container: this.root,
         scene: scene,
+        location: location,
         regionName: regionName,
         onBackToMap: () => this.closeScene(),
         onRouteNavigate: (option) => this.handleRouteNavigation(option)
@@ -272,29 +307,19 @@ class Application {
     }
   }
 
-  private handleRouteNavigation(option: RouteOption): void {
+  public handleRouteNavigation(option: RouteOption): RouteNavigationResult {
     this.closeScene();
+    const result = computeRouteNavigationEffect(option, WORLD_DATA.locations);
 
-    // Option 1 has a fully playable cross-school workshop scene
-    if (option.id === 'opt_concrete_action') {
-      const matchingLocs = WORLD_DATA.locations.filter(loc =>
-        loc.knowledgeNodeIds?.some(nId => option.targetKnowledgeNodeIds.includes(nId))
-      );
-      const targetLocationIds = matchingLocs.map(l => l.id);
-
-      this.mapEngine.highlightLocations(targetLocationIds);
-      this.mapEngine.fitLocations(targetLocationIds);
-
-      this.showRouteHighlightBanner(
-        `🧭 Erkundungsperspektive: <strong>${option.label}</strong> (Werkstatt der Erprobung hervorgehoben)`
-      );
+    if (result.highlightedLocationIds.length > 0) {
+      this.mapEngine?.highlightLocations(result.highlightedLocationIds);
+      this.mapEngine?.fitLocations(result.highlightedLocationIds);
     } else {
-      // Options 2-5: Do NOT highlight school-specific places. Show neutral development banner.
-      this.mapEngine.clearHighlights();
-      this.showRouteHighlightBanner(
-        `🧭 Diese Erkundungsperspektive ist vorgemerkt. Die zugehörigen schulenübergreifenden Schauplätze sind noch in Entwicklung. Du kannst die Karte weiter frei erkunden.`
-      );
+      this.mapEngine?.clearHighlights();
     }
+
+    this.showRouteHighlightBanner(result.bannerHtml);
+    return result;
   }
 
   private showRouteHighlightBanner(messageHtml: string): void {
@@ -321,7 +346,7 @@ class Application {
   }
 
   public clearRouteHighlights(): void {
-    this.mapEngine.clearHighlights();
+    this.mapEngine?.clearHighlights();
     if (this.routeHighlightBanner) {
       this.routeHighlightBanner.remove();
       this.routeHighlightBanner = null;
@@ -330,33 +355,35 @@ class Application {
 }
 
 // Start application & global shortcuts
-window.addEventListener('DOMContentLoaded', () => {
-  const app = new Application();
+if (typeof window !== 'undefined') {
+  window.addEventListener('DOMContentLoaded', () => {
+    const app = new Application();
 
-  // Click on Brand Badge in header
-  document.querySelector('.brand-badge')?.addEventListener('click', () => {
-    app.closeScene();
-  });
+    // Click on Brand Badge in header
+    document.querySelector('.brand-badge')?.addEventListener('click', () => {
+      app.closeScene();
+    });
 
-  // Global Keyboard Shortcuts (ESC & M)
-  window.addEventListener('keydown', (e: KeyboardEvent) => {
-    if (e.key === 'Escape') {
-      const activeBackdrop = document.querySelector('.modal-backdrop.active');
-      const activeBackpack = document.querySelector('.backpack-modal.active');
-      
-      if (activeBackdrop) {
-        activeBackdrop.classList.remove('active');
-      } else if (activeBackpack) {
-        activeBackpack.classList.remove('active');
-      } else {
-        app.closeScene();
-        app.closeTeaserCard();
-        app.clearRouteHighlights();
+    // Global Keyboard Shortcuts (ESC & M)
+    window.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        const activeBackdrop = document.querySelector('.modal-backdrop.active');
+        const activeBackpack = document.querySelector('.backpack-modal.active');
+        
+        if (activeBackdrop) {
+          activeBackdrop.classList.remove('active');
+        } else if (activeBackpack) {
+          activeBackpack.classList.remove('active');
+        } else {
+          app.closeScene();
+          app.closeTeaserCard();
+          app.clearRouteHighlights();
+        }
+      } else if (e.key === 'm' || e.key === 'M') {
+        if (document.activeElement?.tagName !== 'INPUT' && document.activeElement?.tagName !== 'TEXTAREA') {
+          app.closeScene();
+        }
       }
-    } else if (e.key === 'm' || e.key === 'M') {
-      if (document.activeElement?.tagName !== 'INPUT' && document.activeElement?.tagName !== 'TEXTAREA') {
-        app.closeScene();
-      }
-    }
+    });
   });
-});
+}

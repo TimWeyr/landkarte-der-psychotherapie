@@ -1,13 +1,22 @@
 class ToastManager {
-  private container: HTMLElement;
+  private container: HTMLElement | null = null;
 
   constructor() {
-    this.container = document.createElement('div');
-    this.container.className = 'toast-container';
-    document.body.appendChild(this.container);
+    if (typeof document !== 'undefined') {
+      this.container = document.createElement('div');
+      this.container.className = 'toast-container';
+      document.body.appendChild(this.container);
+    }
   }
 
   public show(message: string, duration = 3000): void {
+    if (!this.container && typeof document !== 'undefined') {
+      this.container = document.createElement('div');
+      this.container.className = 'toast-container';
+      document.body.appendChild(this.container);
+    }
+    if (!this.container) return;
+
     const toast = document.createElement('div');
     toast.className = 'toast';
     toast.innerHTML = `<span>🎒</span><span>${message}</span>`;

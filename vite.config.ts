@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { defineConfig } from 'vite';
 
 export default defineConfig({
@@ -7,5 +8,8 @@ export default defineConfig({
   },
   build: {
     target: 'esnext'
+  },
+  test: {
+    environment: 'happy-dom'
   }
 });

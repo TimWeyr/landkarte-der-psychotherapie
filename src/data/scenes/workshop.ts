@@ -21,7 +21,7 @@ export const workshopScene: Scene = {
         speakerRole: 'Praktische Schauplatz-Übersicht',
         text: 'In vielen psychotherapeutischen Richtungen geht es nicht nur um das Reden über Probleme, sondern um das konkrete Ausprobieren neuer Schritte. KVT nutzt Verhaltensexperimente im Alltag, Gestalttherapie lässt innere Anteile auf Stühlen in Dialog treten, und die systemische Therapie vergibt Beobachtungsaufgaben.',
         claimIds: ['claim_action_oriented_rumination', 'claim_fit_collaboration_dynamic'],
-        subtext: 'Konkrete Übungen helfen, festgefahrene Denkschleifen durch reale neue Erfahrungen zu durchbrechen.',
+        subtext: 'Konkrete Übungen bieten einen Erkundungsrahmen, um festgefahrene Denkschleifen durch reale neue Erfahrungen im Handeln schrittweise zu lockern.',
         subtextClaimIds: ['claim_action_oriented_rumination'],
         actions: [
           {
@@ -66,9 +66,9 @@ export const workshopScene: Scene = {
         speaker: 'Notizen zur therapeutischen Allianz',
         speakerRole: 'Orientierungsleitfaden',
         text: '„Passung ist keine vorab berechenbare Eigenschaft einer Therapieschule. Ob eine Zusammenarbeit funktioniert, zeigt sich im konkreten Gespräch: Fühle ich mich verstanden? Werden meine Ziele ernst genommen? Kann ich offen ansprechen, wenn eine Übung nicht passt?“',
-        claimIds: ['claim_fit_collaboration_dynamic', 'claim_therapeutic_alliance'],
+        claimIds: ['claim_fit_collaboration_dynamic', 'claim_therapeutic_alliance', 'claim_therapist_characteristics_null_finding'],
         subtext: 'Die therapeutische Beziehung entsteht im gemeinsamen Tun und darf aktiv mitgestaltet werden.',
-        subtextClaimIds: ['claim_therapeutic_alliance'],
+        subtextClaimIds: ['claim_therapeutic_alliance', 'claim_therapist_characteristics_null_finding'],
         actions: [
           {
             id: 'act_ws_about_me_flexibility',
@@ -83,6 +83,13 @@ export const workshopScene: Scene = {
             label: 'Das interessiert mich: Das therapeutische Arbeitsbündnis als Wirkfaktor',
             description: 'Du interessierst dich für die wissenschaftlichen Befunde zur Bedeutung der therapeutischen Beziehung.',
             claimIds: ['claim_therapeutic_alliance']
+          },
+          {
+            id: 'act_ws_interest_goldberg_fit',
+            type: 'INTEREST',
+            label: 'Das interessiert mich: Grenzen statischer Vorab-Merkmale (Goldberg 2026)',
+            description: 'Wissenschaftlicher Befund: 38 statische Vorabmerkmale sagten Behandlungsergebnisse kaum vorher – Passung entscheidet sich im realen Dialog.',
+            claimIds: ['claim_therapist_characteristics_null_finding']
           }
         ]
       }

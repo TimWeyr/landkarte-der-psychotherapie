@@ -1,25 +1,12 @@
 import { KnowledgeRelation } from '../../types';
 
+/**
+ * Wissensrelationen mit expliziter Richtungssemantik (fromNodeId -> toNodeId).
+ * Hinweis: Die Verbindung `experience -> need + working-mode` entsteht ausschließlich
+ * didaktisch durch die explizite Nutzerentscheidung in einer RouteOption.
+ */
 export const KNOWLEDGE_RELATIONS: KnowledgeRelation[] = [
-  // 1. Erleben -> Bedürfnis
-  {
-    id: 'rel_rumination_evokes_coping',
-    fromNodeId: 'node_exp_constant_rumination',
-    toNodeId: 'node_need_structure_coping',
-    type: 'evokes-need',
-    claimIds: ['claim_action_oriented_rumination']
-  },
-
-  // 2. Bedürfnis -> Arbeitsweise
-  {
-    id: 'rel_need_addresses_action',
-    fromNodeId: 'node_need_structure_coping',
-    toNodeId: 'node_wm_concrete_action',
-    type: 'addresses-need',
-    claimIds: ['claim_action_oriented_rumination']
-  },
-
-  // 3. Arbeitsweise -> Prozess
+  // 1. Arbeitsweise -> Prozess (acts-via)
   {
     id: 'rel_action_acts_via_activation',
     fromNodeId: 'node_wm_concrete_action',
@@ -28,7 +15,7 @@ export const KNOWLEDGE_RELATIONS: KnowledgeRelation[] = [
     claimIds: ['claim_action_oriented_rumination']
   },
 
-  // 4. Prozess -> Intervention (realized-by)
+  // 2. Prozess -> Intervention (realized-by)
   {
     id: 'rel_activation_realized_by_experiment',
     fromNodeId: 'node_proc_behavioral_activation',
@@ -37,7 +24,7 @@ export const KNOWLEDGE_RELATIONS: KnowledgeRelation[] = [
     claimIds: ['claim_action_oriented_rumination']
   },
 
-  // 5. Intervention -> Ansätze (cross-school)
+  // 3. Intervention -> Ansätze (belongs-to, methodische Einordnung ohne Wirkbehauptung)
   {
     id: 'rel_experiment_to_cbt',
     fromNodeId: 'node_tech_behavioral_experiment',
@@ -60,7 +47,7 @@ export const KNOWLEDGE_RELATIONS: KnowledgeRelation[] = [
     claimIds: []
   },
 
-  // 6. Arbeitsweise -> Reale Passungsprüfung
+  // 4. Arbeitsweise -> Reale Passungsprüfung (examines-fit)
   {
     id: 'rel_action_to_fit_collab',
     fromNodeId: 'node_wm_concrete_action',
@@ -69,7 +56,7 @@ export const KNOWLEDGE_RELATIONS: KnowledgeRelation[] = [
     claimIds: ['claim_fit_collaboration_dynamic']
   },
 
-  // 7. Passungsprüfung -> Therapeutische Allianz
+  // 5. Passungsprüfung -> Therapeutische Allianz (examines-fit)
   {
     id: 'rel_fit_to_alliance',
     fromNodeId: 'node_collab_fit_examination',

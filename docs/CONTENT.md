@@ -1,4 +1,4 @@
-# Inhaltliche Dokumentation: Psychotherapie-Landkarte (V0.2)
+# Inhaltliche Dokumentation: Psychotherapie-Landkarte (V0.2.1)
 
 ## 1. Didaktischer Ansatz & Tonalität
 
@@ -7,7 +7,8 @@ Die Psychotherapie-Landkarte ist **kein Screening-Test, kein Diagnosewerkzeug un
 * **Entlastend & Orientierend:** Komplexe Fachbegriffe und bürokratische Hürden des deutschen Gesundheitssystems werden in anschauliche, geordnete Wissensräume übersetzt.
 * **Respektvoll & Neutral:** Keine therapeutische Methode wird als universell überlegen dargestellt.
 * **Schulenübergreifend & Integrativ:** Die Anwendung vermittelt transparent, dass reale Therapeuten oft integrativ arbeiten und Elemente verschiedener Traditionen verbinden.
-* **Selbstbestimmt:** Der Nutzer entscheidet durch explizite Aktionen selbst, welche Erkenntnisse und Leitfragen er in seinen persönlichen Rucksack übernimmt.
+* **Selbstbestimmt ohne Zwangszuordnung:** Der Übergang von einem Erleben zu Bedürfnissen und Arbeitsweisen erfolgt ausschließlich über die explizite didaktische Auswahl einer Erkundungsperspektive durch die Nutzerin bzw. den Nutzer.
+* **Modellperspektiven statt Wirksamkeitsversprechen:** Handlungsansätze bei Grübeln werden als schulenübergreifende Arbeitsmodelle und Reflexionsräume dargestellt, nicht als isolierte Erfolgsgarantien.
 
 ---
 
@@ -30,23 +31,24 @@ Ausgangspunkt: *„Ich kann nicht abschalten und grüble ständig.“*
 
 ---
 
-## 3. Schauplätze & Szenen in V0.2
+## 3. Schauplätze & Szenen in V0.2.1
 
 ### 3.1 Szene A: Leuchtturm der Evidenz (`scene_lighthouse`)
 * **Wissensarten & wissenschaftliche Fundierung:** Zusammenspiel aus empirischer Forschung, Fachmodellen und Praxiserfahrung.
-* **Kompasstisch:** Interaktiver Einstieg in die 5 Erkundungsrichtungen.
-* **Studientafel:** Richtlinienverfahren und Rolle des Gemeinsamen Bundesausschusses (G-BA).
+* **Kompasstisch:** Interaktiver Einstieg in die 5 Erkundungsrichtungen (Target: `need` + `working-mode`).
+* **Studientafel:** Richtlinienverfahren und Rolle des Gemeinsamen Bundesausschusses (G-BA) als sozialrechtlicher Zulassungsrahmen.
 * **Wissensfrage:** Definition von Evidenzbasierung.
-* **Leuchtturmwärter:** Die therapeutische Allianz als universeller Wirkfaktor.
+* **Leuchtturmwärter:** Die therapeutische Allianz als schulenübergreifender Wirkfaktor.
 
 ### 3.2 Szene B: Bahnhof der Versorgung (`scene_station`)
-* **Erste praktische Schritte:** Psychotherapeutische Sprechstunde, 116 117 und Formblatt PTV 11.
+* **Erste praktische Schritte:** Psychotherapeutische Sprechstunde über 116 117 und Formblatt PTV 11 (mit geregelten KBV-Ausnahmen bei Akutbehandlung, Klinikentlassung oder nahtloser Weiterbehandlung).
 * **Wartebank:** Umgang mit Wartezeiten und niedrigschwellige Überbrückungsangebote.
-* **Abfahrtsplan:** Die Abrechnungswege (GKV-Kassensitz, Kostenerstattung nach § 13 Abs. 3 SGB V, Privatpraxis).
+* **Abfahrtsplan:** Abrechnungswege: GKV-Kassensitz, Kostenerstattung nach § 13 Abs. 3 Satz 1 SGB V (Alternative 1: unaufschiebbare Leistung bei Systemversagen; Alternative 2: rechtswidrige Ablehnung) und Privatpraxis.
 
 ### 3.3 Szene C: Werkstatt der Erprobung (`scene_workshop`)
 * **Handlungsorientiertes Arbeiten:** Praktische Übungen aus KVT (Verhaltensexperimente), Gestalttherapie (Stuhlarbeit) und Systemik (Beobachtungsaufgaben).
-* **Passungsprüfung:** Notizen zur partnerschaftlichen Abstimmung vor und während der Therapie.
+* **Passungsprüfung:** Partnerschaftliche Abstimmung vor und während der Therapie.
+* **Grenzen statischer Merkmale (Goldberg et al., 2026):** Nullbefunde zu 38 Vorabmerkmalen – therapeutische Passung entscheidet sich im realen Dialog.
 * **Reflexionsfrage:** Speichern der Leitfrage für das persönliche Erstgespräch im Rucksack.
 
 ---
@@ -54,9 +56,9 @@ Ausgangspunkt: *„Ich kann nicht abschalten und grüble ständig.“*
 ## 4. Evidenzkategorien & Informationskanäle
 
 * 🔬 **Wirksamkeitsbefund (`effectiveness`):** Empirisch durch kontrollierte Studien/Reviews belegt.
-* 📊 **Zusammenhang / Prädiktor (`association`):** Statistische Korrelationen (z. B. Allianz & Outcome).
-* ⚙️ **Wirkmechanismus (`process`):** Beschreibt die vermutete Wirkungsweise.
+* 📊 **Zusammenhang / Prädiktor (`association`):** Statistische Zusammenhänge (z. B. Allianz & Outcome, Goldberg 2026 Vorabmerkmale).
+* ⚙️ **Wirkmechanismus (`process`):** Beschreibt die vermutete psychologische Wirkungsweise.
 * 📖 **Begriffsklärung (`definition`):** Fachliche Definitionen.
 * 🏛️ **Versorgungsregel (`care-fact`):** Gesetzliche und vertragsärztliche Regelungen.
-* 💡 **Theoretisches Fachmodell (`theory`):** Lehrbuchwissen und Konzepte.
-* 🗣️ **Patientenerfahrung (`experience`):** Subjektive Perspektiven und Zitate (ausdrücklich kein Wirksamkeitsnachweis).
+* 💡 **Theoretisches Fachmodell (`theory`):** Konzeptuelle Arbeitsmodelle (z. B. Grawe 1997 Problembewältigung).
+* 🗣️ **Patientenerfahrung (`experience`):** Subjektive Perspektiven (kein Wirksamkeitsnachweis).

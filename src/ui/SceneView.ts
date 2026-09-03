@@ -1,10 +1,11 @@
-import { Scene, Hotspot } from '../types';
+import { Scene, Hotspot, LocationNode } from '../types';
 import { store } from '../state/store';
 import { ActionModal } from './ActionModal';
 
 export interface SceneViewOptions {
   container: HTMLElement;
   scene: Scene;
+  location?: LocationNode;
   regionName?: string;
   onBackToMap: () => void;
   onRouteNavigate?: (option: import('../types').RouteOption) => void;
@@ -14,6 +15,7 @@ export class SceneView {
   private options: SceneViewOptions;
   private actionModal: ActionModal;
   private element: HTMLElement;
+  private unsubscribeStore?: () => void;
 
   constructor(options: SceneViewOptions, actionModal: ActionModal) {
     this.options = options;
@@ -32,7 +34,7 @@ export class SceneView {
 
   private render(): void {
     const scene = this.options.scene;
-    const regionName = this.options.regionName || 'Zentralregion';
+    const location = this.options.location;
 
     // Mark as visited in user state
     store.markLocationVisited(scene.locationId);
@@ -48,7 +50,14 @@ export class SceneView {
       </div>
 
       <div class="scene-bottom-bar">
-        ✨ Tippe auf die leuchtenden Punkte, um Schauplätze und Dialoge zu erkunden.
+        <div class="scene-hint">
+          ✨ Tippe auf die leuchtenden Punkte, um Schauplätze und Dialoge zu erkunden.
+        </div>
+        ${location?.knowledgeNodeIds && location.knowledgeNodeIds.length > 0 ? `
+          <button class="btn btn-secondary btn-sm btn-scene-evidence" id="btn-scene-evidence" title="Wissenschaftliche Einordnung & Fachkonzepte dieses Schauplatzes">
+            <span>📚 Schauplatz-Evidenz (${location.knowledgeNodeIds.length})</span>
+          </button>
+        ` : ''}
       </div>
 
       <!-- Bottom Right Compass / Back to Map Button (Option A) -->
@@ -66,6 +75,11 @@ export class SceneView {
       this.options.onBackToMap();
     });
 
+    // Scene Evidence button
+    this.element.querySelector('#btn-scene-evidence')?.addEventListener('click', () => {
+      this.actionModal.openSceneEvidenceModal(scene, location);
+    });
+
     // Subscribe to store updates to reflect inspected/completed states live
     this.unsubscribeStore = store.subscribe(() => {
       this.updateHotspotsState();
@@ -74,8 +88,6 @@ export class SceneView {
     // Initial render of Hotspots
     this.renderHotspots();
   }
-
-  private unsubscribeStore?: () => void;
 
   private renderHotspots(): void {
     const layer = this.element.querySelector('#hotspots-layer');

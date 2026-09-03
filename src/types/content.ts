@@ -88,9 +88,16 @@ export interface KnowledgeNode {
   tags: string[];
 }
 
+/**
+ * Richtungssemantik der Wissensrelationen (fromNodeId -> toNodeId):
+ * - `acts-via`: [working-mode] -> [process] (Eine Arbeitsweise wirkt über einen psychologischen Veränderungsprozess)
+ * - `realized-by`: [process] -> [intervention] (Ein Veränderungsprozess wird durch eine konkrete Intervention/Technik realisiert)
+ * - `implements`: [intervention] -> [process] (Eine Intervention implementiert einen Veränderungsprozess)
+ * - `belongs-to`: [intervention] -> [approach] (Eine Methode wird in einem oder mehreren Therapieansätzen methodisch verortet)
+ * - `examines-fit`: [working-mode | collaboration] -> [collaboration] (Übergang zur realen Passungsprüfung und Allianz)
+ * - `explores-aspect`: [any] -> [any] (Erkundung weiterer inhaltlicher Facetten)
+ */
 export type RelationType =
-  | 'evokes-need'
-  | 'addresses-need'
   | 'implements'
   | 'realized-by'
   | 'acts-via'
